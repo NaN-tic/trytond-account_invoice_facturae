@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+     copyright notices and license terms. -->
+<data>
+    <xpath expr="/form/notebook" position="inside">
+        <page name="credited_invoices">
+            <label name="rectificative_reason_code"/>
+            <field name="rectificative_reason_code"/>
+            <field name="credited_invoices" colspan="4"/>
+        </page>
+    </xpath>
+    <xpath expr="/form/notebook/page[@id='invoice']/group/group/group[@id='reconciled_state']"
+            position="inside">
+        <label name="invoice_facturae"/>
+        <field name="invoice_facturae"/>
+    </xpath>
+    <xpath expr="/form/notebook/page[@id='invoice']/group/group/group[@id='buttons']"
+            position="inside">
+        <button name="generate_facturae_wizard"
+            string="Generate Factura-e" icon="tryton-lock"/>
+    </xpath>
+</data>

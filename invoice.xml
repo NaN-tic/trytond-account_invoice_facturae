@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+     copyright notices and license terms. -->
+<tryton>
+    <data>
+        <!-- account.invoice -->
+        <record model="ir.ui.view" id="invoice_view_form">
+            <field name="model">account.invoice</field>
+            <field name="inherit" ref="account_invoice.invoice_view_form"/>
+            <field name="name">invoice_form</field>
+        </record>
+
+        <record model="ir.ui.view" id="invoice_view_list">
+            <field name="model">account.invoice</field>
+            <field name="inherit" ref="account_invoice.invoice_view_tree"/>
+            <field name="name">invoice_list</field>
+        </record>
+
+        <!-- account.invoice.credit -->
+        <record model="ir.ui.view" id="credit_start_view_form">
+            <field name="model">account.invoice.credit.start</field>
+            <field name="inherit" ref="account_invoice.credit_start_view_form"/>
+            <field name="name">credit_start_form</field>
+        </record>
+
+        <!-- account.invoice.generate_facturae -->
+        <record model="ir.ui.view" id="ask_password_view_form">
+            <field name="model">account.invoice.generate_facturae.ask_password</field>
+            <field name="type">form</field>
+            <field name="name">ask_password_form</field>
+        </record>
+
+        <record model="ir.action.wizard" id="wizard_generate_signed_facturae">
+            <field name="name">Generate Factura-e</field>
+            <field name="wiz_name">account.invoice.generate_facturae</field>
+            <field name="model">account.invoice</field>
+        </record>
+        <!--<record model="ir.action.keyword" id="generate_signed_facturae_keyword">
+            <field name="keyword">form_action</field>
+            <field name="model">account.invoice,-1</field>
+            <field name="action" ref="wizard_generate_signed_facturae"/>
+        </record>-->
+    </data>
+</tryton>

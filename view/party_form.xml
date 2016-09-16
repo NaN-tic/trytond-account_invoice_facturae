@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+     copyright notices and license terms. -->
+<data>
+    <xpath expr="/form/notebook/page[@id='accounting']" position="after">
+        <page id="facturae" string="Factura-e">
+            <label name="facturae_person_type"/>
+            <field name="facturae_person_type"/>
+            <label name="facturae_residence_type"/>
+            <field name="facturae_residence_type"/>
+        </page>
+    </xpath>
+</data>

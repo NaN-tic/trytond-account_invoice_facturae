@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+     copyright notices and license terms. -->
+<data>
+    <xpath expr="/form/field[@name='code']" position="after">
+        <newline/>
+        <label name="facturae_type"/>
+        <field name="facturae_type"/>
+        <newline/>
+    </xpath>
+</data>

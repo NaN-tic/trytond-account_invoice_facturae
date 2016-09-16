@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+     copyright notices and license terms. -->
+<data>
+    <xpath expr="/tree" position="inside">
+        <field name="credited_invoices" tree_invisible="1"/>
+        <button name="generate_facturae_wizard"
+            string="Generate Factura-e" tree_invisible="1"/>
+    </xpath>
+</data>

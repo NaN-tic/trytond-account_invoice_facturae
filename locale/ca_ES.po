@@ -1,0 +1,512 @@
+#
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+msgctxt "error:account.invoice:"
+msgid ""
+"Error signing invoice \"%(invoice)s\".\n"
+"Message returned by signing process: %(process_output)s"
+msgstr ""
+"Error firmant la factura \"%(invoice)s\".\n"
+"Missatge retornat pel procés de firma: %(process_output)s"
+
+msgctxt "error:account.invoice:"
+msgid "Missing Factura-e Certificate in company \"%s\"."
+msgstr "Falta el Certificat Factura-e a l'empresa \"%s\"."
+
+msgctxt "error:account.invoice:"
+msgid ""
+"Missing Street, Zip, City, Subdivision or Country in  in Invoice Address of "
+"invoice \"%s\"."
+msgstr ""
+"Falta el carrer, codi postal, ciutat, província o país de la direcció de la "
+"factura \"%s\"."
+
+msgctxt "error:account.invoice:"
+msgid ""
+"Missing Street, Zip, City, Subdivision or Country in default address of "
+"company's Party \"%s\"."
+msgstr ""
+"Falta el carrer, codi postal, ciutat, província o país de la direcció per "
+"defecte del tercer de l'empresa \"%s\"."
+
+msgctxt "error:account.invoice:"
+msgid ""
+"Missing VAT Identifier in company's Party \"%s\", or its length is not "
+"between 3 and 30."
+msgstr ""
+"Falta l'identificador VAT del tercer de l'empresa \"%s\", o la seva longitud"
+" no és superior a 3 i inferior a 30."
+
+msgctxt "error:account.invoice:"
+msgid ""
+"Missing VAT Identifier in party \"%(party)s\" of invoice \"%(invoice)s\", or"
+" its length is not between 3 and 30."
+msgstr ""
+"Falta l'identificador VAT del tercer \"%(party)s\" de la factura "
+"\"%(invoice)s\", o la seva longitud no és superior a 3 i inferior a 30."
+
+msgctxt "error:account.invoice:"
+msgid "Missing some Factura-e fields in company's Party \"%s\"."
+msgstr "Falta algun camp Factura-e al tercer de l'empresa \"%s\"."
+
+msgctxt "error:account.invoice:"
+msgid ""
+"Missing some Factura-e fields in party \"%(party)s\" of invoice "
+"\"%(invoice)s\"."
+msgstr ""
+"Falta algun camp Factura-e al tercer \"%(party)s\" de la factura "
+"\"%(invoice)s\"."
+
+msgctxt "error:account.invoice:"
+msgid "No rate found for currency \"%(currency)s\" on \"%(date)s\""
+msgstr ""
+"No s'ha trobat cap taxa de canvi per a la moneda \"%(currency)s\" a la data "
+"\"%(date)s\"."
+
+msgctxt "error:account.invoice:"
+msgid ""
+"The Bank Account \"%(bank_account)s\" used in invoice \"%(invoice)s\" "
+"doesn't have an IBAN number and it's required to generate the Factura-e "
+"document."
+msgstr ""
+"El compte bancari \"%(bank_account)s\" utilitzat a la factura "
+"\"%(invoice)s\" no té número IBAN i es requereix per generar el document "
+"Factura-e."
+
+msgctxt "error:account.invoice:"
+msgid "The Bank Account is missing in some move lines of invoice \"%s\"."
+msgstr "Falta el compte bancari en algun dels apunts de la factura \"%s\"."
+
+msgctxt "error:account.invoice:"
+msgid ""
+"The Factura-e Type is missing in payment type \"%(payment_type)s\" used in "
+"invoice \"%(invoice)s\"."
+msgstr ""
+"Falta el Tipus Factura-e al tipus de pagament \"%(payment_type)s\" utilitzat"
+" a la factura \"%(invoice)s\"."
+
+msgctxt "error:account.invoice:"
+msgid ""
+"The Factura-e file (XML) generated for invoice \"%s\" is not valid against "
+"the oficial XML Schema Definition."
+msgstr ""
+"El fitxer Factura-e (XML) generat per la factura \"%s\" no és vàlid segons "
+"el XML Schema Definition oficial."
+
+msgctxt "error:account.invoice:"
+msgid ""
+"The name of \"%(party)s\" of invoice \"%(invoice)s\" doesn't contain the Name and the, at least, First Surname.\n"
+"They must to be separated by one space: Name Surname."
+msgstr ""
+"El nom del tercer \"%(party)s\" de la factura \"%(invoice)s\" no conté el nom i, al menys, el primer cognom.\n"
+"Aquests han d'anar separats per un espai: Nom Cognom."
+
+msgctxt "error:account.invoice:"
+msgid "The payment type is missing in some move lines of invoice \"%s\"."
+msgstr "Falta el tipus de pagament en alguns apunts de la factura \"%s\"."
+
+msgctxt "error:account.invoice:"
+msgid ""
+"You must to install \"account_bank\" module to inform the Bank Account in invoices.\n"
+"The payment type \"%(payment_type)s\" used in invoice \"%(invoice)s\" is configured as \"Direct Debit\" or \"Credit Transfer\" and it requires the company/party bank account."
+msgstr ""
+"S'ha d'instal·lar el mòdul \"account_bank\" per poder indicar el compte bancari a les factures.\n"
+"El tipus de pagament \"%(payment_type)s\" utilitzat a la factura \"%(invoice)s\" està configurat com \"Rebut domiciliat\" o \"Transferència\" i es requereix el copmte bancari de l'empresa o del tercer."
+
+msgctxt "error:account.payment.type:"
+msgid ""
+"The Factura-e Type and Account Bank Kind of Payment Type \"%s\" are not "
+"compatible."
+msgstr ""
+"El Tipus Fatura-e i el Tipus compte bancari del Tipus de pagament \"%s\" no "
+"són compatibles."
+
+msgctxt "field:account.invoice,credited_invoices:"
+msgid "Credited Invoices"
+msgstr "Factures abonades"
+
+msgctxt "field:account.invoice,invoice_facturae:"
+msgid "Factura-e"
+msgstr "Factura-e"
+
+msgctxt "field:account.invoice,invoice_facturae_filename:"
+msgid "Factura-e filename"
+msgstr "Nom ficher Factura-e"
+
+msgctxt "field:account.invoice,rectificative_reason_code:"
+msgid "Rectificative Reason Code"
+msgstr "Codi motiu rectificació"
+
+msgctxt "field:account.invoice.credit.start,rectificative_reason_code:"
+msgid "Rectificative Reason Code"
+msgstr "Codi motiu rectificació"
+
+msgctxt ""
+"field:account.invoice.generate_facturae.ask_password,certificate_password:"
+msgid "Certificate Password"
+msgstr "Contrasenya certificat"
+
+msgctxt "field:account.invoice.generate_facturae.ask_password,id:"
+msgid "ID"
+msgstr "Identificador"
+
+msgctxt "field:account.payment.type,facturae_type:"
+msgid "Factura-e Type"
+msgstr "Tipus Factura-e"
+
+msgctxt "field:company.company,facturae_certificate:"
+msgid "Factura-e Certificate"
+msgstr "Certificat Factura-e"
+
+msgctxt "field:party.party,facturae_person_type:"
+msgid "Person Type"
+msgstr "Tipus persona"
+
+msgctxt "field:party.party,facturae_residence_type:"
+msgid "Residence Type"
+msgstr "Tipus residència"
+
+msgctxt "help:company.company,facturae_certificate:"
+msgid "The certificate to generate the XAdES electronic firm for invoices."
+msgstr "El certificat per generar la firma electrònica XAdES de les factures."
+
+msgctxt "model:account.invoice.generate_facturae.ask_password,name:"
+msgid "Generate Signed Factura-e file - Ask Password"
+msgstr "Generar fitxer Factura-e firmat - Demanar contrasenya"
+
+msgctxt "model:ir.action,name:wizard_generate_signed_facturae"
+msgid "Generate Factura-e"
+msgstr "Genera Factura-e"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid ""
+msgstr " "
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid "Applicable Date/Period"
+msgstr "Data/Període a aplicar"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid "Applicable Tax Amount"
+msgstr "Quota tributària a aplicar"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid "Applicable Tax Rate"
+msgstr "Percentatge impositiu a aplicar"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid "Calculation of tax inputs"
+msgstr "Càlcul de quotes retingudes"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid "Calculation of tax outputs"
+msgstr "Càlcul de quotes repercutides"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid "Invoice Class"
+msgstr "Classe de factura"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid "Invoice number"
+msgstr "Número de la factura"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid "Invoice serial number"
+msgstr "Serie de la factura"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid "Issue date"
+msgstr "Data expedició"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid "Issuer's Tax Identification Number"
+msgstr "Identificació fiscal emissor/obligat"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid "Issuer's address"
+msgstr "Domicili emissor/Obligat"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid "Item line"
+msgstr "Detall operació"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid "Legal literals"
+msgstr "Literals legals"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid "Name and surnames/Corporate name-Issuer (Sender)"
+msgstr "Nom i cognoms/Raó social-Emissor"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid "Name and surnames/Corporate name-Receiver"
+msgstr "Nom i cognoms/Raó social-Receptor"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid "Receiver's Tax Identification Number"
+msgstr "Identificació fiscal receptor"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid "Receiver's address"
+msgstr "Domicili receptor"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid "Taxable Base"
+msgstr "Base imposable"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid "Taxable Base modified due to discounts and rebates"
+msgstr "Base imposable modificada per descomptes i bonificacions"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid ""
+"Taxable Base modified due to firm court ruling or administrative decision"
+msgstr ""
+"Base imposable modificada per resolució ferma, judicial o administrativa"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid ""
+"Taxable Base modified due to return of packages and packaging materials"
+msgstr "Base imposable modificada per devolució d'envasos/embalatges"
+
+msgctxt "selection:account.invoice,rectificative_reason_code:"
+msgid ""
+"Taxable Base modified due to unpaid outputs where there is a judgement "
+"opening insolvency proceedings"
+msgstr ""
+"Base imposable modificada quotes repercutides no satisfetes. Autodeclaració "
+"en curs"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid "Applicable Date/Period"
+msgstr "Data/Període a aplicar"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid "Applicable Tax Amount"
+msgstr "Quota tributària a aplicar"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid "Applicable Tax Rate"
+msgstr "Percentatge impositiu a aplicar"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid "Calculation of tax inputs"
+msgstr "Càlcul de quotes retingudes"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid "Calculation of tax outputs"
+msgstr "Càlcul de quotes repercutides"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid "Invoice Class"
+msgstr "Classe de factura"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid "Invoice number"
+msgstr "Número de la factura"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid "Invoice serial number"
+msgstr "Serie de la factura"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid "Issue date"
+msgstr "Data expedició"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid "Issuer's Tax Identification Number"
+msgstr "Identificació fiscal emissor/obligat"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid "Issuer's address"
+msgstr "Domicili emissor/Obligat"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid "Item line"
+msgstr "Detall operació"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid "Legal literals"
+msgstr "Literals legals"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid "Name and surnames/Corporate name-Issuer (Sender)"
+msgstr "Nom i cognoms/Raó social-Emissor"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid "Name and surnames/Corporate name-Receiver"
+msgstr "Nom i cognoms/Raó social-Receptor"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid "Receiver's Tax Identification Number"
+msgstr "Identificació fiscal receptor"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid "Receiver's address"
+msgstr "Domicili receptor"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid "Taxable Base"
+msgstr "Base imposable"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid "Taxable Base modified due to discounts and rebates"
+msgstr "Base imposable modificada per descomptes i bonificacions"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid ""
+"Taxable Base modified due to firm court ruling or administrative decision"
+msgstr ""
+"Base imposable modificada per resolució ferma, judicial o administrativa"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid ""
+"Taxable Base modified due to return of packages and packaging materials"
+msgstr "Base imposable modificada per devolució d'envasos/embalatges"
+
+msgctxt "selection:account.invoice.credit.start,rectificative_reason_code:"
+msgid ""
+"Taxable Base modified due to unpaid outputs where there is a judgement "
+"opening insolvency proceedings"
+msgstr ""
+"Base imposable modificada quotes repercutides no satisfetes. Autodeclaració "
+"en curs"
+
+msgctxt "selection:account.payment.type,facturae_type:"
+msgid ""
+msgstr ""
+
+msgctxt "selection:account.payment.type,facturae_type:"
+msgid "Accepted bill of exchange"
+msgstr "Lletra acceptada"
+
+msgctxt "selection:account.payment.type,facturae_type:"
+msgid "Banker's draft"
+msgstr "Xec bancari"
+
+msgctxt "selection:account.payment.type,facturae_type:"
+msgid "Bill of exchange"
+msgstr "Lletra de canvi"
+
+msgctxt "selection:account.payment.type,facturae_type:"
+msgid "Cash on delivery"
+msgstr "Pagament contra reembolsament"
+
+msgctxt "selection:account.payment.type,facturae_type:"
+msgid "Certified cheque"
+msgstr "Xec conformat"
+
+msgctxt "selection:account.payment.type,facturae_type:"
+msgid "Cheque"
+msgstr "Xec"
+
+msgctxt "selection:account.payment.type,facturae_type:"
+msgid "Contract award"
+msgstr "Contracte adjudicació"
+
+msgctxt "selection:account.payment.type,facturae_type:"
+msgid "Credit transfer"
+msgstr "Transferència"
+
+msgctxt "selection:account.payment.type,facturae_type:"
+msgid "Direct debit"
+msgstr "Rebut domiciliat"
+
+msgctxt "selection:account.payment.type,facturae_type:"
+msgid "Documentary credit"
+msgstr "Crèdit documentari"
+
+msgctxt "selection:account.payment.type,facturae_type:"
+msgid "In cash"
+msgstr "Al comptat"
+
+msgctxt "selection:account.payment.type,facturae_type:"
+msgid "Non transferable promissory note"
+msgstr "Pagaré no a l'ordre"
+
+msgctxt "selection:account.payment.type,facturae_type:"
+msgid "Open account reimbursement"
+msgstr "Reposició"
+
+msgctxt "selection:account.payment.type,facturae_type:"
+msgid "Payment by card"
+msgstr "Pagament per targeta"
+
+msgctxt "selection:account.payment.type,facturae_type:"
+msgid "Payment by postgiro"
+msgstr "Gir postal"
+
+msgctxt "selection:account.payment.type,facturae_type:"
+msgid "Receipt"
+msgstr "Rebut"
+
+msgctxt "selection:account.payment.type,facturae_type:"
+msgid "Set-off by reciprocal credits"
+msgstr "Compensació"
+
+msgctxt "selection:account.payment.type,facturae_type:"
+msgid "Special payment"
+msgstr "Especials"
+
+msgctxt "selection:account.payment.type,facturae_type:"
+msgid "Transferable promissory note"
+msgstr "Pagaré a l'ordre"
+
+msgctxt "selection:party.party,facturae_person_type:"
+msgid ""
+msgstr " "
+
+msgctxt "selection:party.party,facturae_person_type:"
+msgid "Individual"
+msgstr "Persona física"
+
+msgctxt "selection:party.party,facturae_person_type:"
+msgid "Legal Entity"
+msgstr "Persona jurídica"
+
+msgctxt "selection:party.party,facturae_residence_type:"
+msgid ""
+msgstr " "
+
+msgctxt "selection:party.party,facturae_residence_type:"
+msgid "Foreigner"
+msgstr "Estranger (Fora Unió Europea)"
+
+msgctxt "selection:party.party,facturae_residence_type:"
+msgid "Resident in Spain"
+msgstr "Resident (a Espanya)"
+
+msgctxt "selection:party.party,facturae_residence_type:"
+msgid "Resident in other EU country"
+msgstr "Resident a la Unió Europea (excepte Espanya)"
+
+msgctxt "view:account.invoice.generate_facturae.ask_password:"
+msgid "Generate Signed Factura-e"
+msgstr "Genera Factura-e firmada"
+
+msgctxt "view:account.invoice.generate_facturae.ask_password:"
+msgid ""
+"It will generate a Factura-e file for selected invoices, will sign them with"
+" the certificate stored in the company and will save the resulting files in "
+"each invoice."
+msgstr ""
+"Es generarà un fitxer Factura-e per cada factura seleccionada, es firmarà "
+"amb el certificat de l'empresa i es guardaràn els fitxers resultants a cada "
+"factura."
+
+msgctxt "view:account.invoice:"
+msgid "Generate Factura-e"
+msgstr "Genera Factura-e"
+
+msgctxt "view:party.party:"
+msgid "Factura-e"
+msgstr "Factura-e"
+
+msgctxt "wizard_button:account.invoice.generate_facturae,start,end:"
+msgid "Cancel"
+msgstr "Cancel·la"
+
+msgctxt "wizard_button:account.invoice.generate_facturae,start,generate:"
+msgid "Generate"
+msgstr "Genera"

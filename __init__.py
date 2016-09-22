@@ -6,10 +6,13 @@ import company
 import invoice
 import party
 import payment_type
+import account
 
 
 def register():
     Pool.register(
+        account.TaxTemplate,
+        account.Tax,
         company.Company,
         invoice.Invoice,
         invoice.InvoiceLine,

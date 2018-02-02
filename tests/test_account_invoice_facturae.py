@@ -4,13 +4,9 @@
 import os.path
 import unittest
 from decimal import Decimal
-
 import trytond.tests.test_tryton
 from trytond.pool import Pool
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
-# from trytond.tests.test_tryton import doctest_setup, doctest_teardown
-# from trytond.tests.test_tryton import doctest_checker
-
 from trytond.modules.account.tests import get_fiscalyear
 from trytond.modules.account_es.tests import create_chart
 from trytond.modules.company.tests import create_company, set_company
@@ -19,7 +15,7 @@ from trytond.modules.account_invoice.tests import set_invoice_sequences
 CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 
-class TestCase(ModuleTestCase):
+class TestAccountInvoiceFacturaeCase(ModuleTestCase):
     'Test account_invoice_facturae module'
     module = 'account_invoice_facturae'
 
@@ -161,10 +157,6 @@ class TestCase(ModuleTestCase):
 
 def suite():
     suite = trytond.tests.test_tryton.suite()
-    suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestCase))
-    # suite.addTests(doctest.DocFileSuite(
-    #         'scenario_account_invoice_facturae.rst',
-    #         setUp=doctest_setup, tearDown=doctest_teardown, encoding='utf-8',
-    #         checker=doctest_checker,
-    #         optionflags=doctest.REPORT_ONLY_FIRST_FAILURE))
+    suite.addTests(unittest.TestLoader().loadTestsFromTestCase(
+            TestAccountInvoiceFacturaeCase))
     return suite

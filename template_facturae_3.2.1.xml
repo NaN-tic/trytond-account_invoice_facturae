@@ -106,7 +106,7 @@
             {# AdministrativeCentres optional: not supported #}
             {% if invoice.party.facturae_person_type == 'J' %}
             <LegalEntity>
-                <CorporateName>{{ invoice.party.name[:80] }}</CorporateName>
+                <CorporateName>{{ invoice.party.name and invoice.party.name[:80] or invoice.party.code[:80] }}</CorporateName>
                 {% if invoice.party.trade_name %}
                 <TradeName>{{ invoice.party.trade_name[:40] }}</TradeName>
                 {% endif %}
@@ -152,10 +152,10 @@
             </LegalEntity>
             {% else %}
             <Individual>
-                <Name>{{ invoice.party.name.split(' ', 2)[0][:40] }}</Name>
-                <FirstSurname>{{ invoice.party.name.split(' ', 2)[1][:40] }}</FirstSurname>
+                <Name>{{ invoice.party.name and invoice.party.name.split(' ', 2)[0][:40] or invoice.party.code[:40] }}</Name>
+                <FirstSurname>{{ invoice.party.name and invoice.party.name.split(' ', 2)[1][:40] }}</FirstSurname>
                 {% if invoice.party.name.split(' ') | length > 2 %}
-                <SecondSurname>{{ invoice.party.name.split(' ', 2)[2][:40] }}</SecondSurname>
+                <SecondSurname>{{ invoice.party.name and invoice.party.name.split(' ', 2)[2][:40] }}</SecondSurname>
                 {% endif %}
                 {# RegistrationData optional: not supported #}
                 {% if invoice.invoice_address.country.code == 'ES' %}
@@ -217,7 +217,7 @@
                 <InvoiceClass>{{ 'OO' if not invoice.credited_invoices else 'OR' }}</InvoiceClass>
                 {% if invoice.credited_invoices %}
                 <Corrective>
-                    <InvoiceNumber>{{ invoice.credited_invoices[0].number[:20] }}</InvoiceNumber>
+                    <InvoiceNumber>{{ invoice.credited_invoices and invoice.credited_invoices[0].number[:20] }}</InvoiceNumber>
                     {# InvoiceSeriesCode Optional: not supported #}
                     <ReasonCode>{{ invoice.rectificative_reason_code }}</ReasonCode>
                     <ReasonDescription>{{ invoice.rectificative_reason_spanish_description }}</ReasonDescription>
@@ -430,12 +430,12 @@
                     <PaymentMeans>{{ move_line.payment_type.facturae_type }}</PaymentMeans>
                     {% if move_line.payment_type.facturae_type == '04' %}
                     <AccountToBeCredited>
-                        <IBAN>{{ (move_line.bank_account.numbers | selectattr('type', 'iban'))[0].number_compact }}</IBAN>
+                        <IBAN>{% for number in (move_line.bank_account.numbers|selectattr('type', 'equalto', 'iban')) %}{% if loop.first %}{{ number.number_compact }}{% endif %}{% endfor %}</IBAN>
                         {# Unnecessary if IBAN is supplied: AccountNumber, BankCode, BranchCode, BranchInSpainAddress, OverseasBranchAddress, BIC #}
                     </AccountToBeCredited>
                     {% elif move_line.payment_type.facturae_type == '02' %}
                     <AccountToBeDebited>
-                        <IBAN>{{ (move_line.bank_account.numbers | selectattr('type', 'iban'))[0].number_compact }}</IBAN>
+                        <IBAN>{% for number in (move_line.bank_account.numbers|selectattr('type', 'equalto', 'iban')) %}{% if loop.first %}{{ number.number_compact }}{% endif %}{% endfor %}</IBAN>
                         {# Unnecessary if IBAN is supplied: AccountNumber, BankCode, BranchCode, BranchInSpainAddress, OverseasBranchAddress, BIC #}
                     </AccountToBeDebited>
                     {# optional, not supported:

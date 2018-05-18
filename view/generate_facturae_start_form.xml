@@ -8,6 +8,8 @@
         <label string="It will generate a Factura-e file for selected invoices, will sign them with the certificate stored in the company and will save the resulting files in each invoice."
             id="explanation" colspan="2"
             yalign="0.0" xalign="0.0" xexpand="1"/>
+        <label name="service"/>
+        <field name="service"/>
         <label name="certificate_password"/>
         <field name="certificate_password" widget="password"/>
     </group>

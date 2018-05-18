@@ -16,11 +16,11 @@ def register():
         invoice.Invoice,
         invoice.InvoiceLine,
         invoice.CreditInvoiceStart,
-        invoice.GenerateSignedFacturaeAskPassword,
+        invoice.GenerateFacturaeStart,
         party.Party,
         payment_type.PaymentType,
         module='account_invoice_facturae', type_='model')
     Pool.register(
         invoice.CreditInvoice,
-        invoice.GenerateSignedFacturae,
+        invoice.GenerateFacturae,
         module='account_invoice_facturae', type_='wizard')

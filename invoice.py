@@ -20,7 +20,7 @@ from trytond.transaction import Transaction
 from trytond.wizard import Wizard, StateView, StateTransition, Button
 
 __all__ = ['Invoice', 'InvoiceLine', 'CreditInvoiceStart', 'CreditInvoice',
-    'GenerateSignedFacturaeAskPassword', 'GenerateSignedFacturae']
+    'GenerateFacturaeStart', 'GenerateFacturae']
 
 # Get from XSD scheme of Facturae 3.2.1
 # http://www.facturae.gob.es/formato/Versiones/Facturaev3_2_1.xml
@@ -102,7 +102,7 @@ UOM_CODE2TYPE = {
 # "31", Envelopes-EN
 # "32", Tubs-TB
 # "35", Watt-WTT
-
+FACe_REQUIRED_FIELDS = ['facturae_person_type', 'facturae_residence_type']
 
 _slugify_strip_re = re.compile(r'[^\w\s-]')
 _slugify_hyphenate_re = re.compile(r'[-\s]+')
@@ -137,8 +137,7 @@ class Invoice:
     invoice_facturae = fields.Binary('Factura-e',
         filename='invoice_facturae_filename', readonly=True)
     invoice_facturae_filename = fields.Function(fields.Char(
-            'Factura-e filename'),
-        'get_invoice_facturae_filename')
+        'Factura-e filename'), 'get_invoice_facturae_filename')
 
     @classmethod
     def __setup__(cls):
@@ -154,8 +153,6 @@ class Invoice:
         cls._error_messages.update({
                 'missing_certificate': (
                     'Missing Factura-e Certificate in company "%s".'),
-                'company_facturae_fields': (
-                    'Missing some Factura-e fields in company\'s Party "%s".'),
                 'company_vat_identifier': (
                     'Missing VAT Identifier in company\'s Party "%s", or its '
                     'length is not between 3 and 30.'),
@@ -164,7 +161,7 @@ class Invoice:
                     'default address of company\'s Party "%s".'),
                 'party_facturae_fields': (
                     'Missing some Factura-e fields in party "%(party)s" of '
-                    'invoice "%(invoice)s".'),
+                    'invoice "%(invoice)s": "%(field)s"'),
                 'party_vat_identifier': (
                     'Missing VAT Identifier in party "%(party)s" of invoice '
                     '"%(invoice)s", or its length is not between 3 and 30.'),
@@ -197,7 +194,7 @@ class Invoice:
                     'it\'s required to generate the Factura-e document.'),
                 'invalid_factura_xml_file': (
                     'The Factura-e file (XML) generated for invoice "%s" is '
-                    'not valid against the oficial XML Schema Definition.'),
+                    'not valid against the oficial XML Schema Definition:\n%s'),
                 'error_signing': ('Error signing invoice "%(invoice)s".\n'
                     'Message returned by signing process: %(process_output)s'),
                 })
@@ -260,7 +257,7 @@ class Invoice:
         pass
 
     @classmethod
-    def generate_facturae(cls, invoices, certificate_password):
+    def generate_facturae_default(cls, invoices, certificate_password):
         to_save = []
         for invoice in invoices:
             if invoice.invoice_facturae:
@@ -296,14 +293,14 @@ class Invoice:
         assert len(self.taxes_outputs) > 0, (
             "Missing some tax in invoice %s" % self.id)
 
-        if not self.company.facturae_certificate:
-            self.raise_user_error('missing_certificate',
-                (self.company.rec_name,))
-
-        if (not self.company.party.facturae_person_type
-                or not self.company.party.facturae_residence_type):
-            self.raise_user_error('company_facturae_fields',
-                (self.company.party.rec_name,))
+        for field in FACe_REQUIRED_FIELDS:
+            for party in [self.party, self.company.party]:
+                if not getattr(party, field):
+                    self.raise_user_error('party_facturae_fields', {
+                            'party': party.rec_name,
+                            'invoice': self.rec_name,
+                            'field': field,
+                            })
         if (not self.company.party.vat_code
                 or len(self.company.party.vat_code) < 3
                 or len(self.company.party.vat_code) > 30):
@@ -318,12 +315,6 @@ class Invoice:
             self.raise_user_error('company_address_fields',
                 (self.company.party.rec_name,))
 
-        if (not self.party.facturae_person_type
-                or not self.party.facturae_residence_type):
-            self.raise_user_error('party_facturae_fields', {
-                    'party': self.party.rec_name,
-                    'invoice': self.rec_name,
-                    })
         if (not self.party.vat_code
                 or len(self.party.vat_code) < 3
                 or len(self.party.vat_code) > 30):
@@ -440,19 +431,20 @@ class Invoice:
             facturae_schema.assertValid(etree.fromstring(xml_string))
             logger.debug("Factura-e XML of invoice %s validated",
                 self.rec_name)
-        except Exception:
+        except Exception, e:
             logger.warning("Error validating generated Factura-e file",
                 exc_info=True)
-            logger.warning(xml_string)
-            self.raise_user_error('invalid_factura_xml_file', (self.rec_name,))
+            logger.debug(xml_string)
+            self.raise_user_error('invalid_factura_xml_file', (self.rec_name, e))
         return True
 
     def _sign_facturae(self, xml_string, certificate_password):
         """
         Inspired by https://github.com/pedrobaeza/l10n-spain/blob/d01d049934db55130471e284012be7c860d987eb/l10n_es_facturae/wizard/create_facturae.py
         """
-        assert self.company.facturae_certificate, (
-            'Missing Factura-e certificate in company "%s"' % self.company.id)
+        if not self.company.facturae_certificate:
+            self.raise_user_error('missing_certificate',
+                (self.company.rec_name,))
 
         logger = logging.getLogger('account_invoice_facturae')
 
@@ -567,26 +559,37 @@ class CreditInvoice:
             return super(CreditInvoice, self).do_credit(action)
 
 
-class GenerateSignedFacturaeAskPassword(ModelView):
-    'Generate Signed Factura-e file - Ask Password'
-    __name__ = 'account.invoice.generate_facturae.ask_password'
-    certificate_password = fields.Char('Certificate Password', required=True)
+class GenerateFacturaeStart(ModelView):
+    'Generate Factura-e file - Start'
+    __name__ = 'account.invoice.generate_facturae.start'
+    service = fields.Selection([
+        ('default', 'Default'),
+        ], 'Service', required=True)
+    certificate_password = fields.Char('Certificate Password',
+        states={
+            'required': Eval('service') == 'default',
+            'invisible': Eval('service') != 'default',
+        }, depends=['service'])
+
+    @staticmethod
+    def default_service():
+        return 'default'
 
 
-class GenerateSignedFacturae(Wizard):
-    'Generate Signed Factura-e file'
+class GenerateFacturae(Wizard):
+    'Generate Factura-e file'
     __name__ = 'account.invoice.generate_facturae'
-    start = StateView('account.invoice.generate_facturae.ask_password',
-        'account_invoice_facturae.ask_password_view_form', [
+    start = StateView('account.invoice.generate_facturae.start',
+        'account_invoice_facturae.generate_facturae_start_view_form', [
             Button('Cancel', 'end', 'tryton-cancel'),
             Button('Generate', 'generate', 'tryton-executable', default=True),
             ])
     generate = StateTransition()
 
     def transition_generate(self):
-        pool = Pool()
-        Invoice = pool.get('account.invoice')
-        Invoice.generate_facturae(Invoice.browse(
-                Transaction().context['active_ids']),
-            self.start.certificate_password)
+        Invoice = Pool().get('account.invoice')
+
+        invoices = Invoice.browse(Transaction().context['active_ids'])
+        service = 'generate_facturae_%s' % self.start.service
+        getattr(Invoice, service)(invoices, self.start.certificate_password)
         return 'end'

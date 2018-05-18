@@ -1,0 +1,60 @@
+{% macro administrative_center(centre_code, role_type_code, party) %}
+        <AdministrativeCentre>
+            <CentreCode>{{ centre_code }}</CentreCode>
+            <RoleTypeCode>{{ role_type_code }}</RoleTypeCode>
+            <Name>{% if party.facturae_person_type == 'J' %}{{ party.name and party.name[:40] }}{% else %}{{ party.name and party.name.split(' ', 2)[0][:40] or party.code[:40] }}{% endif %}</Name>
+            {% if party.facturae_person_type == 'F' %}
+            <FirstSurname>{{ party.name and party.name.split(' ', 2)[1][:40] }}</FirstSurname>
+            {% endif %}
+            {% if party.facturae_person_type == 'F' and party.name.split(' ') | length > 2 %}
+            <SecondSurname>{{ party.name and party.name.split(' ', 2)[2][:40] }}</SecondSurname>
+            {% endif %}
+            {% if party.addresses %}{{ address(party.addresses[0]) }}{% endif %}
+            {% if party.contact_mechanisms %}{{ contact(party) }}{% endif %}
+            <PhysicalGLN/>
+            <LogicalOperationalPoint/>
+            <CentreDescription>{{ party.name and party.name.split(' ', 2)[0][:40] or party.code[:40] }}</CentreDescription>
+        </AdministrativeCentre>
+{% endmacro %}
+
+{% macro address(address) %}
+    {% if address.country and address.country.code == 'ES' %}
+        <AddressInSpain>
+            <Address>{{ address.street[:80] }}</Address>
+            <PostCode>{{ address.zip[:5] }}</PostCode>
+            <Town>{{ address.city[:50] }}</Town>
+            <Province>{{ address.subdivision.name[:20] }}</Province>
+            <CountryCode>{{ address.country.code3 }}</CountryCode>
+        </AddressInSpain>
+        {% else %}
+        <OverseasAddress>
+            <Address>{{ address.street[:80] }}</Address>
+            <PostCodeAndTown>{{ (', '.join(address.zip, address.city))[:50] }}</PostCode>
+            <Province>{{ address.subdivision.name[:20] }}</Province>
+            <CountryCode>{{ address.country.code3 }}</CountryCode>
+        </OverseasAddress>
+    {% endif %}
+{% endmacro %}
+
+{% macro contact(party) %}
+        <ContactDetails>
+            {% if party.phone or party.mobile %}
+            <Telephone>{{ (party.phone or party.mobile)[:15] }}</Telephone>
+            {% endif %}
+            {% if party.fax %}
+            <TeleFax>{{ party.fax[:15] }}</TeleFax>
+            {% endif %}
+            {% if party.website %}
+            <WebAddress>{{ party.website[:60] }}</WebAddress>
+            {% endif %}
+            {% if party.email %}
+            <ElectronicMail>{{ party.email[:60] }}</ElectronicMail>
+            {% endif %}
+            {# Optional: not supported
+            <ContactPersons></ContactPersons>
+            <CnoCnae></CnoCnae>
+            <INETownCode></INETownCode>
+            <AdditionalContactDetails></AdditionalContactDetails>
+            #}
+        </ContactDetails>
+{% endmacro %}

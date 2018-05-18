@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+{% from "template_facturae_macros.xml" import administrative_center, address, contact %}<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <namespace:Facturae xmlns:namespace2="http://uri.etsi.org/01903/v1.2.2#" xmlns:namespace3="http://www.w3.org/2000/09/xmldsig#" xmlns:namespace="http://www.facturae.es/Facturae/2014/v3.2.1/Facturae">
     <FileHeader>
         <SchemaVersion>3.2.1</SchemaVersion>
@@ -43,52 +43,27 @@
             </TaxIdentification>
             {# Optional. It could be the ID or the code #}
             {% if invoice.company.party.code and invoice.company.party.code | length < 10 %}
-            <PartyIdentification>{{ invoice.company.party.code }}</PartyIdentification>
+            <PartyIdentification>{{ invoice.company.party.code|int or invoice.company.party.id }}</PartyIdentification>
             {% endif %}
-            {# AdministrativeCentres optional: not supported #}
+            {% if invoice.company.party.oficina_contable or invoice.company.party.organo_gestor or invoice.company.party.unidad_tramitadora or invoice.company.party.organo_proponente %}
+            <AdministrativeCentres>
+                {% if invoice.company.party.oficina_contable %}{{ administrative_center(invoice.company.party.oficina_contable, '01', invoice.company.party) }}{% endif %}
+                {% if invoice.company.party.organo_gestor %}{{ administrative_center(invoice.company.party.organo_gestor, '02', invoice.company.party) }}{% endif %}
+                {% if invoice.company.party.unidad_tramitadora %}{{ administrative_center(invoice.company.party.unidad_tramitadora, '03', invoice.company.party) }}{% endif %}
+                {% if invoice.company.party.organo_proponente %}{{ administrative_center(invoice.company.party.organo_proponente, '04', invoice.company.party) }}{% endif %}
+            </AdministrativeCentres>
+            {% endif %}
             <LegalEntity>
                 <CorporateName>{{ invoice.company.party.name[:80] }}</CorporateName>
                 {% if invoice.company.party.trade_name %}
                 <TradeName>{{ invoice.company.party.trade_name[:40] }}</TradeName>
                 {% endif %}
                 {# RegistrationData optional: not supported #}
-                {% if invoice.company.party.addresses[0].country.code == 'ES' %}
-                <AddressInSpain>
-                    <Address>{{ invoice.company.party.addresses[0].street[:80] }}</Address>
-                    <PostCode>{{ invoice.company.party.addresses[0].zip[:5] }}</PostCode>
-                    <Town>{{ invoice.company.party.addresses[0].city[:50] }}</Town>
-                    <Province>{{ invoice.company.party.addresses[0].subdivision.name[:20] }}</Province>
-                    <CountryCode>{{ invoice.company.party.addresses[0].country.code3 }}</CountryCode>
-                </AddressInSpain>
-                {% else %}
-                <OverseasAddress>
-                    <Address>{{ invoice.company.party.addresses[0].street[:80] }}</Address>
-                    <PostCodeAndTown>{{ (', '.join(invoice.company.party.addresses[0].zip, invoice.company.party.addresses[0].city))[:50] }}</PostCode>
-                    <Province>{{ invoice.company.party.addresses[0].subdivision.name[:20] }}</Province>
-                    <CountryCode>{{ invoice.company.party.addresses[0].country.code3 }}</CountryCode>
-                </OverseasAddress>
+                {% if invoice.company.party.addresses %}
+                {{ address(invoice.company.party.addresses[0]) }}
                 {% endif %}
-                {% if invoice.company.party.phone or invoice.company.party.mobile or invoice.company.party.fax or invoice.company.party.website or invoice.company.party.email %}
-                <ContactDetails>
-                    {% if invoice.company.party.phone or invoice.company.party.mobile %}
-                    <Telephone>{{ (invoice.company.party.phone or invoice.company.party.mobile)[:15] }}</Telephone>
-                    {% endif %}
-                    {% if invoice.company.party.fax %}
-                    <TeleFax>{{ invoice.company.party.fax[:15] }}</TeleFax>
-                    {% endif %}
-                    {% if invoice.company.party.website %}
-                    <WebAddress>{{ invoice.company.party.website[:60] }}</WebAddress>
-                    {% endif %}
-                    {% if invoice.company.party.email %}
-                    <ElectronicMail>{{ invoice.company.party.email[:60] }}</ElectronicMail>
-                    {% endif %}
-                    {# Optional: not supported
-                    <ContactPersons></ContactPersons>
-                    <CnoCnae></CnoCnae>
-                    <INETownCode></INETownCode>
-                    <AdditionalContactDetails></AdditionalContactDetails>
-                    #}
-                </ContactDetails>
+                {% if invoice.company.party.contact_mechanisms %}
+                {{ contact(invoice.company.party) }}
                 {% endif %}
             </LegalEntity>
         </SellerParty>
@@ -101,9 +76,16 @@
             </TaxIdentification>
             {# Optional. It could be the ID or the code #}
             {% if invoice.party.code and invoice.party.code | length < 10 %}
-            <PartyIdentification>{{ invoice.party.code }}</PartyIdentification>
+            <PartyIdentification>{{ invoice.party.code|int or invoice.party.id }}</PartyIdentification>
             {% endif %}
-            {# AdministrativeCentres optional: not supported #}
+            {% if invoice.party.oficina_contable or invoice.party.organo_gestor or invoice.party.unidad_tramitadora or invoice.party.organo_proponente %}
+            <AdministrativeCentres>
+                {% if invoice.party.oficina_contable %}{{ administrative_center(invoice.party.oficina_contable, '01', invoice.party) }}{% endif %}
+                {% if invoice.party.organo_gestor %}{{ administrative_center(invoice.party.organo_gestor, '02', invoice.party) }}{% endif %}
+                {% if invoice.party.unidad_tramitadora %}{{ administrative_center(invoice.party.unidad_tramitadora, '03', invoice.party) }}{% endif %}
+                {% if invoice.party.organo_proponente %}{{ administrative_center(invoice.party.organo_proponente, '04', invoice.party) }}{% endif %}
+            </AdministrativeCentres>
+            {% endif %}
             {% if invoice.party.facturae_person_type == 'J' %}
             <LegalEntity>
                 <CorporateName>{{ invoice.party.name and invoice.party.name[:80] or invoice.party.code[:80] }}</CorporateName>
@@ -111,43 +93,9 @@
                 <TradeName>{{ invoice.party.trade_name[:40] }}</TradeName>
                 {% endif %}
                 {# RegistrationData optional: not supported #}
-                {% if invoice.invoice_address.country.code == 'ES' %}
-                <AddressInSpain>
-                    <Address>{{ invoice.invoice_address.street[:80] }}</Address>
-                    <PostCode>{{ invoice.invoice_address.zip[:5] }}</PostCode>
-                    <Town>{{ invoice.invoice_address.city[:50] }}</Town>
-                    <Province>{{ invoice.invoice_address.subdivision.name[:20] }}</Province>
-                    <CountryCode>{{ invoice.invoice_address.country.code3 }}</CountryCode>
-                </AddressInSpain>
-                {% else %}
-                <OverseasAddress>
-                    <Address>{{ invoice.invoice_address.street[:80] }}</Address>
-                    <PostCodeAndTown>{{ (', '.join(invoice.invoice_address.zip, invoice.invoice_address.city))[:50] }}</PostCode>
-                    <Province>{{ invoice.invoice_address.subdivision.name[:20] }}</Province>
-                    <CountryCode>{{ invoice.invoice_address.country.code3 }}</CountryCode>
-                </OverseasAddress>
-                {% endif %}
-                {% if invoice.party.phone or invoice.party.mobile or invoice.party.fax or invoice.party.website or invoice.party.email %}
-                <ContactDetails>
-                    {% if invoice.party.phone or invoice.party.mobile %}
-                    <Telephone>{{ (invoice.party.phone or invoice.party.mobile)[:15] }}</Telephone>
-                    {% endif %}
-                    {% if invoice.party.fax %}
-                    <TeleFax>{{ invoice.party.fax[:15] }}</TeleFax>
-                    {% endif %}
-                    {% if invoice.party.website %}
-                    <WebAddress>{{ invoice.party.website[:60] }}</WebAddress>
-                    {% endif %}
-                    {% if invoice.party.email %}
-                    <ElectronicMail>{{ invoice.party.email[:60] }}</ElectronicMail>
-                    {% endif %}
-                    {# Optional: not supported
-                    <ContactPersons></ContactPersons>
-                    <CnoCnae></CnoCnae>
-                    <INETownCode></INETownCode>
-                    <AdditionalContactDetails></AdditionalContactDetails>
-                    #}
-                </ContactDetails>
+                {{ address(invoice.invoice_address) }}
+                {% if invoice.party.contact_mechanisms %}
+                {{ contact(invoice.party) }}
                 {% endif %}
             </LegalEntity>
             {% else %}
@@ -158,43 +106,9 @@
                 <SecondSurname>{{ invoice.party.name and invoice.party.name.split(' ', 2)[2][:40] }}</SecondSurname>
                 {% endif %}
                 {# RegistrationData optional: not supported #}
-                {% if invoice.invoice_address.country.code == 'ES' %}
-                <AddressInSpain>
-                    <Address>{{ invoice.invoice_address.street[:80] }}</Address>
-                    <PostCode>{{ invoice.invoice_address.zip[:5] }}</PostCode>
-                    <Town>{{ invoice.invoice_address.city[:50] }}</Town>
-                    <Province>{{ invoice.invoice_address.subdivision.name[:20] }}</Province>
-                    <CountryCode>{{ invoice.invoice_address.country.code3 }}</CountryCode>
-                </AddressInSpain>
-                {% else %}
-                <OverseasAddress>
-                    <Address>{{ invoice.invoice_address.street[:80] }}</Address>
-                    <PostCodeAndTown>{{ (', '.join(invoice.invoice_address.zip, invoice.invoice_address.city))[:50] }}</PostCode>
-                    <Province>{{ invoice.invoice_address.subdivision.name[:20] }}</Province>
-                    <CountryCode>{{ invoice.invoice_address.country.code3 }}</CountryCode>
-                </OverseasAddress>
-                {% endif %}
-                {% if invoice.party.phone or invoice.party.mobile or invoice.party.fax or invoice.party.website or invoice.party.email %}
-                <ContactDetails>
-                    {% if invoice.party.phone or invoice.party.mobile %}
-                    <Telephone>{{ (invoice.party.phone or invoice.party.mobile)[:15] }}</Telephone>
-                    {% endif %}
-                    {% if invoice.party.fax %}
-                    <TeleFax>{{ invoice.party.fax[:15] }}</TeleFax>
-                    {% endif %}
-                    {% if invoice.party.website %}
-                    <WebAddress>{{ invoice.party.website[:60] }}</WebAddress>
-                    {% endif %}
-                    {% if invoice.party.email %}
-                    <ElectronicMail>{{ invoice.party.email[:60] }}</ElectronicMail>
-                    {% endif %}
-                    {# Optional: not supported
-                    <ContactPersons></ContactPersons>
-                    <CnoCnae></CnoCnae>
-                    <INETownCode></INETownCode>
-                    <AdditionalContactDetails></AdditionalContactDetails>
-                    #}
-                </ContactDetails>
+                {{ address(invoice.invoice_address) }}
+                {% if invoice.party.contact_mechanisms %}
+                {{ contact(invoice.party) }}
                 {% endif %}
             </Individual>
             {% endif %}

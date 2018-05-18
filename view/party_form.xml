@@ -8,6 +8,14 @@
             <field name="facturae_person_type"/>
             <label name="facturae_residence_type"/>
             <field name="facturae_residence_type"/>
+            <label name="oficina_contable"/>
+            <field name="oficina_contable"/>
+            <label name="organo_gestor"/>
+            <field name="organo_gestor"/>
+            <label name="unidad_tramitadora"/>
+            <field name="unidad_tramitadora"/>
+            <label name="organo_proponente"/>
+            <field name="organo_proponente"/>
         </page>
     </xpath>
 </data>

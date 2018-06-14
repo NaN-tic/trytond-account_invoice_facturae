@@ -398,6 +398,10 @@ msgstr ""
 "Base imposable modificada quotes repercutides no satisfetes. Autodeclaració "
 "en curs"
 
+msgctxt "selection:account.invoice.generate_facturae.start,service:"
+msgid "Default"
+msgstr "Per defecte"
+
 msgctxt "selection:account.payment.type,facturae_type:"
 msgid ""
 msgstr ""

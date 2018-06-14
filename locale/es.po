@@ -398,6 +398,10 @@ msgstr ""
 "Base imponible modificada cuotas repercutidas no satisfechas. Auto de "
 "declaración de concurso"
 
+msgctxt "selection:account.invoice.generate_facturae.start,service:"
+msgid "Default"
+msgstr "Por defecto"
+
 msgctxt "selection:account.payment.type,facturae_type:"
 msgid ""
 msgstr ""

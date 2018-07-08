@@ -18,6 +18,7 @@ from trytond.pool import Pool, PoolMeta
 from trytond.pyson import Bool, Eval
 from trytond.transaction import Transaction
 from trytond.wizard import Wizard, StateView, StateTransition, Button
+from trytond import backend
 
 __all__ = ['Invoice', 'InvoiceLine', 'CreditInvoiceStart', 'CreditInvoice',
     'GenerateFacturaeStart', 'GenerateFacturae']
@@ -264,8 +265,9 @@ class Invoice:
                 continue
             facturae_content = invoice.get_facturae()
             invoice._validate_facturae(facturae_content)
-            invoice.invoice_facturae = invoice._sign_facturae(
-                facturae_content, certificate_password)
+            if backend.name() != 'sqlite':
+                invoice.invoice_facturae = invoice._sign_facturae(
+                    facturae_content, certificate_password)
             to_save.append(invoice)
         if to_save:
             cls.save(to_save)
@@ -301,11 +303,12 @@ class Invoice:
                             'invoice': self.rec_name,
                             'field': field,
                             })
-        if (not self.company.party.vat_code
-                or len(self.company.party.vat_code) < 3
-                or len(self.company.party.vat_code) > 30):
+        if (not self.company.party.tax_identifier
+                or len(self.company.party.tax_identifier.code) < 3
+                or len(self.company.party.tax_identifier.code) > 30):
             self.raise_user_error('company_vat_identifier',
                 (self.company.party.rec_name,))
+
         if (not self.company.party.addresses
                 or not self.company.party.addresses[0].street
                 or not self.company.party.addresses[0].zip
@@ -315,9 +318,9 @@ class Invoice:
             self.raise_user_error('company_address_fields',
                 (self.company.party.rec_name,))
 
-        if (not self.party.vat_code
-                or len(self.party.vat_code) < 3
-                or len(self.party.vat_code) > 30):
+        if (not self.party.tax_identifier
+                or len(self.party.tax_identifier.code) < 3
+                or len(self.party.tax_identifier.code) > 30):
             self.raise_user_error('party_vat_identifier', {
                     'party': self.party.rec_name,
                     'invoice': self.rec_name,
@@ -408,6 +411,7 @@ class Invoice:
         return jinja_template.render({
                 'invoice': self,
                 'Decimal': Decimal,
+        		'Currency': Currency,
                 'euro': euro,
                 'exchange_rate': exchange_rate,
                 'exchange_rate_date': exchange_rate_date,

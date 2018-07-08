@@ -12,3 +12,4 @@ class Company:
     facturae_certificate = fields.Binary('Factura-e Certificate',
         help='The certificate to generate the XAdES electronic firm for '
         'invoices.')
+

@@ -29,7 +29,7 @@
         {% else %}
         <OverseasAddress>
             <Address>{{ address.street[:80] }}</Address>
-            <PostCodeAndTown>{{ (', '.join(address.zip, address.city))[:50] }}</PostCode>
+            <PostCodeAndTown>{{ (', '.join([address.zip, address.city]))[:50] }}</PostCodeAndTown>
             <Province>{{ address.subdivision.name[:20] }}</Province>
             <CountryCode>{{ address.country.code3 }}</CountryCode>
         </OverseasAddress>

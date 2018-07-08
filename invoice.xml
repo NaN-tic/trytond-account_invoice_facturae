@@ -49,6 +49,18 @@
             <field name="wiz_name">account.invoice.generate_facturae</field>
             <field name="model">account.invoice</field>
         </record>
+
+        <record model="ir.model.button" id="generate_facturae_button">
+            <field name="name">generate_facturae_wizard</field>
+            <field name="string">Generate Facturae</field>
+            <field name="model" search="[('model', '=', 'account.invoice')]"/>
+        </record>
+        <record model="ir.model.button-res.group"
+            id="generate_facturae_button_group_account">
+            <field name="button" ref="generate_facturae_button"/>
+            <field name="group" ref="account.group_account"/>
+        </record>
+
         <!--<record model="ir.action.keyword" id="generate_signed_facturae_keyword">
             <field name="keyword">form_action</field>
             <field name="model">account.invoice,-1</field>

@@ -43,8 +43,7 @@ REPORT_TYPES = [
     ]
 
 
-class TaxTemplate:
-    __metaclass__ = PoolMeta
+class TaxTemplate(metaclass=PoolMeta):
     __name__ = 'account.tax.template'
 
     report_type = fields.Selection(REPORT_TYPES, 'Report Type', sort=False)
@@ -57,8 +56,7 @@ class TaxTemplate:
 
         return res
 
-class Tax():
-    __metaclass__ = PoolMeta
+class Tax(metaclass=PoolMeta):
     __name__ = 'account.tax'
 
     report_type = fields.Selection(REPORT_TYPES, 'Report Type', sort=False)

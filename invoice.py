@@ -110,10 +110,10 @@ _slugify_hyphenate_re = re.compile(r'[-\s]+')
 
 
 def slugify(value):
-    if not isinstance(value, unicode):
-        value = unicode(value)
+    if not isinstance(value, str):
+        value = str(value)
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
-    value = unicode(_slugify_strip_re.sub('', value).strip().lower())
+    value = str(_slugify_strip_re.sub('', value).strip().lower())
     return _slugify_hyphenate_re.sub('-', value)
 
 
@@ -121,9 +121,8 @@ def module_path():
     return os.path.dirname(os.path.abspath(__file__))
 
 
-class Invoice:
+class Invoice(metaclass=PoolMeta):
     __name__ = 'account.invoice'
-    __metaclass__ = PoolMeta
     credited_invoices = fields.Function(fields.One2Many('account.invoice',
             None, 'Credited Invoices'),
         'get_credited_invoices', searcher='search_credited_invoices')
@@ -435,7 +434,7 @@ class Invoice:
             facturae_schema.assertValid(etree.fromstring(xml_string))
             logger.debug("Factura-e XML of invoice %s validated",
                 self.rec_name)
-        except Exception, e:
+        except Exception as e:
             logger.warning("Error validating generated Factura-e file",
                 exc_info=True)
             logger.debug(xml_string)
@@ -508,9 +507,8 @@ class Invoice:
         return signed_file_content
 
 
-class InvoiceLine:
+class InvoiceLine(metaclass=PoolMeta):
     __name__ = 'account.invoice.line'
-    __metaclass__ = PoolMeta
 
     @property
     def taxes_outputs(self):
@@ -544,17 +542,15 @@ class InvoiceLine:
         return res
 
 
-class CreditInvoiceStart:
+class CreditInvoiceStart(metaclass=PoolMeta):
     __name__ = 'account.invoice.credit.start'
-    __metaclass__ = PoolMeta
     rectificative_reason_code = fields.Selection(
         [(x[0], x[1]) for x in RECTIFICATIVE_REASON_CODES],
         'Rectificative Reason Code', required=True, sort=False)
 
 
-class CreditInvoice:
+class CreditInvoice(metaclass=PoolMeta):
     __name__ = 'account.invoice.credit'
-    __metaclass__ = PoolMeta
 
     def do_credit(self, action):
         with Transaction().set_context(

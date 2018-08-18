@@ -6,9 +6,8 @@ from trytond.pool import PoolMeta
 __all__ = ['Party']
 
 
-class Party:
+class Party(metaclass=PoolMeta):
     __name__ = 'party.party'
-    __metaclass__ = PoolMeta
     facturae_person_type = fields.Selection([
             (None, ''),
             ('J', 'Legal Entity'),

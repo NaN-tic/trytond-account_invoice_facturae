@@ -6,9 +6,8 @@ from trytond.pool import PoolMeta
 __all__ = ['PaymentType']
 
 
-class PaymentType:
+class PaymentType(metaclass=PoolMeta):
     __name__ = 'account.payment.type'
-    __metaclass__ = PoolMeta
     facturae_type = fields.Selection([
             (None, ''),
             ('01', 'In cash'),

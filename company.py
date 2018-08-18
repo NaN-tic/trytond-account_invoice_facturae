@@ -6,9 +6,8 @@ from trytond.pool import PoolMeta
 __all__ = ['Company']
 
 
-class Company:
+class Company(metaclass=PoolMeta):
     __name__ = 'company.company'
-    __metaclass__ = PoolMeta
     facturae_certificate = fields.Binary('Factura-e Certificate',
         help='The certificate to generate the XAdES electronic firm for '
         'invoices.')

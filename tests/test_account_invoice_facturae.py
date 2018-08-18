@@ -26,13 +26,12 @@ class TestAccountInvoiceFacturaeCase(ModuleTestCase):
         pool = Pool()
         Account = pool.get('account.account')
         FiscalYear = pool.get('account.fiscalyear')
-        GenerateSignedFacturae = pool.get('account.invoice.generate_facturae',
-            type='wizard')
         Invoice = pool.get('account.invoice')
         InvoiceLine = pool.get('account.invoice.line')
         Party = pool.get('party.party')
         PaymentTerm = pool.get('account.invoice.payment_term')
         ProductUom = pool.get('product.uom')
+        ProductCategory = pool.get('product.category')
         ProductTemplate = pool.get('product.template')
         Product = pool.get('product.product')
         Tax = pool.get('account.tax')
@@ -161,16 +160,22 @@ class TestAccountInvoiceFacturaeCase(ModuleTestCase):
                                         }])],
                         }])
 
+
+            account_category = ProductCategory()
+            account_category.name = 'Account Category'
+            account_category.accounting = True
+            account_category.account_expense = expense
+            account_category.account_revenue = revenue
+            account_category.customer_taxes = [vat21]
+            account_category.save()
+
             unit, = ProductUom.search([('name', '=', 'Unit')])
             template = ProductTemplate()
             template.name = 'product'
             template.default_uom = unit
             template.type = 'service'
             template.list_price = Decimal('40')
-            template.cost_price = Decimal('25')
-            template.account_expense = expense
-            template.account_revenue = revenue
-            template.customer_taxes = [vat21]
+            template.account_category = account_category
             template.save()
             product = Product()
             product.template = template

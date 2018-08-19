@@ -426,7 +426,7 @@ class Invoice(metaclass=PoolMeta):
         schema_file_path = os.path.join(
             module_path(),
             'Facturaev3_2_1-offline.xsd')
-        with open(schema_file_path) as schema_file:
+        with open(schema_file_path, encoding='utf-8') as schema_file:
             facturae_schema = etree.XMLSchema(file=schema_file)
             logger.debug("Schema Facturaev3_2_1-offline.xsd loaded")
 

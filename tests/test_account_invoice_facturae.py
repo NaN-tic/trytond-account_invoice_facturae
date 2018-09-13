@@ -26,8 +26,6 @@ class TestAccountInvoiceFacturaeCase(ModuleTestCase):
         pool = Pool()
         Account = pool.get('account.account')
         FiscalYear = pool.get('account.fiscalyear')
-        GenerateSignedFacturae = pool.get('account.invoice.generate_facturae',
-            type='wizard')
         Invoice = pool.get('account.invoice')
         InvoiceLine = pool.get('account.invoice.line')
         Party = pool.get('party.party')

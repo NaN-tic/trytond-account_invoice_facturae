@@ -115,7 +115,6 @@ DEFAULT_FACTURAE_SCHEMA = 'Facturaev3_2_1-offline.xsd'
 def slugify(value):
     if not isinstance(value, str):
         value = str(value)
-    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
     value = str(_slugify_strip_re.sub('', value).strip().lower())
     return _slugify_hyphenate_re.sub('-', value)
 
@@ -422,14 +421,20 @@ class Invoice(metaclass=PoolMeta):
         return {
                 'invoice': self,
                 'Decimal': Decimal,
-        		'Currency': Currency,
+                'Currency': Currency,
+                'euro': euro,
+                'exchange_rate': exchange_rate,
+                'exchange_rate_date': exchange_rate_date,
+                'invoice': self,
+                'Decimal': Decimal,
+                'Currency': Currency,
                 'euro': euro,
                 'exchange_rate': exchange_rate,
                 'exchange_rate_date': exchange_rate_date,
                 'UOM_CODE2TYPE': UOM_CODE2TYPE,
                 }
 
-    de _validate_facturae(self, xffml_string, schema_file_path=None):
+    def _validate_facturae(self, xml_string, schema_file_path=None):
         """
         Inspired by https://github.com/pedrobaeza/l10n-spain/blob/d01d049934db55130471e284012be7c860d987eb/l10n_es_facturae/wizard/create_facturae.py
         """
@@ -439,22 +444,20 @@ class Invoice(metaclass=PoolMeta):
             schema_file_path = os.path.join(
                 module_path(),
                 DEFAULT_FACTURAE_SCHEMA)
-        with open(schema_file_path) as schema_file:
+        with open(schema_file_path, encoding='utf-8') as schema_file:
             facturae_schema = etree.XMLSchema(file=schema_file)
             logger.debug("%s loaded" % schema_file_path)
-            logger.debug("%s loaded" % schema_file_path)
-
         try:
             facturae_schema.assertValid(etree.fromstring(xml_string))
             logger.debug("Factura-e XML of invoice %s validated",
                 self.rec_name)
-        except Exception, e:
+        except Exception as e:
             logger.warning("Error validating generated Factura-e file",
                 exc_info=True)
             logger.debug(xml_string)
-            logger.debug("Factura-e XML of invoice %s validated",
             self.raise_user_error('invalid_factura_xml_file', (self.rec_name, e))
         return True
+
 
     def _sign_facturae(self, xml_string, certificate_password):
         """

@@ -54,6 +54,8 @@ class TestAccountInvoiceFacturaeCase(ModuleTestCase):
         tax_identifier = PartyIdentifier()
         tax_identifier.type = 'eu_vat'
         tax_identifier.code = 'BE0897290877'
+        company.header = 'Report Header'
+        company.party.name = 'Seller'
         company.party.identifiers = [tax_identifier]
         company.party.facturae_person_type = 'J'
         company.party.facturae_residence_type = 'R'
@@ -116,7 +118,7 @@ class TestAccountInvoiceFacturaeCase(ModuleTestCase):
                 vat21.report_type = '05'
                 vat21.credit_note_account = tax_account
 
-                vat21.save()
+            vat21.save()
 
             company_address, = company.party.addresses
             company_address.street = 'street'
@@ -125,7 +127,7 @@ class TestAccountInvoiceFacturaeCase(ModuleTestCase):
             company_address.subdivision = subdivision
             company_address.country = country
             company_address.save()
-            party = Party(name='Party')
+            party = Party(name='Buyer')
             party.facturae_person_type = 'J'
             party.facturae_residence_type = 'R'
             tax_identifier = PartyIdentifier()

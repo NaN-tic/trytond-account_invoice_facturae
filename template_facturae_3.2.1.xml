@@ -29,7 +29,7 @@
                 <EquivalentInEuros>{{ Currency.compute(invoice.currency, invoice.total_amount, euro) }}</EquivalentInEuros>
                 {% endif %}
             </TotalExecutableAmount>
-            <InvoiceCurrencyCode>{{ invoice.currency.code }}</InvoiceCurrencyCode>
+            <InvoiceCurrencyCode>{{ invoice.currency.code.upper() }}</InvoiceCurrencyCode>
         </Batch>
         {# FactoryAssignmentData optional: not supported (factoring not supported) #}
     </FileHeader>
@@ -158,11 +158,11 @@
                 {# OperationDate required only if is different to IssueDate, but we consider OperatinDate==invoice_date: not supported #}
                 {# PlaceOfIssue optional: not supported #}
                 {# InvoicingPeriod required only for Recapitulativas or temporary service: not supported #}
-                <InvoiceCurrencyCode>{{ invoice.currency.code }}</InvoiceCurrencyCode>
+                <InvoiceCurrencyCode>{{ invoice.currency.code.upper() }}</InvoiceCurrencyCode>
                 {% if invoice.currency != euro %}
                 <ExchangeRateDetails>
-                    <ExchangeRate>{{ exchange_rate_date }}</ExchangeRate>
-                    <ExchangeRateDate>{{ exchange_rate_date.isoformat() }}</ExchangeRateDate>
+                    <ExchangeRate>{{ exchange_rate }}</ExchangeRate>
+                    <ExchangeRateDate>{{ exchange_rate_date }}</ExchangeRateDate>
                 </ExchangeRateDetails>
                 {% endif %}
                 <TaxCurrencyCode>EUR</TaxCurrencyCode>
@@ -255,7 +255,7 @@
                     - TransactionDate
                     - Extensions
                     #}
-                    <ItemDescription>{{ line.description[:2500] }}</ItemDescription>
+                    <ItemDescription>{{ line.description and line.description[:2500] or '' }}</ItemDescription>
                     <Quantity>{{ line.quantity }}</Quantity>
                     <UnitOfMeasure>{{ UOM_CODE2TYPE.get(line.unit.symbol, '05') if line.unit else '05' }}</UnitOfMeasure>
                     <UnitPriceWithoutTax>{{ line.unit_price }}</UnitPriceWithoutTax>

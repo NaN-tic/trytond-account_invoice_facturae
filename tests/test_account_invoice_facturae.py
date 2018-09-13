@@ -6,12 +6,12 @@ import unittest
 from decimal import Decimal
 import trytond.tests.test_tryton
 from trytond.pool import Pool
+from trytond.transaction import Transaction
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
-from trytond.modules.account.tests import get_fiscalyear
-from trytond.modules.account_es.tests import create_chart
+from trytond.modules.account.tests import get_fiscalyear, create_chart
 from trytond.modules.company.tests import create_company, set_company
 from trytond.modules.account_invoice.tests import set_invoice_sequences
-
+from trytond.modules.currency.tests import create_currency, add_currency_rate
 CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -22,31 +22,49 @@ class TestAccountInvoiceFacturaeCase(ModuleTestCase):
     @with_transaction()
     def test_invoice_generation(self):
         'Test invoice generation'
+
         pool = Pool()
         Account = pool.get('account.account')
         FiscalYear = pool.get('account.fiscalyear')
-        GenerateSignedFacturae = pool.get('account.invoice.generate_facturae',
-            type='wizard')
         Invoice = pool.get('account.invoice')
         InvoiceLine = pool.get('account.invoice.line')
-        ModelData = pool.get('ir.model.data')
         Party = pool.get('party.party')
         PaymentTerm = pool.get('account.invoice.payment_term')
         ProductUom = pool.get('product.uom')
         ProductTemplate = pool.get('product.template')
         Product = pool.get('product.product')
         Tax = pool.get('account.tax')
+        Address = pool.get('party.address')
+        PartyIdentifier = pool.get('party.identifier')
+        Country = pool.get('country.country')
+        Subdivision = pool.get('country.subdivision')
+        PaymentType = pool.get('account.payment.type')
 
-        revenue_template_id = ModelData.get_id('account_es', 'pgc_7000_child')
-        expense_template_id = ModelData.get_id('account_es', 'pgc_600_child')
-        vat21_template_id = ModelData.get_id('account_es', 'iva_rep_21')
+        country = Country(name='Country', code='ES', code3='ESP')
+        country.save()
+        subdivision = Subdivision(name='Subdivision', country=country,
+            code='SUB', type='area')
+        subdivision.save()
 
         company = create_company()
+        currency = create_currency('EUR')
+        add_currency_rate(currency, Decimal(1.0))
+
+        tax_identifier = PartyIdentifier()
+        tax_identifier.type = 'eu_vat'
+        tax_identifier.code = 'BE0897290877'
+        company.header = 'Report Header'
+        company.party.identifiers = [tax_identifier]
+        company.party.facturae_person_type = 'J'
+        company.party.facturae_residence_type = 'R'
+        company.party.name = 'Seller'
+        company.party.save()
+        company.save()
+
         # Save certificate into company
         with open(os.path.join(
                     CURRENT_PATH, 'certificate.pfx'), 'rb') as cert_file:
             company.facturae_certificate = cert_file.read()
-        company.save()
 
         payment_term, = PaymentTerm.create([{
                     'name': '20 days, 40 days',
@@ -79,12 +97,54 @@ class TestAccountInvoiceFacturaeCase(ModuleTestCase):
             fiscalyear.save()
             FiscalYear.create_period([fiscalyear])
 
-            revenue, = Account.search([('template', '=', revenue_template_id)])
-            expense, = Account.search([('template', '=', expense_template_id)])
-            vat21, = Tax.search([('template', '=', vat21_template_id)])
+            payment_receivable, = PaymentType.create([{
+                    'name': 'Payment Receivable',
+                    'kind': 'receivable',
+                    'company': company.id,
+                    'facturae_type': '01',
+                    }])
+            revenue, = Account.search([('kind', '=', 'revenue')])
+            expense, = Account.search([('kind', '=', 'expense')])
+            tax_account, = Account.search([
+                    ('name', '=', 'Main Tax'),
+                    ])
+            with Transaction().set_user(0):
+                vat21 = Tax()
+                vat21.name = vat21.description = '21% VAT'
+                vat21.type = 'percentage'
+                vat21.rate = Decimal('0.21')
+                vat21.invoice_account = tax_account
+                vat21.report_type = '05'
+                vat21.credit_note_account = tax_account
 
-            party = Party(name='Party')
+                vat21.save()
+
+            company_address, = company.party.addresses
+            company_address.street = 'street'
+            company_address.zip = '08201'
+            company_address.city = 'City'
+            company_address.subdivision = subdivision
+            company_address.country = country
+            company_address.save()
+            party = Party(name='Buyer')
+            party.facturae_person_type = 'J'
+            party.facturae_residence_type = 'R'
+            tax_identifier = PartyIdentifier()
+            tax_identifier.type = 'eu_vat'
+            tax_identifier.code = 'BE0897290877'
+            party.identifiers = [tax_identifier]
             party.save()
+
+            address_dict = {
+                'party': party.id,
+                'street': 'St sample, 15',
+                'city': 'City',
+                'zip': '08201',
+                'subdivision': subdivision.id,
+                'country': country.id,
+                }
+
+            address, = Address.create([address_dict])
 
             term, = PaymentTerm.create([{
                         'name': 'Payment term',
@@ -116,43 +176,41 @@ class TestAccountInvoiceFacturaeCase(ModuleTestCase):
             product.template = template
             product.save()
 
-            invoice = Invoice()
-            invoice.type = 'out'
-            invoice.on_change_type()
-            invoice.party = party
-            invoice.on_change_party()
-            invoice.payment_term = term
+            with Transaction().set_user(0):
+                invoice = Invoice()
+                invoice.type = 'out'
+                invoice.on_change_type()
+                invoice.party = party
+                invoice.on_change_party()
+                invoice.payment_type = payment_receivable
+                invoice.payment_term = term
+                invoice.currency = currency
+                invoice.company = company
 
-            line1 = InvoiceLine()
-            line1.product = product
-            line1.on_change_product()
-            line1.on_change_account()
-            line1.quantity = 5
-            line1.unit_price = Decimal('40')
+                line1 = InvoiceLine()
+                line1.account = revenue
+                line1.product = product
+                line1.on_change_product()
+                line1.on_change_account()
+                line1.description = 'TestLine2'
+                line1.quantity = 5
+                line1.unit_price = Decimal('40')
 
-            line2 = InvoiceLine()
-            line2.account = revenue
-            line2.on_change_account()
-            line2.description = 'Test'
-            line2.quantity = 1
-            line2.unit_price = Decimal(20)
+                line2 = InvoiceLine()
+                line2.account = revenue
+                line2.product = product
+                line2.on_change_product()
+                line2.on_change_account()
+                line2.description = 'TestLine2'
+                line2.quantity = 1
+                line2.unit_price = Decimal(20)
 
-            invoice.lines = [line1, line2]
-            invoice.on_change_lines()
-            invoice.save()
-            # invoice.untaxed_amount == Decimal('220.00')
-            # invoice.tax_amount == Decimal('20.00')
-            # invoice.total_amount == Decimal('240.00')
+                invoice.lines = [line1, line2]
+                invoice.on_change_lines()
+                invoice.save()
 
             Invoice.post([invoice])
-
-            session_id, _, _ = GenerateSignedFacturae.create()
-            generate_signed_facturae = GenerateSignedFacturae(session_id)
-            generate_signed_facturae.account.certificate_password = (
-                'privatepassword')
-            generate_signed_facturae.transition_generate()
-
-            self.assertIsNotNone(invoice.invoice_facturae)
+            Invoice.generate_facturae_default([invoice], 'privatepassword')
 
 
 def suite():

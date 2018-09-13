@@ -108,6 +108,9 @@ FACe_REQUIRED_FIELDS = ['facturae_person_type', 'facturae_residence_type']
 _slugify_strip_re = re.compile(r'[^\w\s-]')
 _slugify_hyphenate_re = re.compile(r'[-\s]+')
 
+DEFAULT_FACTURAE_TEMPLATE = 'template_facturae_3.2.1.xml'
+DEFAULT_FACTURAE_SCHEMA = 'Facturaev3_2_1-offline.xsd'
+
 
 def slugify(value):
     if not isinstance(value, str):
@@ -258,21 +261,37 @@ class Invoice(metaclass=PoolMeta):
 
     @classmethod
     def generate_facturae_default(cls, invoices, certificate_password):
-        to_save = []
+        to_write = ([],)
         for invoice in invoices:
             if invoice.invoice_facturae:
                 continue
             facturae_content = invoice.get_facturae()
             invoice._validate_facturae(facturae_content)
             if backend.name() != 'sqlite':
-                invoice.invoice_facturae = invoice._sign_facturae(
+                invoice_facturae = invoice._sign_facturae(
                     facturae_content, certificate_password)
-            to_save.append(invoice)
-        if to_save:
-            cls.save(to_save)
+            else:
+                invoice_facturae = facturae_content
+            to_write[0].append(invoice)
+            to_write += ({'invoice_facturae': invoice_facturae},)
+        if to_write:
+            cls.write(*to_write)
 
     def get_facturae(self):
-        """Return the content of factura-e XML file"""
+        jinja_env = Environment(
+            loader=FileSystemLoader(module_path()),
+            trim_blocks=True,
+            lstrip_blocks=True,
+            )
+        template = DEFAULT_FACTURAE_TEMPLATE
+        return self._get_jinja_template(jinja_env, template).render(
+            self._get_content_to_render(), ).encode('utf-8')
+
+    def _get_jinja_template(self, jinja_env, template):
+        return jinja_env.get_template(template)
+
+    def _get_content_to_render(self):
+        """Return the content to render in factura-e XML file"""
         pool = Pool()
         Currency = pool.get('currency.currency')
         Date = pool.get('ir.date')
@@ -400,14 +419,7 @@ class Invoice(metaclass=PoolMeta):
                         'invoice': self.rec_name,
                         })
 
-        jinja_env = Environment(
-            loader=FileSystemLoader(module_path()),
-            trim_blocks=True,
-            lstrip_blocks=True,
-            )
-        jinja_template = jinja_env.get_template('template_facturae_3.2.1.xml')
-
-        return jinja_template.render({
+        return {
                 'invoice': self,
                 'Decimal': Decimal,
         		'Currency': Currency,
@@ -415,29 +427,32 @@ class Invoice(metaclass=PoolMeta):
                 'exchange_rate': exchange_rate,
                 'exchange_rate_date': exchange_rate_date,
                 'UOM_CODE2TYPE': UOM_CODE2TYPE,
-                }, ).encode('utf-8')
+                }
 
-    def _validate_facturae(self, xml_string):
+    de _validate_facturae(self, xffml_string, schema_file_path=None):
         """
         Inspired by https://github.com/pedrobaeza/l10n-spain/blob/d01d049934db55130471e284012be7c860d987eb/l10n_es_facturae/wizard/create_facturae.py
         """
         logger = logging.getLogger('account_invoice_facturae')
 
-        schema_file_path = os.path.join(
-            module_path(),
-            'Facturaev3_2_1-offline.xsd')
-        with open(schema_file_path, encoding='utf-8') as schema_file:
+        if not schema_file_path:
+            schema_file_path = os.path.join(
+                module_path(),
+                DEFAULT_FACTURAE_SCHEMA)
+        with open(schema_file_path) as schema_file:
             facturae_schema = etree.XMLSchema(file=schema_file)
-            logger.debug("Schema Facturaev3_2_1-offline.xsd loaded")
+            logger.debug("%s loaded" % schema_file_path)
+            logger.debug("%s loaded" % schema_file_path)
 
         try:
             facturae_schema.assertValid(etree.fromstring(xml_string))
             logger.debug("Factura-e XML of invoice %s validated",
                 self.rec_name)
-        except Exception as e:
+        except Exception, e:
             logger.warning("Error validating generated Factura-e file",
                 exc_info=True)
             logger.debug(xml_string)
+            logger.debug("Factura-e XML of invoice %s validated",
             self.raise_user_error('invalid_factura_xml_file', (self.rec_name, e))
         return True
 

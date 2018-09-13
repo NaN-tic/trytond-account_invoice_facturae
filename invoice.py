@@ -322,9 +322,9 @@ class Invoice:
                             'invoice': self.rec_name,
                             'field': field,
                             })
-        if (not self.company.party.vat_code
-                or len(self.company.party.vat_code) < 3
-                or len(self.company.party.vat_code) > 30):
+        if (not self.company.party.tax_identifier.code
+                or len(self.company.party.tax_identifier.code) < 3
+                or len(self.company.party.tax_identifier.code) > 30):
             self.raise_user_error('company_vat_identifier',
                 (self.company.party.rec_name,))
 

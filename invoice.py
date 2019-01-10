@@ -19,6 +19,8 @@ from trytond.pyson import Bool, Eval
 from trytond.transaction import Transaction
 from trytond.wizard import Wizard, StateView, StateTransition, Button
 from trytond import backend
+from trytond.i18n import gettext
+from trytond.exceptions import UserError
 
 __all__ = ['Invoice', 'InvoiceLine', 'CreditInvoiceStart', 'CreditInvoice',
     'GenerateFacturaeStart', 'GenerateFacturae']
@@ -152,54 +154,6 @@ class Invoice(metaclass=PoolMeta):
                     'readonly': Bool(Eval('invoice_facturae')),
                     }
                 })
-        cls._error_messages.update({
-                'missing_certificate': (
-                    'Missing Factura-e Certificate in company "%s".'),
-                'company_vat_identifier': (
-                    'Missing VAT Identifier in company\'s Party "%s", or its '
-                    'length is not between 3 and 30.'),
-                'company_address_fields': (
-                    'Missing Street, Zip, City, Subdivision or Country in '
-                    'default address of company\'s Party "%s".'),
-                'party_facturae_fields': (
-                    'Missing some Factura-e fields in party "%(party)s" of '
-                    'invoice "%(invoice)s": "%(field)s"'),
-                'party_vat_identifier': (
-                    'Missing VAT Identifier in party "%(party)s" of invoice '
-                    '"%(invoice)s", or its length is not between 3 and 30.'),
-                'party_name_surname': (
-                    'The name of "%(party)s" of invoice "%(invoice)s" '
-                    'doesn\'t contain the Name and the, at least, First '
-                    'Surname.\n'
-                    'They must to be separated by one space: Name Surname.'),
-                'invoice_address_fields': (
-                    'Missing Street, Zip, City, Subdivision or Country in '
-                    'Invoice Address of invoice "%s".'),
-                'no_rate': ('No rate found for currency "%(currency)s" on '
-                    '"%(date)s"'),
-                'missing_payment_type': ('The payment type is missing in some '
-                    'move lines of invoice "%s".'),
-                'missing_payment_type_facturae_type': (
-                    'The Factura-e Type is missing in payment type '
-                    '"%(payment_type)s" used in invoice "%(invoice)s".'),
-                'missing_account_bank_module': (
-                    'You must to install "account_bank" module to inform the '
-                    'Bank Account in invoices.\n'
-                    'The payment type "%(payment_type)s" used in invoice '
-                    '"%(invoice)s" is configured as "Direct Debit" or '
-                    '"Credit Transfer" and it requires the company/party bank '
-                    'account.'),
-                'missing_bank_account': ('The Bank Account is missing in some '
-                    'move lines of invoice "%s".'),
-                'missing_iban': ('The Bank Account "%(bank_account)s" used in '
-                    'invoice "%(invoice)s" doesn\'t have an IBAN number and '
-                    'it\'s required to generate the Factura-e document.'),
-                'invalid_factura_xml_file': (
-                    'The Factura-e file (XML) generated for invoice "%s" is '
-                    'not valid against the oficial XML Schema Definition:\n%s'),
-                'error_signing': ('Error signing invoice "%(invoice)s".\n'
-                    'Message returned by signing process: %(process_output)s'),
-                })
 
     def get_credited_invoices(self, name):
         pool = Pool()
@@ -315,16 +269,17 @@ class Invoice(metaclass=PoolMeta):
         for field in FACe_REQUIRED_FIELDS:
             for party in [self.party, self.company.party]:
                 if not getattr(party, field):
-                    self.raise_user_error('party_facturae_fields', {
-                            'party': party.rec_name,
-                            'invoice': self.rec_name,
-                            'field': field,
-                            })
+                    raise UserError(gettext(
+                        'account_invoice_facturae.party_facturae_fields',
+                            party=party.rec_name,
+                            invoice=self.rec_name,
+                            field=field))
         if (not self.company.party.tax_identifier
                 or len(self.company.party.tax_identifier.code) < 3
                 or len(self.company.party.tax_identifier.code) > 30):
-            self.raise_user_error('company_vat_identifier',
-                (self.company.party.rec_name,))
+            raise UserError(gettext(
+                'account_invoice_facturae.company_vat_identifier',
+                    party=self.company.party.rec_name))
 
         if (not self.company.party.addresses
                 or not self.company.party.addresses[0].street
@@ -332,28 +287,31 @@ class Invoice(metaclass=PoolMeta):
                 or not self.company.party.addresses[0].city
                 or not self.company.party.addresses[0].subdivision
                 or not self.company.party.addresses[0].country):
-            self.raise_user_error('company_address_fields',
-                (self.company.party.rec_name,))
+            raise UserError(gettext(
+                'account_invoice_facturae.company_address_fields',
+                    party=self.company.party.rec_name))
 
         if (not self.party.tax_identifier
                 or len(self.party.tax_identifier.code) < 3
                 or len(self.party.tax_identifier.code) > 30):
-            self.raise_user_error('party_vat_identifier', {
-                    'party': self.party.rec_name,
-                    'invoice': self.rec_name,
-                    })
+            raise UserError(gettext(
+                'account_invoice_facturae.party_vat_identifier',
+                    party=self.party.rec_name,
+                    invoice=self.rec_name))
         if (self.party.facturae_person_type == 'F'
                 and len(self.party.name.split(' ', 2)) < 2):
-            self.raise_user_error('party_name_surname', {
-                    'party': self.party.rec_name,
-                    'invoice': self.rec_name,
-                    })
+            raise UserError(gettext(
+                'account_invoice_facturae.party_name_surname',
+                    party=self.party.rec_name,
+                    invoice=self.rec_name))
         if (not self.invoice_address.street
                 or not self.invoice_address.zip
                 or not self.invoice_address.city
                 or not self.invoice_address.subdivision
                 or not self.invoice_address.country):
-            self.raise_user_error('invoice_address_fields', (self.rec_name,))
+            raise UserError(gettext(
+                'account_invoice_facturae.invoice_address_fields',
+                    invoice=self.rec_name))
 
         euro, = Currency.search([('code', '=', 'EUR')])
         if self.currency != euro:
@@ -367,10 +325,10 @@ class Invoice(metaclass=PoolMeta):
                         ('date', '<=', self.invoice_date),
                         ], limit=1, order=[('date', 'DESC')])
                 if not rates:
-                    self.raise_user_error('no_rate', {
-                            'currency': self.currenc.name,
-                            'date': self.invoice_date.strftime('%d/%m/%Y'),
-                            })
+                    raise UserError(gettext(
+                        'account_invoice_facturae.no_rate',
+                            currency=self.currenc.name,
+                            date=self.invoice_date.strftime('%d/%m/%Y')))
                 exchange_rate = rates[0].rate
                 exchange_rate_date = rates[0].date
             else:
@@ -379,10 +337,10 @@ class Invoice(metaclass=PoolMeta):
                         ('date', '<=', self.invoice_date),
                         ], limit=1, order=[('date', 'DESC')])
                 if not rates:
-                    self.raise_user_error('no_rate', {
-                            'currency': euro.name,
-                            'date': self.invoice_date.strftime('%d/%m/%Y'),
-                            })
+                    raise UserError(gettext(
+                        'account_invoice_facturae.no_rate',
+                            currency=euro.name,
+                            date=self.invoice_date.strftime('%d/%m/%Y')))
                 exchange_rate = Decimal(1) / rates[0].rate
                 exchange_rate_date = rates[0].date
         else:
@@ -396,27 +354,30 @@ class Invoice(metaclass=PoolMeta):
 
         for move_line in self.payment_details:
             if not move_line.payment_type:
-                self.raise_user_error('missing_payment_type', (self.rec_name,))
+                raise UserError(gettext(
+                    'account_invoice_facturae.missing_payment_type',
+                    invoice=self.rec_name))
             if not move_line.payment_type.facturae_type:
-                self.raise_user_error('missing_payment_type_facturae_type', {
-                        'payment_type': move_line.payment_type.rec_name,
-                        'invoice': self.rec_name,
-                        })
+                raise UserError(gettext(
+                    'account_invoice_facturae.missing_payment_type_facturae_type',
+                        payment_type=move_line.payment_type.rec_name,
+                        invoice=self.rec_name))
             if move_line.payment_type.facturae_type in ('02', '04'):
                 if not hasattr(move_line, 'account_bank'):
-                    self.raise_user_error('missing_account_bank_module', {
-                        'payment_type': move_line.payment_type.rec_name,
-                        'invoice': self.rec_name,
-                        })
+                    raise UserError(gettext(
+                        'account_invoice_facturae.missing_account_bank_module',
+                            payment_type=move_line.payment_type.rec_name,
+                            invoice=self.rec_name))
                 if not move_line.bank_account:
-                    self.raise_user_error('missing_bank_account',
-                        (self.rec_name,))
+                    raise UserError(gettext(
+                        'account_invoice_facturae.missing_bank_account',
+                            invoice=self.rec_name))
                 if not [n for n in move_line.bank_account.numbers
                         if n.type == 'iban']:
-                    self.raise_user_error('missing_iban', {
-                        'bank_account': move_line.bank_account.rec_name,
-                        'invoice': self.rec_name,
-                        })
+                    raise UserError(gettext(
+                        'account_invoice_facturae.missing_iban',
+                        bank_account=move_line.bank_account.rec_name,
+                        invoice=self.rec_name))
 
         return {
                 'invoice': self,
@@ -455,7 +416,9 @@ class Invoice(metaclass=PoolMeta):
             logger.warning("Error validating generated Factura-e file",
                 exc_info=True)
             logger.debug(xml_string)
-            self.raise_user_error('invalid_factura_xml_file', (self.rec_name, e))
+            raise UserError(gettext(
+                'account_invoice_facturae.invalid_factura_xml_file',
+                    invoice=self.rec_name, message=e))
         return True
 
 
@@ -464,8 +427,9 @@ class Invoice(metaclass=PoolMeta):
         Inspired by https://github.com/pedrobaeza/l10n-spain/blob/d01d049934db55130471e284012be7c860d987eb/l10n_es_facturae/wizard/create_facturae.py
         """
         if not self.company.facturae_certificate:
-            self.raise_user_error('missing_certificate',
-                (self.company.rec_name,))
+            raise UserError(gettext(
+                'account_invoice_facturae.missing_certificate',
+                company=self.company.rec_name))
 
         logger = logging.getLogger('account_invoice_facturae')
 
@@ -508,10 +472,11 @@ class Invoice(metaclass=PoolMeta):
             logger.warning('Error %s signing invoice "%s" with command '
                 '"%s <password>": %s %s', rc, self.id,
                 signature_command[:-1], output, err)
-            self.raise_user_error('error_signing', {
-                    'invoice': self.rec_name,
-                    'process_output': output,
-                    })
+            raise UserError(gettext(
+                'account_invoice_factura.error_signing',
+                    invoice=self.rec_name,
+                    process_output=output))
+
         logger.info("Factura-e for invoice %s (%s) generated and signed",
             self.rec_name, self.id)
 

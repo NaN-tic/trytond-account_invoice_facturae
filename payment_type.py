@@ -2,8 +2,6 @@
 # copyright notices and license terms.
 from trytond.model import fields
 from trytond.pool import PoolMeta
-from trytond.i18n import gettext
-from trytond.exceptions import UserError
 
 __all__ = ['PaymentType']
 
@@ -33,7 +31,14 @@ class PaymentType(metaclass=PoolMeta):
             ('19', 'Payment by card'),
             ], 'Factura-e Type', sort=False)
 
-
+    @classmethod
+    def __setup__(cls):
+        super(PaymentType, cls).__setup__()
+        cls._error_messages.update({
+                'incompatible_facturae_type_account_bank': (
+                    'The Factura-e Type and Account Bank Kind of Payment Type '
+                    '"%s" are not compatible.'),
+                })
 
     @classmethod
     def validate(cls, payment_types):
@@ -49,6 +54,6 @@ class PaymentType(metaclass=PoolMeta):
                 and self.account_bank != 'party'
                 or self.facturae_type and self.facturae_type == '04'
                 and self.account_bank != 'company'):
-            raise UserError(gettext(
-                'account_invoice_facturae.incompatible_facturae_type_account_bank',
-                payment_type=self.rec_name))
+            self.raise_user_error('incompatible_facturae_type_account_bank',
+                (self.rec_name,))
+

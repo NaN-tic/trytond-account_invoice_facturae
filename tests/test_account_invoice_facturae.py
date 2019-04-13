@@ -104,8 +104,8 @@ class TestAccountInvoiceFacturaeCase(ModuleTestCase):
                     'company': company.id,
                     'facturae_type': '01',
                     }])
-            revenue, = Account.search([('kind', '=', 'revenue')])
-            expense, = Account.search([('kind', '=', 'expense')])
+            revenue, = Account.search([('type.revenue', '=', True)])
+            expense, = Account.search([('type.expense', '=', True)])
             tax_account, = Account.search([
                     ('name', '=', 'Main Tax'),
                     ])

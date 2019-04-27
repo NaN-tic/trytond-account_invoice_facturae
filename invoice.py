@@ -193,7 +193,7 @@ class Invoice(metaclass=PoolMeta):
     @property
     def payment_details(self):
         return sorted([ml for ml in self.move.lines
-                if ml.account.kind == 'receivable'],
+                if ml.account.type.receivable],
             key=attrgetter('maturity_date'))
 
     def _credit(self):

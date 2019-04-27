@@ -5,7 +5,6 @@ import glob
 import logging
 import os
 import re
-import unicodedata
 from decimal import Decimal
 from jinja2 import Environment, FileSystemLoader
 from lxml import etree

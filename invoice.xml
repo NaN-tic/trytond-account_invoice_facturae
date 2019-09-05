@@ -66,5 +66,11 @@
             <field name="model">account.invoice,-1</field>
             <field name="action" ref="wizard_generate_signed_facturae"/>
         </record>-->
+
+        <record model="ir.ui.icon" id="lock_icon">
+            <field name="name">tryton-lock</name>
+            <field name="path">icons/tryton-lock.svg</name>
+        </record>
+
     </data>
 </tryton>

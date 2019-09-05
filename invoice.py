@@ -564,7 +564,7 @@ class GenerateFacturae(Wizard):
     start = StateView('account.invoice.generate_facturae.start',
         'account_invoice_facturae.generate_facturae_start_view_form', [
             Button('Cancel', 'end', 'tryton-cancel'),
-            Button('Generate', 'generate', 'tryton-executable', default=True),
+            Button('Generate', 'generate', 'tryton-launch', default=True),
             ])
     generate = StateTransition()
 

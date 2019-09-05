@@ -2,7 +2,7 @@
 <!-- The COPYRIGHT file at the top level of this repository contains the full
      copyright notices and license terms. -->
 <form col="2">
-    <image name="tryton-dialog-information" xexpand="0"
+    <image name="tryton-info" xexpand="0"
         xfill="0"/>
     <group col="2" id="explanation_password">
         <label string="It will generate a Factura-e file for selected invoices, will sign them with the certificate stored in the company and will save the resulting files in each invoice."

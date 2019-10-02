@@ -78,87 +78,6 @@ this repository contains the full copyright notices and license terms. -->
         <record model="account.tax.template" id="account_es.iva_IC_compras_21_ser_2">
             <field name="report_type">01</field>
         </record>
-        <record model="account.tax.template" id="account_es.igic_X0_compras_bc">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_X0_compras_bi">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_X3_compras_bc">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_X3_compras_bi">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_X7_compras_bc">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_X7_compras_bi">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_X9_5_compras_bc">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_X9_5_compras_bi">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_X13_5_compras_bc">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_X13_5_compras_bi">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_IO">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_IC_compras_3_bc_1">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_IC_compras_3_bc_2">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_IC_compras_3_bi_1">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_IC_compras_3_bi_2">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_IC_compras_7_bc_1">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_IC_compras_7_bc_2">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_IC_compras_7_bi_1">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_IC_compras_7_bi_2">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_IC_compras_9_5_bc_1">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_IC_compras_9_5_bc_2">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_IC_compras_9_5_bi_1">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_IC_compras_9_5_bi_2">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_IC_compras_13_5_bc_1">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_IC_compras_13_5_bc_2">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_IC_compras_13_5_bi_1">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_IC_compras_13_5_bi_2">
-            <field name="report_type">03</field>
-        </record>
         <record model="account.tax.template" id="account_es.iva_reagp_compras_12_1">
             <field name="report_type">01</field>
         </record>
@@ -170,51 +89,6 @@ this repository contains the full copyright notices and license terms. -->
         </record>
         <record model="account.tax.template" id="account_es.iva_ISP_compras_2">
             <field name="report_type">01</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_sop_0">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_sop_3">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_sop_7">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_sop_9_5">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_sop_13_5">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_sop_0_inv">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_sop_3_inv">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_sop_7_inv">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_sop_9_5_inv">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_sop_13_5_inv">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_rep_0">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_rep_3">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_rep_7">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_rep_9_5">
-            <field name="report_type">03</field>
-        </record>
-        <record model="account.tax.template" id="account_es.igic_rep_13_5">
-            <field name="report_type">03</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_sop_ex">
             <field name="report_type">01</field>
@@ -250,24 +124,6 @@ this repository contains the full copyright notices and license terms. -->
             <field name="report_type">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_rep_21">
-            <field name="report_type">01</field>
-        </record>
-        <record model="account.tax.template" id="account_es.iva_rep_4_recc">
-            <field name="report_type">01</field>
-        </record>
-        <record model="account.tax.template" id="account_es.iva_rep_10_recc">
-            <field name="report_type">01</field>
-        </record>
-        <record model="account.tax.template" id="account_es.iva_rep_21_recc">
-            <field name="report_type">01</field>
-        </record>
-        <record model="account.tax.template" id="account_es.iva_sop_4_recc">
-            <field name="report_type">01</field>
-        </record>
-        <record model="account.tax.template" id="account_es.iva_sop_10_recc">
-            <field name="report_type">01</field>
-        </record>
-        <record model="account.tax.template" id="account_es.iva_sop_21_recc">
             <field name="report_type">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_sop_alq_ex">

@@ -14,8 +14,7 @@
         <label name="invoice_facturae"/>
         <field name="invoice_facturae"/>
     </xpath>
-    <xpath expr="/form/notebook/page[@id='invoice']/group/group/group[@id='buttons']"
-            position="inside">
+    <xpath expr="/form/group[@id='buttons']" position="inside">
         <button name="generate_facturae_wizard"
             string="Generate Factura-e" icon="tryton-lock"/>
     </xpath>

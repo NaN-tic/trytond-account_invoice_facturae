@@ -219,7 +219,7 @@ class Invoice(metaclass=PoolMeta):
                 continue
             facturae_content = invoice.get_facturae()
             invoice._validate_facturae(facturae_content)
-            if backend.name() != 'sqlite':
+            if backend.name != 'sqlite':
                 invoice_facturae = invoice._sign_facturae(
                     facturae_content, certificate_password)
             else:

@@ -44,7 +44,7 @@ class TestAccountInvoiceFacturaeCase(ModuleTestCase):
         country = Country(name='Country', code='ES', code3='ESP')
         country.save()
         subdivision = Subdivision(
-            name='Subdivision', country=country, code='SUB', type='area')
+            name='Subdivision', country=country, code='SUB', type='province')
         subdivision.save()
 
         company = create_company()

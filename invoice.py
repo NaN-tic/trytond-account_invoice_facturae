@@ -196,8 +196,8 @@ class Invoice(metaclass=PoolMeta):
                 if ml.account.type.receivable],
             key=attrgetter('maturity_date'))
 
-    def _credit(self):
-        invoice_vals = super(Invoice, self)._credit()
+    def _credit(self, **values):
+        invoice_vals = super(Invoice, self)._credit(**values)
         rectificative_reason_code = Transaction().context.get(
             'rectificative_reason_code')
         if rectificative_reason_code:

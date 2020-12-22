@@ -25,7 +25,7 @@ import org.xml.sax.SAXException;
 
 import es.mityc.firmaJava.libreria.utilidades.UtilidadTratarNodo;
 import es.mityc.firmaJava.libreria.xades.DataToSign;
-import es.mityc.firmaJava.libreria.xades.EnumFormatoFirma;
+import es.mityc.javasign.EnumFormatoFirma;
 import es.mityc.firmaJava.libreria.xades.FirmaXML;
 import es.mityc.firmaJava.libreria.xades.XAdESSchemas;
 import es.mityc.firmaJava.libreria.xades.elementos.xades.ObjectIdentifier;

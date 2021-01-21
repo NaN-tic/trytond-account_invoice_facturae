@@ -197,13 +197,12 @@ class Invoice(metaclass=PoolMeta):
             key=attrgetter('maturity_date'))
 
     def _credit(self, **values):
-        invoice_vals = super(Invoice, self)._credit(**values)
+        credit = super(Invoice, self)._credit(**values)
         rectificative_reason_code = Transaction().context.get(
             'rectificative_reason_code')
         if rectificative_reason_code:
-            invoice_vals['rectificative_reason_code'] = (
-                rectificative_reason_code)
-        return invoice_vals
+            credit.rectificative_reason_code = rectificative_reason_code
+        return credit
 
     @classmethod
     @ModelView.button_action(

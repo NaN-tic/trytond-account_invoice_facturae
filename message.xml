@@ -19,7 +19,8 @@ this repository contains the full copyright notices and license terms. -->
           <field name="text">Missing VAT Identifier in party "%(party)s" of invoice "%(invoice)s", or its length is not between 3 and 30</field>
       </record>
       <record model="ir.message" id="party_name_surname">
-          <field name="text">The name of "%(party)s" of invoice "%(invoice)s" doesn\'t contain the Name and the, at least, First Surname.\n They must to be separated by one space: Name Surname.</field>
+          <field name="text">The name of "%(party)s" of invoice "%(invoice)s" doesn\'t contain the Name and the, at least, First Surname.
+They must to be separated by one space: Name Surname.</field>
       </record>
       <record model="ir.message" id="invoice_address_fields">
           <field name="text">Missing Street, Zip, City, Subdivision or Country in Invoice Address of invoice "%(invoice)s".</field>
@@ -34,7 +35,8 @@ this repository contains the full copyright notices and license terms. -->
           <field name="text">The Factura-e Type is missing in payment type "%(payment_type)s" used in invoice "%(invoice)s".</field>
       </record>
       <record model="ir.message" id="missing_account_bank_module">
-          <field name="text">You must to install "account_bank" module to inform the Bank Account in invoices.\nThe payment type "%(payment_type)s" used in invoice "%(invoice)s" is configured as "Direct Debit" or "Credit Transfer" and it requires the company/party bank account.</field>
+          <field name="text">You must to install "account_bank" module to inform the Bank Account in invoices.
+The payment type "%(payment_type)s" used in invoice "%(invoice)s" is configured as "Direct Debit" or "Credit Transfer" and it requires the company/party bank account.</field>
       </record>
       <record model="ir.message" id="missing_bank_account">
           <field name="text">The Bank Account is missing in some move lines of invoice "%(invoice)s".</field>
@@ -43,10 +45,12 @@ this repository contains the full copyright notices and license terms. -->
           <field name="text">The Bank Account "%(bank_account)s" used in invoice "%(invoice)s" doesn\'t have an IBAN number and it\'s required to generate the Factura-e document.</field>
       </record>
       <record model="ir.message" id="invalid_factura_xml_file">
-          <field name="text">The Factura-e file (XML) generated for invoice "%(invoice)s" is not valid against the oficial XML Schema Definition:\n%(message)s</field>
+          <field name="text">The Factura-e file (XML) generated for invoice "%(invoice)s" is not valid against the oficial XML Schema Definition:
+%(message)s</field>
       </record>
       <record model="ir.message" id="error_signing">
-          <field name="text">Error signing invoice "%(invoice)s".\nMessage returned by signing process: %(process_output)s</field>
+          <field name="text">Error signing invoice "%(invoice)s".
+Message returned by signing process: %(process_output)s</field>
       </record>
       <record model="ir.message" id="incompatible_facturae_type_account_bank">
           <field name="text">The Factura-e Type and Account Bank Kind of Payment Type "%(paymen_type)s" are not compatible.</field>

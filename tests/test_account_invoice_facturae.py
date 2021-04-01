@@ -199,6 +199,8 @@ class TestAccountInvoiceFacturaeCase(ModuleTestCase):
                 invoice.account = invoice.on_change_with_account()
 
                 line1 = InvoiceLine()
+                line1.company = company
+                line1.currency = currency
                 line1.product = product
                 line1.on_change_product()
                 line1.on_change_account()
@@ -206,6 +208,8 @@ class TestAccountInvoiceFacturaeCase(ModuleTestCase):
                 line1.unit_price = Decimal('40')
 
                 line2 = InvoiceLine()
+                line2.company = company
+                line2.currency = currency
                 line2.account = revenue
                 line2.on_change_account()
                 line2.product = product

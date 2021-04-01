@@ -21,9 +21,6 @@ from trytond import backend
 from trytond.i18n import gettext
 from trytond.exceptions import UserError
 
-__all__ = ['Invoice', 'InvoiceLine', 'CreditInvoiceStart', 'CreditInvoice',
-    'GenerateFacturaeStart', 'GenerateFacturae']
-
 # Get from XSD scheme of Facturae 3.2.1
 # http://www.facturae.gob.es/formato/Versiones/Facturaev3_2_1.xml
 RECTIFICATIVE_REASON_CODES = [

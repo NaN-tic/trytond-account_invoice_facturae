@@ -281,7 +281,7 @@ class Invoice(metaclass=PoolMeta):
 
         if (not self.company.party.addresses
                 or not self.company.party.addresses[0].street
-                or not self.company.party.addresses[0].zip
+                or not self.company.party.addresses[0].postal_code
                 or not self.company.party.addresses[0].city
                 or not self.company.party.addresses[0].subdivision
                 or not self.company.party.addresses[0].country):
@@ -303,7 +303,7 @@ class Invoice(metaclass=PoolMeta):
                     party=self.party.rec_name,
                     invoice=self.rec_name))
         if (not self.invoice_address.street
-                or not self.invoice_address.zip
+                or not self.invoice_address.postal_code
                 or not self.invoice_address.city
                 or not self.invoice_address.subdivision
                 or not self.invoice_address.country):

@@ -10,7 +10,7 @@ this repository contains the full copyright notices and license terms. -->
           <field name="text">Missing VAT Identifier in company\'s Party "%(party)s", or its length is not between 3 and 30.</field>
       </record>
       <record model="ir.message" id="company_address_fields">
-          <field name="text">Missing Street, Zip, City, Subdivision or Country in default address of company\'s Party "%(party)s".</field>
+          <field name="text">Missing Street, Postal Code, City, Subdivision or Country in default address of company\'s Party "%(party)s".</field>
       </record>
       <record model="ir.message" id="party_facturae_fields">
           <field name="text">Missing some Factura-e fields in party "%(party)s" of invoice "%(invoice)s": "%(field)s"</field>
@@ -23,7 +23,7 @@ this repository contains the full copyright notices and license terms. -->
 They must to be separated by one space: Name Surname.</field>
       </record>
       <record model="ir.message" id="invoice_address_fields">
-          <field name="text">Missing Street, Zip, City, Subdivision or Country in Invoice Address of invoice "%(invoice)s".</field>
+          <field name="text">Missing Street, Postal Code, City, Subdivision or Country in Invoice Address of invoice "%(invoice)s".</field>
       </record>
       <record model="ir.message" id="no_rate">
           <field name="text">No rate found for currency "%(currency)s" on "%(date)s"</field>

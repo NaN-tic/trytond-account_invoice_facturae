@@ -122,7 +122,7 @@ class TestAccountInvoiceFacturaeCase(ModuleTestCase):
 
             company_address, = company.party.addresses
             company_address.street = 'street'
-            company_address.zip = '08201'
+            company_address.postal_code = '08201'
             company_address.city = 'City'
             company_address.subdivision = subdivision
             company_address.country = country
@@ -140,7 +140,7 @@ class TestAccountInvoiceFacturaeCase(ModuleTestCase):
                 'party': party.id,
                 'street': 'St sample, 15',
                 'city': 'City',
-                'zip': '08201',
+                'postal_code': '08201',
                 'subdivision': subdivision.id,
                 'country': country.id,
                 }

@@ -21,7 +21,7 @@
     {% if address.country and address.country.code == 'ES' %}
         <AddressInSpain>
             <Address>{{ address.street[:80] }}</Address>
-            <PostCode>{{ address.zip[:5] }}</PostCode>
+            <PostCode>{{ address.postal_code[:5] }}</PostCode>
             <Town>{{ address.city[:50] }}</Town>
             <Province>{{ address.subdivision.name[:20] }}</Province>
             <CountryCode>{{ address.country.code3 }}</CountryCode>
@@ -29,7 +29,7 @@
         {% else %}
         <OverseasAddress>
             <Address>{{ address.street[:80] }}</Address>
-            <PostCodeAndTown>{{ (', '.join([address.zip, address.city]))[:50] }}</PostCodeAndTown>
+            <PostCodeAndTown>{{ (', '.join([address.postal_code, address.city]))[:50] }}</PostCodeAndTown>
             <Province>{{ address.subdivision.name[:20] }}</Province>
             <CountryCode>{{ address.country.code3 }}</CountryCode>
         </OverseasAddress>

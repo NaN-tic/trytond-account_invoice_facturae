@@ -473,7 +473,7 @@ class Invoice(metaclass=PoolMeta):
             signed_properties_id = (
                 signature_id
                 + "-SignedProperties%05d" % random.randint(rand_min, rand_max)
-            )
+                )
             key_info_id = "KeyInfo%05d" % random.randint(rand_min, rand_max)
             reference_id = "Reference%05d" % random.randint(rand_min, rand_max)
             object_id = "Object%05d" % random.randint(rand_min, rand_max)
@@ -483,7 +483,7 @@ class Invoice(metaclass=PoolMeta):
                 "politica_de_firma_formato_facturae/"
                 "politica_de_firma_formato_facturae_v3_1"
                 ".pdf"
-            )
+                )
             sig_policy_hash_value = "Ohixl6upD6av8N7pEvDABhEL6hM="
             root = etree.fromstring(request)
             sign = xmlsig.template.create(
@@ -491,7 +491,7 @@ class Invoice(metaclass=PoolMeta):
                 sign_method=xmlsig.constants.TransformRsaSha1,
                 name=signature_id,
                 ns="ds",
-            )
+                )
             key_info = xmlsig.template.ensure_key_info(sign, name=key_info_id)
             x509_data = xmlsig.template.add_x509_data(key_info)
             xmlsig.template.x509_data_add_certificate(x509_data)
@@ -607,7 +607,7 @@ class Invoice(metaclass=PoolMeta):
                 signed_data_object_properties,
                 etree.QName(etsi, "DataObjectFormat"),
                 attrib={"ObjectReference": "#" + reference_id},
-            )
+                )
             etree.SubElement(
                 data_object_format, etree.QName(etsi, "Description")
                 ).text = "Factura"

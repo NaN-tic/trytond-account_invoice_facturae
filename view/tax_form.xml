@@ -2,10 +2,10 @@
 <!--The COPYRIGHT file at the top level of this repository
 contains the full copyright notices and license terms. -->
 <data>
-    <xpath expr="/form/notebook/page[@id='general']/field[@name='update_unit_price']"
-        position="after">
-        <newline/>
+    <xpath expr="/form/notebook/page[@name='legal_notice']" position="after">
+      <page string="Factura-e" id="factura-e">
         <label name="report_type"/>
         <field name="report_type"/>
+      </page>
     </xpath>
 </data>

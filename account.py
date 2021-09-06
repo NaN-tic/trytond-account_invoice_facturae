@@ -56,6 +56,7 @@ class TaxTemplate(metaclass=PoolMeta):
 
         return res
 
+
 class Tax(metaclass=PoolMeta):
     __name__ = 'account.tax'
 

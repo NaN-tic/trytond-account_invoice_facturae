@@ -67,30 +67,6 @@ class TestAccountInvoiceFacturaeCase(ModuleTestCase):
                     CURRENT_PATH, 'certificate.pfx'), 'rb') as cert_file:
             company.facturae_certificate = cert_file.read()
 
-        payment_term, = PaymentTerm.create([{
-                    'name': '20 days, 40 days',
-                    'lines': [
-                        ('create', [{
-                                    'sequence': 0,
-                                    'type': 'percent',
-                                    'divisor': 2,
-                                    'ratio': Decimal('.5'),
-                                    'relativedeltas': [('create', [{
-                                                    'days': 20,
-                                                    },
-                                                ]),
-                                        ],
-                                    }, {
-                                    'sequence': 1,
-                                    'type': 'remainder',
-                                    'relativedeltas': [('create', [{
-                                                    'days': 40,
-                                                    },
-                                                ]),
-                                        ],
-                                    }])]
-                    }])
-
         with set_company(company):
             create_chart(company, tax=True)
 
@@ -196,7 +172,6 @@ class TestAccountInvoiceFacturaeCase(ModuleTestCase):
                 invoice.payment_term = term
                 invoice.currency = currency
                 invoice.company = company
-                invoice.payment_term = invoice.on_change_with_payment_term()
                 invoice.account = invoice.on_change_with_account()
 
                 line1 = InvoiceLine()
@@ -222,7 +197,8 @@ class TestAccountInvoiceFacturaeCase(ModuleTestCase):
                 Invoice.post([invoice])
 
             Invoice.generate_facturae_default([invoice], 'privatepassword')
-
+            self.assertNotEqual(invoice.invoice_facturae, None)
+            self.assertEqual(invoice.invoice_facturae_filename, 'facturae-1.xsig')
 
 def suite():
     suite = trytond.tests.test_tryton.suite()

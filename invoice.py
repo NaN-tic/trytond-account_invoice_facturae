@@ -282,7 +282,7 @@ class Invoice(metaclass=PoolMeta):
             for party in [self.party, self.company.party]:
                 if not getattr(party, field):
                     raise UserError(gettext(
-                        'account_invoice_facturae.party_facturae_fields',
+                            'account_invoice_facturae.party_facturae_fields',
                             party=party.rec_name,
                             invoice=self.rec_name,
                             field=field))
@@ -290,7 +290,7 @@ class Invoice(metaclass=PoolMeta):
                 or len(self.company.party.tax_identifier.code) < 3
                 or len(self.company.party.tax_identifier.code) > 30):
             raise UserError(gettext(
-                'account_invoice_facturae.company_vat_identifier',
+                    'account_invoice_facturae.company_vat_identifier',
                     party=self.company.party.rec_name))
 
         if (not self.company.party.addresses
@@ -300,20 +300,20 @@ class Invoice(metaclass=PoolMeta):
                 or not self.company.party.addresses[0].subdivision
                 or not self.company.party.addresses[0].country):
             raise UserError(gettext(
-                'account_invoice_facturae.company_address_fields',
+                    'account_invoice_facturae.company_address_fields',
                     party=self.company.party.rec_name))
 
         if (not self.party.tax_identifier
                 or len(self.party.tax_identifier.code) < 3
                 or len(self.party.tax_identifier.code) > 30):
             raise UserError(gettext(
-                'account_invoice_facturae.party_vat_identifier',
+                    'account_invoice_facturae.party_vat_identifier',
                     party=self.party.rec_name,
                     invoice=self.rec_name))
         if (self.party.facturae_person_type == 'F'
                 and len(self.party.name.split(' ', 2)) < 2):
             raise UserError(gettext(
-                'account_invoice_facturae.party_name_surname',
+                    'account_invoice_facturae.party_name_surname',
                     party=self.party.rec_name,
                     invoice=self.rec_name))
         if (not self.invoice_address.street
@@ -322,7 +322,7 @@ class Invoice(metaclass=PoolMeta):
                 or not self.invoice_address.subdivision
                 or not self.invoice_address.country):
             raise UserError(gettext(
-                'account_invoice_facturae.invoice_address_fields',
+                    'account_invoice_facturae.invoice_address_fields',
                     invoice=self.rec_name))
 
         euro, = Currency.search([('code', '=', 'EUR')], limit=1)
@@ -338,7 +338,7 @@ class Invoice(metaclass=PoolMeta):
                         ], limit=1, order=[('date', 'DESC')])
                 if not rates:
                     raise UserError(gettext(
-                        'account_invoice_facturae.no_rate',
+                            'account_invoice_facturae.no_rate',
                             currency=self.currenc.name,
                             date=self.invoice_date.strftime('%d/%m/%Y')))
                 exchange_rate = rates[0].rate
@@ -350,7 +350,7 @@ class Invoice(metaclass=PoolMeta):
                         ], limit=1, order=[('date', 'DESC')])
                 if not rates:
                     raise UserError(gettext(
-                        'account_invoice_facturae.no_rate',
+                            'account_invoice_facturae.no_rate',
                             currency=euro.name,
                             date=self.invoice_date.strftime('%d/%m/%Y')))
                 exchange_rate = Decimal(1) / rates[0].rate
@@ -371,18 +371,20 @@ class Invoice(metaclass=PoolMeta):
                     invoice=self.rec_name))
             if not move_line.payment_type.facturae_type:
                 raise UserError(gettext(
-                    'account_invoice_facturae.missing_payment_type_facturae_type',
+                        'account_invoice_facturae.'
+                        'missing_payment_type_facturae_type',
                         payment_type=move_line.payment_type.rec_name,
                         invoice=self.rec_name))
             if move_line.payment_type.facturae_type in ('02', '04'):
                 if not hasattr(move_line, 'account_bank'):
                     raise UserError(gettext(
-                        'account_invoice_facturae.missing_account_bank_module',
+                            'account_invoice_facturae.'
+                            'missing_account_bank_module',
                             payment_type=move_line.payment_type.rec_name,
                             invoice=self.rec_name))
                 if not move_line.bank_account:
                     raise UserError(gettext(
-                        'account_invoice_facturae.missing_bank_account',
+                            'account_invoice_facturae.missing_bank_account',
                             invoice=self.rec_name))
                 if not [n for n in move_line.bank_account.numbers
                         if n.type == 'iban']:
@@ -429,10 +431,9 @@ class Invoice(metaclass=PoolMeta):
                 exc_info=True)
             logger.debug(xml_string)
             raise UserError(gettext(
-                'account_invoice_facturae.invalid_factura_xml_file',
+                    'account_invoice_facturae.invalid_factura_xml_file',
                     invoice=self.rec_name, message=e))
         return True
-
 
     def _sign_facturae(self, xml_string, certificate_password):
         """
@@ -509,7 +510,8 @@ class Invoice(metaclass=PoolMeta):
             ref = xmlsig.template.add_reference(
                 sign, xmlsig.constants.TransformSha1, name=reference_id, uri=""
                 )
-            xmlsig.template.add_transform(ref, xmlsig.constants.TransformEnveloped)
+            xmlsig.template.add_transform(ref,
+                xmlsig.constants.TransformEnveloped)
             object_node = etree.SubElement(
                 sign,
                 etree.QName(xmlsig.constants.DSigNs, "Object"),
@@ -527,14 +529,16 @@ class Invoice(metaclass=PoolMeta):
                 attrib={xmlsig.constants.ID_ATTR: signed_properties_id},
                 )
             signed_signature_properties = etree.SubElement(
-                signed_properties, etree.QName(etsi, "SignedSignatureProperties")
+                signed_properties, etree.QName(etsi,
+                    "SignedSignatureProperties")
                 )
             now = datetime.datetime.now()
             etree.SubElement(
                 signed_signature_properties, etree.QName(etsi, "SigningTime")
                 ).text = now.isoformat()
             signing_certificate = etree.SubElement(
-                signed_signature_properties, etree.QName(etsi, "SigningCertificate")
+                signed_signature_properties, etree.QName(etsi,
+                    "SigningCertificate")
                 )
             signing_certificate_cert = etree.SubElement(
                 signing_certificate, etree.QName(etsi, "Cert")
@@ -550,17 +554,20 @@ class Invoice(metaclass=PoolMeta):
 
             hash_cert = hashlib.sha1(crt)
             etree.SubElement(
-                cert_digest, etree.QName(xmlsig.constants.DSigNs, "DigestValue")
+                cert_digest, etree.QName(xmlsig.constants.DSigNs,
+                    "DigestValue")
                 ).text = base64.b64encode(hash_cert.digest())
 
             issuer_serial = etree.SubElement(
                 signing_certificate_cert, etree.QName(etsi, "IssuerSerial")
                 )
             etree.SubElement(
-                issuer_serial, etree.QName(xmlsig.constants.DSigNs, "X509IssuerName")
+                issuer_serial, etree.QName(xmlsig.constants.DSigNs,
+                    "X509IssuerName")
                 ).text = xmlsig.utils.get_rdns_name(certificate.issuer.rdns)
             etree.SubElement(
-                issuer_serial, etree.QName(xmlsig.constants.DSigNs, "X509SerialNumber")
+                issuer_serial, etree.QName(xmlsig.constants.DSigNs,
+                    "X509SerialNumber")
                 ).text = str(certificate.serial_number)
 
             signature_policy_identifier = etree.SubElement(
@@ -568,7 +575,8 @@ class Invoice(metaclass=PoolMeta):
                 etree.QName(etsi, "SignaturePolicyIdentifier"),
                 )
             signature_policy_id = etree.SubElement(
-                signature_policy_identifier, etree.QName(etsi, "SignaturePolicyId")
+                signature_policy_identifier, etree.QName(etsi,
+                    "SignaturePolicyId")
                 )
             sig_policy_id = etree.SubElement(
                 signature_policy_id, etree.QName(etsi, "SigPolicyId")
@@ -589,7 +597,8 @@ class Invoice(metaclass=PoolMeta):
                 )
             hash_value = sig_policy_hash_value
             etree.SubElement(
-                sig_policy_hash, etree.QName(xmlsig.constants.DSigNs, "DigestValue")
+                sig_policy_hash, etree.QName(xmlsig.constants.DSigNs,
+                    "DigestValue")
                 ).text = hash_value
             signer_role = etree.SubElement(
                 signed_signature_properties, etree.QName(etsi, "SignerRole")
@@ -601,7 +610,8 @@ class Invoice(metaclass=PoolMeta):
                 claimed_roles, etree.QName(etsi, "ClaimedRole")
                 ).text = "supplier"
             signed_data_object_properties = etree.SubElement(
-                signed_properties, etree.QName(etsi, "SignedDataObjectProperties")
+                signed_properties, etree.QName(etsi,
+                    "SignedDataObjectProperties")
                 )
             data_object_format = etree.SubElement(
                 signed_data_object_properties,

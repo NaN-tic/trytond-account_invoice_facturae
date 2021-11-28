@@ -142,7 +142,7 @@ class Invoice(metaclass=PoolMeta):
                 & (Eval('state').in_(['posted', 'paid']))),
             }, depends=['credited_invoices'])
     invoice_facturae = fields.Binary('Factura-e',
-        filename='invoice_facturae_filename', readonly=True)
+        filename='invoice_facturae_filename')
     invoice_facturae_filename = fields.Function(fields.Char(
         'Factura-e filename'), 'get_invoice_facturae_filename')
 

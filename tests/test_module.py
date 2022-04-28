@@ -1,22 +1,21 @@
-# The COPYRIGHT file at the top level of this repository contains the full
-# copyright notices and license terms.
-# import doctest
+
+# This file is part of Tryton.  The COPYRIGHT file at the top level of
+# this repository contains the full copyright notices and license terms.
+
 import os.path
-import unittest
 from decimal import Decimal
-import trytond.tests.test_tryton
 from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
 from trytond.modules.account.tests import get_fiscalyear, create_chart
-from trytond.modules.company.tests import create_company, set_company
+from trytond.modules.company.tests import create_company, set_company, CompanyTestMixin
 from trytond.modules.account_invoice.tests import set_invoice_sequences
 from trytond.modules.currency.tests import create_currency, add_currency_rate
 CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 
-class TestAccountInvoiceFacturaeCase(ModuleTestCase):
-    'Test account_invoice_facturae module'
+class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
+    'Test AccountInvoiceFacturae module'
     module = 'account_invoice_facturae'
 
     @with_transaction()
@@ -204,8 +203,5 @@ class TestAccountInvoiceFacturaeCase(ModuleTestCase):
             self.assertNotEqual(invoice.invoice_facturae, None)
             self.assertEqual(invoice.invoice_facturae_filename, 'facturae-1.xsig')
 
-def suite():
-    suite = trytond.tests.test_tryton.suite()
-    suite.addTests(unittest.TestLoader().loadTestsFromTestCase(
-            TestAccountInvoiceFacturaeCase))
-    return suite
+
+del ModuleTestCase

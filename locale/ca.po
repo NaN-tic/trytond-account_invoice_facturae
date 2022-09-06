@@ -108,11 +108,11 @@ msgstr ""
 
 msgctxt "model:ir.message,text:incompatible_facturae_type_account_bank"
 msgid ""
-"The Factura-e Type and Account Bank Kind of Payment Type \"%(paymen_type)s\""
+"The Factura-e Type and Account Bank Kind of Payment Type \"%(payment_type)s\""
 " are not compatible."
 msgstr ""
 "El Tipus Fatura-e i el Tipus compte bancari del Tipus de pagament "
-"\"%(paymen_type)s\" no són compatibles."
+"\"%(payment_type)s\" no són compatibles."
 
 msgctxt "model:ir.message,text:invalid_factura_xml_file"
 msgid ""

@@ -53,7 +53,7 @@ The payment type "%(payment_type)s" used in invoice "%(invoice)s" is configured 
 Message returned by signing process: %(process_output)s</field>
       </record>
       <record model="ir.message" id="incompatible_facturae_type_account_bank">
-          <field name="text">The Factura-e Type and Account Bank Kind of Payment Type "%(paymen_type)s" are not compatible.</field>
+          <field name="text">The Factura-e Type and Account Bank Kind of Payment Type "%(payment_type)s" are not compatible.</field>
       </record>
 
     </data>

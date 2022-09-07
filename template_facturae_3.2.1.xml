@@ -255,7 +255,7 @@
                     - TransactionDate
                     - Extensions
                     #}
-                    <ItemDescription>{{ line.description and line.description[:2500] or '' }}</ItemDescription>
+                    <ItemDescription>{{ (line.description and line.description[:2500]) or (line.product and line.product.rec_name[:2500]) or '#'+line.id|string }}</ItemDescription>
                     <Quantity>{{ line.quantity }}</Quantity>
                     <UnitOfMeasure>{{ UOM_CODE2TYPE.get(line.unit.symbol, '05') if line.unit else '05' }}</UnitOfMeasure>
                     <UnitPriceWithoutTax>{{ Currency.compute(invoice.currency, line.unit_price, euro) }}</UnitPriceWithoutTax>

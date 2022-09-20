@@ -452,19 +452,17 @@ class Invoice(metaclass=PoolMeta):
         cert_file.close()
 
         def _sign_file(cert, password, request):
+            # get key and certificates from PCK12 file
             (
                 private_key,
                 certificate,
                 additional_certificates,
                 ) = pkcs12.load_key_and_certificates(cert, password)
-            # key = private_key.private_bytes(
-            #     encoding=serialization.Encoding.PEM,
-            #     format=serialization.PrivateFormat.PKCS8,
-            #     encryption_algorithm=serialization.NoEncryption(),
-            #     )
+
             # DER is an ASN.1 encoding type
             crt = certificate.public_bytes(serialization.Encoding.DER)
 
+            # Set variables values
             rand_min = 1
             rand_max = 99999
             signature_id = "Signature%05d" % random.randint(rand_min, rand_max)
@@ -483,18 +481,32 @@ class Invoice(metaclass=PoolMeta):
                 ".pdf"
                 )
             sig_policy_hash_value = "Ohixl6upD6av8N7pEvDABhEL6hM="
+
+            # Get XML file to edit
             root = etree.fromstring(request)
+
+            # Create a signature template for RSA-SHA1 enveloped signature.
             sign = xmlsig.template.create(
                 c14n_method=xmlsig.constants.TransformInclC14N,
                 sign_method=xmlsig.constants.TransformRsaSha1,
                 name=signature_id,
                 ns="ds",
                 )
-            key_info = xmlsig.template.ensure_key_info(sign, name=key_info_id)
-            x509_data = xmlsig.template.add_x509_data(key_info)
-            xmlsig.template.x509_data_add_certificate(x509_data)
-            xmlsig.template.add_key_value(key_info)
+            assert sign is not None
 
+            # Add the <ds:Signature/> node to the document.
+            root.append(sign)
+
+            # Add the <ds:Reference/> node to the signature template.
+            ref = xmlsig.template.add_reference(
+                sign, xmlsig.constants.TransformSha1, name=reference_id, uri=""
+                )
+
+            # Add the enveloped transform descriptor.
+            xmlsig.template.add_transform(ref,
+                xmlsig.constants.TransformEnveloped)
+
+            # Add 2 new <ds:Reference/> node to the signature template.
             xmlsig.template.add_reference(
                 sign,
                 xmlsig.constants.TransformSha1,
@@ -504,11 +516,20 @@ class Invoice(metaclass=PoolMeta):
             xmlsig.template.add_reference(
                 sign, xmlsig.constants.TransformSha1, uri="#" + key_info_id
                 )
-            ref = xmlsig.template.add_reference(
-                sign, xmlsig.constants.TransformSha1, name=reference_id, uri=""
-                )
-            xmlsig.template.add_transform(ref,
-                xmlsig.constants.TransformEnveloped)
+
+            # Add the <ds:KeyInfo/> and <ds:KeyName/> nodes.
+            key_info = xmlsig.template.ensure_key_info(sign, name=key_info_id)
+            x509_data = xmlsig.template.add_x509_data(key_info)
+            xmlsig.template.x509_data_add_certificate(x509_data)
+
+            # Set the certificate values
+            ctx = xmlsig.SignatureContext()
+            ctx.private_key = private_key
+            ctx.x509 = certificate
+            ctx.ca_certificates = additional_certificates
+            ctx.public_key = certificate.public_key()
+
+            # Set the footer validation
             object_node = etree.SubElement(
                 sign,
                 etree.QName(xmlsig.constants.DSigNs, "Object"),
@@ -618,15 +639,25 @@ class Invoice(metaclass=PoolMeta):
             etree.SubElement(
                 data_object_format, etree.QName(etsi, "Description")
                 ).text = "Factura"
+            data_object_format_identifier = etree.SubElement(
+                data_object_format, etree.QName(etsi, "ObjectIdentifier")
+                )
+            etree.SubElement(
+                data_object_format_identifier,
+                etree.QName(etsi, "Identifier"),
+                attrib={"Qualifier": "OIDAsURN"}
+                ).text = "urn:oid:1.2.840.10003.5.109.10"
+            etree.SubElement(
+                data_object_format_identifier, etree.QName(etsi, "Description")
+                )
             etree.SubElement(
                 data_object_format, etree.QName(etsi, "MimeType")
                 ).text = "text/xml"
-            ctx = xmlsig.SignatureContext()
-            ctx.x509 = certificate
-            ctx.public_key = certificate.public_key()
-            ctx.private_key = private_key
-            root.append(sign)
+
+            # Sign the file and verify the sign.
             ctx.sign(sign)
+            ctx.verify(sign)
+
             return etree.tostring(root, xml_declaration=True, encoding="UTF-8")
 
         signed_file_content = _sign_file(

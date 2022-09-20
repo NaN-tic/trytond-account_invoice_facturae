@@ -1,5 +1,5 @@
 {% from "template_facturae_macros.xml" import administrative_center, address, contact %}<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-<namespace:Facturae xmlns:namespace2="http://uri.etsi.org/01903/v1.2.2#" xmlns:namespace3="http://www.w3.org/2000/09/xmldsig#" xmlns:namespace="http://www.facturae.es/Facturae/2014/v3.2.1/Facturae">
+<namespace:Facturae xmlns:namespace="http://www.facturae.es/Facturae/2014/v3.2.1/Facturae" xmlns:namespace2="http://uri.etsi.org/01903/v1.2.2#" xmlns:namespace3="http://www.w3.org/2000/09/xmldsig#">
     <FileHeader>
         <SchemaVersion>3.2.1</SchemaVersion>
         <Modality>I</Modality>

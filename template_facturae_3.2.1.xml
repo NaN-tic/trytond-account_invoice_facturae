@@ -381,6 +381,9 @@
                 - Extensions
                 #}
                 <InvoiceAdditionalInformation>
+                  {% if 'Kit Digital' in invoice.reference %}
+                  Financiado por el Programa Kit Digital. Plan de Recuperación, Transformación y Resiliencia de España-Next Generation EU
+                  {% endif %}
                   Factura generada con Tryton (https://www.tryton.org)
                 </InvoiceAdditionalInformation>
             </AdditionalData>

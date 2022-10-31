@@ -321,11 +321,15 @@
                         </Tax>
                         {% endfor %}
                     </TaxesOutputs>
-                    {% if line.taxes_additional_line_item_information %}
+                    {% if line.taxes_additional_line_item_information or line.note %}
                     <AdditionalLineItemInformation>
-                        {% for key, description in line.taxes_additional_line_item_information.items() %}
-                        {{ key }} = {{ description }}
-                        {% endfor %}
+                    {% if line.taxes_additional_line_item_information %}
+                    {% for key, description in line.taxes_additional_line_item_information.items() %}
+                    {{ key }} = {{ description }}
+                    {% endfor %}
+                    {% elif line.note %}
+                        {{ line.note }}
+                    {% endif %}
                     </AdditionalLineItemInformation>
                     {% endif %}
                     {# TODO: SpecialTaxableEvent not supported #}
@@ -376,7 +380,9 @@
                 - RelatedDocuments
                 - Extensions
                 #}
-                <InvoiceAdditionalInformation>Factura generada con Tryton (https://www.tryton.org)</InvoiceAdditionalInformation>
+                <InvoiceAdditionalInformation>
+                  Factura generada con Tryton (https://www.tryton.org)
+                </InvoiceAdditionalInformation>
             </AdditionalData>
         </Invoice>
     </Invoices>

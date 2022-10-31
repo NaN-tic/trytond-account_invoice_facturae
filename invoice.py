@@ -290,12 +290,13 @@ class Invoice(metaclass=PoolMeta):
                     'account_invoice_facturae.company_vat_identifier',
                     party=self.company.party.rec_name))
 
-        if (not self.company.party.addresses
-                or not self.company.party.addresses[0].street
-                or not self.company.party.addresses[0].postal_code
-                or not self.company.party.addresses[0].city
-                or not self.company.party.addresses[0].subdivision
-                or not self.company.party.addresses[0].country):
+        company_address = self.company.party.address_get(type='invoice')
+        if (not company_address
+                or not company_address.street
+                or not company_address.postal_code
+                or not company_address.city
+                or not company_address.subdivision
+                or not company_address.country):
             raise UserError(gettext(
                     'account_invoice_facturae.company_address_fields',
                     party=self.company.party.rec_name))

@@ -7,9 +7,12 @@ branches). Maybe these patches are required for the module to work.
 
 .. _trytond-patches project: https://bitbucket.org/nantic/trytond-patches
 
-The Facturaev3_2_1-offline.xsd is the same that Facturaev3_2_1.xsd but gets the
+The FacturaevX_X_X-offline.xml is the same that FacturaevX_X_X.xml but gets the
 xmldsig-core-schema.xsd file from local because it fails to download from
 w3.org website.
+
+The file are obtained from:
+https://www.facturae.gob.es/formato/Paginas/formato.aspx
 
 Installing
 ----------

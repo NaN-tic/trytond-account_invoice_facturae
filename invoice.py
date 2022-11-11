@@ -25,8 +25,8 @@ from trytond import backend
 from trytond.i18n import gettext
 from trytond.exceptions import UserError
 
-# Get from XSD scheme of Facturae 3.2.1
-# http://www.facturae.gob.es/formato/Versiones/Facturaev3_2_1.xml
+# Get from XSD scheme of Facturae 3.2.2
+# http://www.facturae.gob.es/formato/Versiones/Facturaev3_2_2.xml
 RECTIFICATIVE_REASON_CODES = [
     ("01", "Invoice number", "Número de la factura"),
     ("02", "Invoice serial number", "Serie de la factura"),
@@ -110,8 +110,8 @@ FACe_REQUIRED_FIELDS = ['facturae_person_type', 'facturae_residence_type']
 _slugify_strip_re = re.compile(r'[^\w\s-]')
 _slugify_hyphenate_re = re.compile(r'[-\s]+')
 
-DEFAULT_FACTURAE_TEMPLATE = 'template_facturae_3.2.1.xml'
-DEFAULT_FACTURAE_SCHEMA = 'Facturaev3_2_1-offline.xsd'
+DEFAULT_FACTURAE_TEMPLATE = 'template_facturae_3.2.2.xml'
+DEFAULT_FACTURAE_SCHEMA = 'Facturaev3_2_2-offline.xml'
 
 
 def slugify(value):

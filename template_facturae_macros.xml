@@ -58,3 +58,17 @@
             #}
         </ContactDetails>
 {% endmacro %}
+
+{% macro registration_data(company) %}
+    {% if company.registration_data_location %}
+        <RegistrationData>
+            <Book>{{ company.registration_data_book[:20] or '0' }}</Book>
+            <RegisterOfCompaniesLocation>{{ company.registration_data_location[:20] }}</RegisterOfCompaniesLocation>
+            <Sheet>{{ company.registration_data_sheet[:20] }}</Sheet>
+            <Folio>{{ company.registration_data_folio[:20] }}</Folio>
+            <Section>{{ company.registration_data_section[:20] }}</Section>
+            <Volume>{{ company.registration_data_volume[:20] }}</Volume>
+            <AdditionalRegistrationData>{{ company.registration_data_additional[:20] }}</AdditionalRegistrationData>
+        </RegistrationData>
+    {% endif %}
+{% endmacro %}

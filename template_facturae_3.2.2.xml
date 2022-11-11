@@ -1,7 +1,8 @@
-{% from "template_facturae_macros.xml" import administrative_center, address, contact %}<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-<namespace:Facturae xmlns:namespace="http://www.facturae.es/Facturae/2014/v3.2.1/Facturae" xmlns:namespace2="http://uri.etsi.org/01903/v1.2.2#" xmlns:namespace3="http://www.w3.org/2000/09/xmldsig#">
+{% from "template_facturae_macros.xml" import administrative_center, address, contact, registration_data %}
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<namespace:Facturae xmlns:namespace="http://www.facturae.gob.es/formato/Versiones/Facturaev3_2_2.xml" xmlns:namespace2="http://uri.etsi.org/01903/v1.2.2#" xmlns:namespace3="http://www.w3.org/2000/09/xmldsig#">
     <FileHeader>
-        <SchemaVersion>3.2.1</SchemaVersion>
+        <SchemaVersion>3.2.2</SchemaVersion>
         <Modality>I</Modality>
         {# The invoice is signed by Issuer (the company, only supported out invoices) #}
         <InvoiceIssuerType>EM</InvoiceIssuerType>
@@ -58,7 +59,9 @@
                 {% if invoice.company.party.trade_name %}
                 <TradeName>{{ invoice.company.party.trade_name[:40] }}</TradeName>
                 {% endif %}
-                {# RegistrationData optional: not supported #}
+                {% if invoice.company %}
+                {{ registration_data(invoice.company) }}
+                {% endif %}
                 {% if invoice.company.party.addresses %}
                 {{ address(invoice.company.party.addresses[0]) }}
                 {% endif %}
@@ -92,7 +95,6 @@
                 {% if invoice.party.trade_name %}
                 <TradeName>{{ invoice.party.trade_name[:40] }}</TradeName>
                 {% endif %}
-                {# RegistrationData optional: not supported #}
                 {{ address(invoice.invoice_address) }}
                 {% if invoice.party.contact_mechanisms %}
                 {{ contact(invoice.party) }}
@@ -105,7 +107,6 @@
                 {% if invoice.party.name.split(' ') | length > 2 %}
                 <SecondSurname>{{ invoice.party.name and invoice.party.name.split(' ', 2)[2][:40] }}</SecondSurname>
                 {% endif %}
-                {# RegistrationData optional: not supported #}
                 {{ address(invoice.invoice_address) }}
                 {% if invoice.party.contact_mechanisms %}
                 {{ contact(invoice.party) }}
@@ -140,16 +141,15 @@
                         <StartDate>{{ invoice.credited_invoices[0].move.period.start_date.isoformat() }}</StartDate>
                         <EndDate>{{ invoice.credited_invoices[0].move.period.end_date.isoformat() }}</EndDate>
                     </TaxPeriod>
-                    {# TODO: Methods not supported:
-                    - 02 (solo se
-                    anotan los detalles ya rectificados)
-                    - 03 (Rectificación por
-                    descuento por volumen de operaciones durante un periodo)
+                    {# TODO: Methods not supported: 
+                    - 02 (solo se anotan los detalles ya rectificados)
+                    - 03 (Rectificación por descuento por volumen de operaciones durante un periodo)
                     - 04 (Autorizadas por la Agencia Tributaria)
                     #}
                     <CorrectionMethod>01</CorrectionMethod>
                     <CorrectionMethodDescription>Rectificación íntegra</CorrectionMethodDescription>
                     {# AdditionalReasonDescription optional: not supported #}
+                    {# TODO: InvoiceIssueDate: Nuevo campo para definir la fecha de expedición de la factura rectificada. Valor obligatorio en el supuesto de que la etiqueta CorrectionMethod tome los valores “01” o “02” #}
                 </Corrective>
                 {% endif %}
             </InvoiceHeader>
@@ -251,7 +251,6 @@
                     - FileReference, FileDate
                     - SequenceNumber
                     - DeliveryNotesReferences (account_invoice_stock)
-                    - LineItemPeriod
                     - TransactionDate
                     - Extensions
                     #}
@@ -321,6 +320,12 @@
                         </Tax>
                         {% endfor %}
                     </TaxesOutputs>
+                    {% if line.origin and line.origin.contract %}
+                    <LineItemPeriod>
+                        <StartDate>{{ line.origin.start_date }}</StartDate>
+                        <EndDate>{{ line.origin.end_date }}</EndDate>
+                    </LineItemPeriod>
+                    {% endif %}
                     {% if line.taxes_additional_line_item_information or line.note %}
                     <AdditionalLineItemInformation>
                     {% if line.taxes_additional_line_item_information %}

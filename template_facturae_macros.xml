@@ -62,7 +62,7 @@
 {% macro registration_data(company) %}
     {% if company.registration_data_location %}
         <RegistrationData>
-            <Book>{{ company.registration_data_book[:20] or '0' }}</Book>
+            <Book>{{ company.registration_data_book and company.registration_data_book[:20] or '0' }}</Book>
             <RegisterOfCompaniesLocation>{{ company.registration_data_location[:20] }}</RegisterOfCompaniesLocation>
             <Sheet>{{ company.registration_data_sheet[:20] }}</Sheet>
             <Folio>{{ company.registration_data_folio[:20] }}</Folio>

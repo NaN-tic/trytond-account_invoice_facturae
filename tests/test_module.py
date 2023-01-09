@@ -164,9 +164,9 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
             with Transaction().set_user(0):
                 invoice = Invoice()
                 invoice.type = 'out'
-                invoice.on_change_type()
                 invoice.party = party
                 invoice.on_change_party()
+                invoice.journal = invoice.on_change_with_journal()
                 invoice.payment_type = payment_receivable
                 invoice.payment_term = term
                 invoice.currency = currency

@@ -117,6 +117,9 @@ this repository contains the full copyright notices and license terms. -->
         <record model="account.tax.template" id="account_es.iva_rep_ex">
             <field name="report_type">01</field>
         </record>
+        <record model="account.tax.template" id="account_es.iva_rep_0">
+            <field name="report_type">01</field>
+        </record>
         <record model="account.tax.template" id="account_es.iva_rep_4">
             <field name="report_type">01</field>
         </record>

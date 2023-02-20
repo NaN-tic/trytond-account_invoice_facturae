@@ -236,7 +236,7 @@ class Invoice(metaclass=PoolMeta):
                 invoice_facturae = facturae_content
             to_write[0].append(invoice)
             to_write += ({'invoice_facturae': invoice_facturae},)
-        if to_write:
+        if to_write[0]:
             cls.write(*to_write)
 
     def get_facturae(self):

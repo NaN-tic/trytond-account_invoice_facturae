@@ -339,7 +339,7 @@
                     {% endif %}
                     {# TODO: SpecialTaxableEvent not supported #}
                     {% if line.product and line.product.code %}
-                    <ArticleCode>{{ line.product.code }}</ArticleCode>
+                    <ArticleCode>{{ line.product.code[:20] }}</ArticleCode>
                     {% endif %}
                 </InvoiceLine>
                 {% endfor %}
@@ -362,10 +362,10 @@
                         {# Unnecessary if IBAN is supplied: AccountNumber, BankCode, BranchCode, BranchInSpainAddress, OverseasBranchAddress, BIC #}
                     </AccountToBeDebited>
                     {# optional, not supported:
-                    - PaymentReconciliationReference
-                    - CollectionAdditionalInformation
+                    - PaymentReconciliationReference[:60]
+                    - CollectionAdditionalInformation[:2500]
                     - RegulatoryReportingData (for international operations)
-                    - DebitReconciliationReference
+                    - DebitReconciliationReference[:60]
                     #}
                     {% endif %}
                 </Installment>
@@ -381,13 +381,13 @@
             </LegalLiterals>
             <AdditionalData>
                 {# optional, not supported:
-                - RelatedInvoice
+                - RelatedInvoice[:40]
                 - RelatedDocuments
                 - Extensions
                 #}
-                <InvoiceAdditionalInformation>
+                <InvoiceAdditionalInformation> # [:2500]
                   {% if invoice.reference and 'Kit Digital' in invoice.reference %}
-                  {{ invoice.description }}
+                  {{ invoice.description[:2445] }}
                   {% endif %}
                   Factura generada con Tryton (https://www.tryton.org)
                 </InvoiceAdditionalInformation>

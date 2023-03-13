@@ -23,6 +23,8 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         'Test invoice generation'
 
         pool = Pool()
+        Configuration = pool.get('account.configuration')
+        CertificateManager = pool.get('certificate.manager')
         Account = pool.get('account.account')
         FiscalYear = pool.get('account.fiscalyear')
         Invoice = pool.get('account.invoice')
@@ -61,12 +63,19 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         company.party.save()
         company.save()
 
-        # Save certificate into company
+        certificate = CertificateManager()
+        certificate.name = 'dummy Certificate'
+        # Save certificate
         with open(os.path.join(
                     CURRENT_PATH, 'certificate.pfx'), 'rb') as cert_file:
-            company.facturae_certificate = cert_file.read()
+            certificate.pem_certificate = cert_file.read()
+        certificate.save()
 
         with set_company(company):
+            config = Configuration(1)
+            config.certificate_facturae = certificate
+            config.save()
+
             create_chart(company, tax=True)
 
             fiscalyear = set_invoice_sequences(get_fiscalyear(company))

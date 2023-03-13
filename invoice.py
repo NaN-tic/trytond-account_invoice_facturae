@@ -222,7 +222,7 @@ class Invoice(metaclass=PoolMeta):
         pass
 
     @classmethod
-    def generate_facturae_default(cls, invoices, certificate_password):
+    def generate_facturae_default(cls, invoices, certificate_password=None):
         to_write = ([],)
         for invoice in invoices:
             if invoice.invoice_facturae:
@@ -433,13 +433,25 @@ class Invoice(metaclass=PoolMeta):
                     invoice=self.rec_name, message=e))
         return True
 
-    def _sign_facturae(self, xml_string, certificate_password):
+    def _sign_facturae(self, xml_string, certificate_password=None):
         """
         Inspired by https://github.com/pedrobaeza/l10n-spain/blob/d01d049934db55130471e284012be7c860d987eb/l10n_es_facturae/wizard/create_facturae.py
         """
-        if not self.company.facturae_certificate:
+        Configuration = Pool().get('account.configuration')
+
+        config = Configuration(1)
+        certificate_facturae = (config.certificate_facturae
+            and config.certificate_facturae.pem_certificate)
+        if not certificate_facturae:
             raise UserError(gettext(
-                'account_invoice_facturae.missing_certificate',
+                'account_invoice_facturae.msg_missing_certificate',
+                company=self.company.rec_name))
+
+        certificate_password = (certificate_password
+            or config.certificate_facturae.certificate_password)
+        if not certificate_password:
+            raise UserError(gettext(
+                'account_invoice_facturae.msg_missing_password_certificate',
                 company=self.company.rec_name))
 
         logger = logging.getLogger('account_invoice_facturae')
@@ -449,7 +461,7 @@ class Invoice(metaclass=PoolMeta):
         unsigned_file.close()
 
         cert_file = NamedTemporaryFile(suffix='.pfx', delete=False)
-        cert_file.write(self.company.facturae_certificate)
+        cert_file.write(certificate_facturae)
         cert_file.close()
 
         def _sign_file(cert, password, request):
@@ -662,7 +674,7 @@ class Invoice(metaclass=PoolMeta):
             return etree.tostring(root, xml_declaration=True, encoding="UTF-8")
 
         signed_file_content = _sign_file(
-            self.company.facturae_certificate,
+            certificate_facturae,
             certificate_password.encode(),
             xml_string,
             )
@@ -733,9 +745,30 @@ class GenerateFacturaeStart(ModelView):
         ], 'Service', required=True)
     certificate_password = fields.Char('Certificate Password',
         states={
-            'required': Eval('service') == 'default',
-            'invisible': Eval('service') != 'default',
-        }, depends=['service'])
+            'required': ~Bool(Eval('certificate_has_password', False)),
+            'invisible': Bool(Eval('certificate_has_password', True)),
+        }, depends=['certificate_has_password'])
+    certificate_facturae = fields.Function(
+        fields.Many2One('certificate.manager', 'Certificate'),
+        'on_change_with_certificate_facturae')
+    certificate_has_password = fields.Function(
+        fields.Boolean('Certificate Has Password'),
+        'on_change_with_certificate_has_password')
+
+    @fields.depends('service')
+    def on_change_with_certificate_facturae(self, name=None):
+        Config = Pool().get('account.configuration')
+
+        config = Config(1)
+        return (config.certificate_facturae.id
+            if config.certificate_facturae else None)
+
+    @fields.depends('service', 'certificate_facturae')
+    def on_change_with_certificate_has_password(self, name=None):
+        if (self.certificate_facturae
+                and self.certificate_facturae.certificate_password):
+            return True
+        return False
 
     @staticmethod
     def default_service():

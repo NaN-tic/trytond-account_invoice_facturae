@@ -3,9 +3,6 @@
 from trytond.model import fields
 from trytond.pool import PoolMeta
 
-__all__ = ['TaxTemplate', 'Tax']
-
-
 REPORT_TYPES = [
     (None, ""),
     ("01", "Value-Added Tax"),
@@ -41,6 +38,12 @@ REPORT_TYPES = [
     ("28", "IRNR: Non-resident Income Tax"),
     ("29", "Corporation Tax"),
     ]
+
+
+class Configuration(metaclass=PoolMeta):
+    __name__ = 'account.configuration'
+    certificate_facturae = fields.Many2One('certificate.manager',
+        'Certificate Factura-e')
 
 
 class TaxTemplate(metaclass=PoolMeta):

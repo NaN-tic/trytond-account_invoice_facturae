@@ -1,7 +1,9 @@
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
-from trytond.model import fields
-from trytond.pool import PoolMeta
+from trytond.model import ModelSQL, fields
+from trytond.pool import Pool, PoolMeta
+from trytond.modules.company.model import CompanyValueMixin
+from trytond.pyson import Eval
 
 REPORT_TYPES = [
     (None, ""),
@@ -42,8 +44,31 @@ REPORT_TYPES = [
 
 class Configuration(metaclass=PoolMeta):
     __name__ = 'account.configuration'
-    certificate_facturae = fields.Many2One('certificate.manager',
-        'Certificate Factura-e')
+    certificate_service_facturae = fields.MultiValue(
+        fields.Many2One('certificate.service',
+        'Certificate Service Post Factura-e',
+        help='Service to be used when post the invoice'))
+    invoice_facturae_after = fields.TimeDelta("Send Factura-e after",
+        help="The grace period during can still to send to service when "
+        "post invoice.\n"
+        "Applied if a worker queue is activated.")
+
+    @classmethod
+    def multivalue_model(cls, field):
+        pool = Pool()
+        if field in 'certificate_service_facturae':
+            return pool.get('account.configuration.facturae')
+        return super().multivalue_model(field)
+
+
+class ConfigurationFacturae(ModelSQL, CompanyValueMixin):
+    "Account Configuration Factura-e"
+    __name__ = 'account.configuration.facturae'
+    certificate_service_facturae = fields.Many2One(
+        'certificate.service', 'Certificate Service Post Factura-e',
+        domain=[
+            ('certificate.company', 'in', [Eval('company', -1), None]),
+            ])
 
 
 class TaxTemplate(metaclass=PoolMeta):

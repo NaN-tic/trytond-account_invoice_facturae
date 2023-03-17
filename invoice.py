@@ -25,6 +25,8 @@ from trytond import backend
 from trytond.i18n import gettext
 from trytond.exceptions import UserError
 
+FACTURAE_SCHEMA_VERSION = '3.2.2'
+
 # Get from XSD scheme of Facturae 3.2.2
 # http://www.facturae.gob.es/formato/Versiones/Facturaev3_2_2.xml
 RECTIFICATIVE_REASON_CODES = [
@@ -207,6 +209,29 @@ class Invoice(metaclass=PoolMeta):
                 if ml.account.type.receivable],
             key=attrgetter('maturity_date'))
 
+    @classmethod
+    def post(cls, invoices):
+        Config = Pool().get('account.configuration')
+
+        config = Config(1)
+        transaction = Transaction()
+        context = transaction.context
+
+        super(Invoice, cls).post(invoices)
+
+        if config.certificate_service_facturae:
+            service = config.certificate_service_facturae.service
+
+            with transaction.set_context(
+                    queue_scheduled_at=config.invoice_facturae_after,
+                    queue_batch=context.get('queue_batch', True)):
+                cls.__queue__.post_facturae(invoices, service)
+
+    @classmethod
+    def post_facturae(cls, invoices, service):
+        service = 'generate_facturae_%s' % service
+        getattr(cls, service)(invoices)
+
     def _credit(self, **values):
         credit = super(Invoice, self)._credit(**values)
         rectificative_reason_code = Transaction().context.get(
@@ -222,7 +247,8 @@ class Invoice(metaclass=PoolMeta):
         pass
 
     @classmethod
-    def generate_facturae_default(cls, invoices, certificate_password=None):
+    def generate_facturae_default(cls, invoices, certificate=None,
+            certificate_password=None):
         to_write = ([],)
         for invoice in invoices:
             if invoice.invoice_facturae:
@@ -230,8 +256,8 @@ class Invoice(metaclass=PoolMeta):
             facturae_content = invoice.get_facturae()
             invoice._validate_facturae(facturae_content)
             if backend.name != 'sqlite':
-                invoice_facturae = invoice._sign_facturae(
-                    facturae_content, certificate_password)
+                invoice_facturae = invoice._sign_facturae(facturae_content,
+                    'default', certificate, certificate_password)
             else:
                 invoice_facturae = facturae_content
             to_write[0].append(invoice)
@@ -433,26 +459,31 @@ class Invoice(metaclass=PoolMeta):
                     invoice=self.rec_name, message=e))
         return True
 
-    def _sign_facturae(self, xml_string, certificate_password=None):
+    def _sign_facturae(self, xml_string, service='default', certificate=None,
+            certificate_password=None):
         """
         Inspired by https://github.com/pedrobaeza/l10n-spain/blob/d01d049934db55130471e284012be7c860d987eb/l10n_es_facturae/wizard/create_facturae.py
         """
-        Configuration = Pool().get('account.configuration')
+        CertificateService = Pool().get('certificate.service')
 
-        config = Configuration(1)
-        certificate_facturae = (config.certificate_facturae
-            and config.certificate_facturae.pem_certificate)
-        if not certificate_facturae:
-            raise UserError(gettext(
-                'account_invoice_facturae.msg_missing_certificate',
-                company=self.company.rec_name))
+        if not certificate:
+            certificates = CertificateService.search([
+                ('service', '=', service),
+                ('is_default', '=', True),
+                ], limit=1)
+            if not certificates:
+                raise UserError(gettext(
+                        'account_invoice_facturae.msg_missing_certificate_service',
+                        service=service))
+            certificate, = certificates
 
-        certificate_password = (certificate_password
-            or config.certificate_facturae.certificate_password)
+        certificate_facturae = certificate.pem_certificate
+
+        certificate_password = certificate_password or certificate.certificate_password
         if not certificate_password:
             raise UserError(gettext(
-                'account_invoice_facturae.msg_missing_password_certificate',
-                company=self.company.rec_name))
+                'account_invoice_facturae.msg_missing_password_certificate_service',
+                service=service))
 
         logger = logging.getLogger('account_invoice_facturae')
 
@@ -743,32 +774,9 @@ class GenerateFacturaeStart(ModelView):
     service = fields.Selection([
         ('default', 'Default'),
         ], 'Service', required=True)
-    certificate_password = fields.Char('Certificate Password',
-        states={
-            'required': ~Bool(Eval('certificate_has_password', False)),
-            'invisible': Bool(Eval('certificate_has_password', True)),
-        }, depends=['certificate_has_password'])
-    certificate_facturae = fields.Function(
-        fields.Many2One('certificate.manager', 'Certificate'),
-        'on_change_with_certificate_facturae')
-    certificate_has_password = fields.Function(
-        fields.Boolean('Certificate Has Password'),
-        'on_change_with_certificate_has_password')
-
-    @fields.depends('service')
-    def on_change_with_certificate_facturae(self, name=None):
-        Config = Pool().get('account.configuration')
-
-        config = Config(1)
-        return (config.certificate_facturae.id
-            if config.certificate_facturae else None)
-
-    @fields.depends('service', 'certificate_facturae')
-    def on_change_with_certificate_has_password(self, name=None):
-        if (self.certificate_facturae
-                and self.certificate_facturae.certificate_password):
-            return True
-        return False
+    certificate_facturae = fields.Many2One('certificate.manager',
+        'Certificate Factura-e')
+    certificate_password = fields.Char('Certificate Password')
 
     @staticmethod
     def default_service():
@@ -790,5 +798,6 @@ class GenerateFacturae(Wizard):
 
         invoices = Invoice.browse(Transaction().context['active_ids'])
         service = 'generate_facturae_%s' % self.start.service
-        getattr(Invoice, service)(invoices, self.start.certificate_password)
+        getattr(Invoice, service)(invoices,
+            self.start.certificate_facturae, self.start.certificate_password)
         return 'end'

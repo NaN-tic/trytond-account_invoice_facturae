@@ -6,8 +6,14 @@ this repository contains the full copyright notices and license terms. -->
       <record model="ir.message" id="msg_missing_certificate">
           <field name="text">Missing Factura-e Certificate in company "%(company)s".</field>
       </record>
+      <record model="ir.message" id="msg_missing_certificate_service">
+          <field name="text">Missing default "%(service)s" Factura-e Certificate.</field>
+      </record>
       <record model="ir.message" id="msg_missing_password_certificate">
           <field name="text">Missing Password Factura-e Certificate in company "%(company)s".</field>
+      </record>
+      <record model="ir.message" id="msg_missing_password_certificate_service">
+          <field name="text">Missing default "%(service)s" Password Factura-e Certificate.</field>
       </record>
       <record model="ir.message" id="company_vat_identifier">
           <field name="text">Missing VAT Identifier in company\'s Party "%(party)s", or its length is not between 3 and 30.</field>

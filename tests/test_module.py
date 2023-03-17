@@ -25,6 +25,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         pool = Pool()
         Configuration = pool.get('account.configuration')
         CertificateManager = pool.get('certificate.manager')
+        CertificateService = pool.get('certificate.service')
         Account = pool.get('account.account')
         FiscalYear = pool.get('account.fiscalyear')
         Invoice = pool.get('account.invoice')
@@ -63,18 +64,20 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         company.party.save()
         company.save()
 
-        certificate = CertificateManager()
-        certificate.name = 'dummy Certificate'
-        # Save certificate
-        with open(os.path.join(
-                    CURRENT_PATH, 'certificate.pfx'), 'rb') as cert_file:
-            certificate.pem_certificate = cert_file.read()
-        certificate.save()
-
         with set_company(company):
-            config = Configuration(1)
-            config.certificate_facturae = certificate
-            config.save()
+            certificate = CertificateManager()
+            certificate.name = 'dummy Certificate'
+            # Save certificate
+            with open(os.path.join(
+                        CURRENT_PATH, 'certificate.pfx'), 'rb') as cert_file:
+                certificate.pem_certificate = cert_file.read()
+            certificate.save()
+
+            certificate_service = CertificateService()
+            certificate_service.certificate = certificate
+            certificate_service.service = 'default'
+            certificate_service.is_default = True
+            certificate_service.save()
 
             create_chart(company, tax=True)
 

@@ -5,10 +5,15 @@ from . import account
 from . import invoice
 from . import party
 from . import payment_type
+from .invoice import FACTURAE_SCHEMA_VERSION
+
+__all__ = [FACTURAE_SCHEMA_VERSION]
+
 
 def register():
     Pool.register(
         account.Configuration,
+        account.ConfigurationFacturae,
         account.TaxTemplate,
         account.Tax,
         invoice.Invoice,

@@ -2,9 +2,21 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
-msgctxt "field:account.configuration,certificate_facturae:"
-msgid "Certificate Factura-e"
-msgstr "Certificat Factura-e"
+msgctxt "field:account.configuration,certificate_service_facturae:"
+msgid "Certificate Service Post Factura-e"
+msgstr "Servei certificat comptabilitar Factura-e"
+
+msgctxt "field:account.configuration,invoice_facturae_after:"
+msgid "Send Factura-e after"
+msgstr "Envia "
+
+msgctxt "field:account.configuration.facturae,certificate_service_facturae:"
+msgid "Certificate Service Post Factura-e"
+msgstr "Servei certificat comptabilitar Factura-e"
+
+msgctxt "field:account.configuration.facturae,company:"
+msgid "Company"
+msgstr "Empresa"
 
 msgctxt "field:account.invoice,credited_invoices:"
 msgid "Credited Invoices"
@@ -27,13 +39,8 @@ msgid "Rectificative Reason Code"
 msgstr "Codi motiu rectificació"
 
 msgctxt "field:account.invoice.generate_facturae.start,certificate_facturae:"
-msgid "Certificate"
+msgid "Certificate Factura-e"
 msgstr "Certificat"
-
-msgctxt ""
-"field:account.invoice.generate_facturae.start,certificate_has_password:"
-msgid "Certificate Has Password"
-msgstr "El Certificat té contrasenya"
 
 msgctxt "field:account.invoice.generate_facturae.start,certificate_password:"
 msgid "Certificate Password"
@@ -78,6 +85,22 @@ msgstr "Organo proponente"
 msgctxt "field:party.party,unidad_tramitadora:"
 msgid "Unidad tramitadora"
 msgstr "Unidad tramitadora"
+
+msgctxt "help:account.configuration,certificate_service_facturae:"
+msgid "Service to be used when post the invoice"
+msgstr "El servei que s'utilitzarà quan es comptabilitzi una factura"
+
+msgctxt "help:account.configuration,invoice_facturae_after:"
+msgid ""
+"The grace period during can still to send to service when post invoice.\n"
+"Applied if a worker queue is activated."
+msgstr ""
+"El període durant el qual s'esperà abans d'enviar la factura comptabilitzada al servei.\n"
+"Aplica només si la cua de treballs està activada."
+
+msgctxt "model:account.configuration.facturae,name:"
+msgid "Account Configuration Factura-e"
+msgstr "Configuració comptable Factura-e"
 
 msgctxt "model:account.invoice.generate_facturae.start,name:"
 msgid "Generate Factura-e file - Start"
@@ -175,10 +198,18 @@ msgctxt "model:ir.message,text:msg_missing_certificate"
 msgid "Missing Factura-e Certificate in company \"%(company)s\"."
 msgstr "Falta el Certificat Factura-e a l'empresa \"%(company)s\"."
 
+msgctxt "model:ir.message,text:msg_missing_certificate_service"
+msgid "Missing default \"%(service)s\" Factura-e Certificate."
+msgstr "Falta el per defecte del servei \"%(service)s\" de certificat Factura-e."
+
 msgctxt "model:ir.message,text:msg_missing_password_certificate"
 msgid "Missing Password Factura-e Certificate in company \"%(company)s\"."
 msgstr ""
 "Falta la contrasenya del certificat Factura-e a l'empresa \"%(company)s\"."
+
+msgctxt "model:ir.message,text:msg_missing_password_certificate_service"
+msgid "Missing default \"%(service)s\" Password Factura-e Certificate."
+msgstr "Falta la contrasenya del servei \"%(service)s\" de certificat Factura-e."
 
 msgctxt "model:ir.message,text:no_rate"
 msgid "No rate found for currency \"%(currency)s\" on \"%(date)s\""
@@ -212,7 +243,7 @@ msgstr ""
 
 msgctxt "model:ir.model.button,string:generate_facturae_button"
 msgid "Generate Facturae"
-msgstr "Genera Facturae"
+msgstr "Crea Facturae"
 
 msgctxt "selection:account.invoice,rectificative_reason_code:"
 msgid ""

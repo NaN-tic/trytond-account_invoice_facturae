@@ -2,9 +2,21 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
-msgctxt "field:account.configuration,certificate_facturae:"
-msgid "Certificate Factura-e"
-msgstr "Certificado Factura-e"
+msgctxt "field:account.configuration,certificate_service_facturae:"
+msgid "Certificate Service Post Factura-e"
+msgstr "Servicio certificado contabilizar Factura-e"
+
+msgctxt "field:account.configuration,invoice_facturae_after:"
+msgid "Send Factura-e after"
+msgstr "Enviar Factura-e después de"
+
+msgctxt "field:account.configuration.facturae,certificate_service_facturae:"
+msgid "Certificate Service Post Factura-e"
+msgstr "Servicio certificado contabilizar Factura-e"
+
+msgctxt "field:account.configuration.facturae,company:"
+msgid "Company"
+msgstr "Empresa"
 
 msgctxt "field:account.invoice,credited_invoices:"
 msgid "Credited Invoices"
@@ -27,13 +39,8 @@ msgid "Rectificative Reason Code"
 msgstr "Código motivo rectificación"
 
 msgctxt "field:account.invoice.generate_facturae.start,certificate_facturae:"
-msgid "Certificate"
-msgstr "Certificado"
-
-msgctxt ""
-"field:account.invoice.generate_facturae.start,certificate_has_password:"
-msgid "Certificate Has Password"
-msgstr "Certificado dispone de contraseña"
+msgid "Certificate Factura-e"
+msgstr "Certificado Factura-e"
 
 msgctxt "field:account.invoice.generate_facturae.start,certificate_password:"
 msgid "Certificate Password"
@@ -78,6 +85,22 @@ msgstr "Organo proponente"
 msgctxt "field:party.party,unidad_tramitadora:"
 msgid "Unidad tramitadora"
 msgstr "Unidad tramitadora"
+
+msgctxt "help:account.configuration,certificate_service_facturae:"
+msgid "Service to be used when post the invoice"
+msgstr "El servicio que se utilitzará cuando se contabilize una factura"
+
+msgctxt "help:account.configuration,invoice_facturae_after:"
+msgid ""
+"The grace period during can still to send to service when post invoice.\n"
+"Applied if a worker queue is activated."
+msgstr ""
+"El periodo durante el cual se espera a ser enviado la factura contabilizada al servicio.\n"
+"Solo aplica si la cola de trabajos está activada."
+
+msgctxt "model:account.configuration.facturae,name:"
+msgid "Account Configuration Factura-e"
+msgstr "Configuración contable Factura-e"
 
 msgctxt "model:account.invoice.generate_facturae.start,name:"
 msgid "Generate Factura-e file - Start"
@@ -174,11 +197,22 @@ msgctxt "model:ir.message,text:msg_missing_certificate"
 msgid "Missing Factura-e Certificate in company \"%(company)s\"."
 msgstr "Falta el Certificado Factura-e en la empresa \"%(company)s\"."
 
+msgctxt "model:ir.message,text:msg_missing_certificate_service"
+msgid "Missing default \"%(service)s\" Factura-e Certificate."
+msgstr ""
+"Falta el por defecto del servicio \"%(service)s\" del certificado Factura-e."
+
 msgctxt "model:ir.message,text:msg_missing_password_certificate"
 msgid "Missing Password Factura-e Certificate in company \"%(company)s\"."
 msgstr ""
 "Falta la contraseña del certificado Factura-e Certificate en la empresa "
 "\"%(company)s\"."
+
+msgctxt "model:ir.message,text:msg_missing_password_certificate_service"
+msgid "Missing default \"%(service)s\" Password Factura-e Certificate."
+msgstr ""
+"Falta el por defecto de la contraseña \"%(service)s\" del certificado "
+"Factura-e."
 
 msgctxt "model:ir.message,text:no_rate"
 msgid "No rate found for currency \"%(currency)s\" on \"%(date)s\""
@@ -212,7 +246,7 @@ msgstr ""
 
 msgctxt "model:ir.model.button,string:generate_facturae_button"
 msgid "Generate Facturae"
-msgstr ""
+msgstr "Crear Facturae"
 
 msgctxt "selection:account.invoice,rectificative_reason_code:"
 msgid "Applicable Date/Period"

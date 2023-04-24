@@ -467,15 +467,15 @@ class Invoice(metaclass=PoolMeta):
         CertificateService = Pool().get('certificate.service')
 
         if not certificate:
-            certificates = CertificateService.search([
+            certificate_services = CertificateService.search([
                 ('service', '=', service),
                 ('is_default', '=', True),
                 ], limit=1)
-            if not certificates:
+            if not certificate_services:
                 raise UserError(gettext(
                         'account_invoice_facturae.msg_missing_certificate_service',
                         service=service))
-            certificate, = certificates
+            certificate = certificate_services[0].certificate
 
         certificate_facturae = certificate.pem_certificate
 
@@ -497,11 +497,16 @@ class Invoice(metaclass=PoolMeta):
 
         def _sign_file(cert, password, request):
             # get key and certificates from PCK12 file
-            (
-                private_key,
-                certificate,
-                additional_certificates,
-                ) = pkcs12.load_key_and_certificates(cert, password)
+            try:
+                (
+                    private_key,
+                    certificate,
+                    additional_certificates,
+                    ) = pkcs12.load_key_and_certificates(cert, password)
+            except ValueError as e:
+                logger.warning("Error load_key_and_certificates file",
+                    exc_info=True)
+                raise UserError(str(e))
 
             # DER is an ASN.1 encoding type
             crt = certificate.public_bytes(serialization.Encoding.DER)

@@ -166,12 +166,12 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
                 invoice.type = 'out'
                 invoice.party = party
                 invoice.on_change_party()
-                invoice.journal = invoice.on_change_with_journal()
                 invoice.payment_type = payment_receivable
                 invoice.payment_term = term
                 invoice.currency = currency
                 invoice.company = company
-                invoice.account = invoice.on_change_with_account()
+                invoice.set_journal()
+                invoice._update_account()
 
                 line1 = InvoiceLine()
                 line1.company = company

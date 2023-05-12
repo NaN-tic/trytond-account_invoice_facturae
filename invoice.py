@@ -144,16 +144,20 @@ class Invoice(metaclass=PoolMeta):
         filename='invoice_facturae_filename')
     invoice_facturae_filename = fields.Function(fields.Char(
         'Factura-e filename'), 'get_invoice_facturae_filename')
+    invoice_facturae_send = fields.Boolean('Factura-e send')
+        # states={
+        #     'readonly': True,
+        # })
 
     @classmethod
     def __setup__(cls):
         super(Invoice, cls).__setup__()
-        cls._check_modify_exclude.add('invoice_facturae')
+        cls._check_modify_exclude |= {'invoice_facturae', 'invoice_facturae_send'}
         cls._buttons.update({
                 'generate_facturae_wizard': {
                     'invisible': ((Eval('type') != 'out')
                         | ~Eval('state').in_(['posted', 'paid'])),
-                    'readonly': Bool(Eval('invoice_facturae')),
+                    'readonly': Bool(Eval('invoice_facturae_send')),
                     }
                 })
 
@@ -219,18 +223,10 @@ class Invoice(metaclass=PoolMeta):
 
         super(Invoice, cls).post(invoices)
 
-        if config.certificate_service_facturae:
-            service = config.certificate_service_facturae.service
-
-            with transaction.set_context(
-                    queue_scheduled_at=config.invoice_facturae_after,
-                    queue_batch=context.get('queue_batch', True)):
-                cls.__queue__.post_facturae(invoices, service)
-
-    @classmethod
-    def post_facturae(cls, invoices, service):
-        service = 'generate_facturae_%s' % service
-        getattr(cls, service)(invoices)
+        with transaction.set_context(
+                queue_scheduled_at=config.invoice_facturae_after,
+                queue_batch=context.get('queue_batch', True)):
+            cls.__queue__.generate_facturae(invoices)
 
     def _credit(self, **values):
         credit = super(Invoice, self)._credit(**values)
@@ -247,8 +243,13 @@ class Invoice(metaclass=PoolMeta):
         pass
 
     @classmethod
-    def generate_facturae_default(cls, invoices, certificate=None,
-            certificate_password=None):
+    def generate_facturae(cls, invoices, certificate=None, service=None):
+        Configuration = Pool().get('account.configuration')
+
+        config = Configuration(1)
+        transaction = Transaction()
+        context = transaction.context
+
         to_write = ([],)
         for invoice in invoices:
             if invoice.invoice_facturae:
@@ -257,13 +258,27 @@ class Invoice(metaclass=PoolMeta):
             invoice._validate_facturae(facturae_content)
             if backend.name != 'sqlite':
                 invoice_facturae = invoice._sign_facturae(facturae_content,
-                    'default', certificate, certificate_password)
+                    'default', certificate)
             else:
                 invoice_facturae = facturae_content
             to_write[0].append(invoice)
             to_write += ({'invoice_facturae': invoice_facturae},)
         if to_write[0]:
             cls.write(*to_write)
+
+        # send facturae to service
+        if not service and config.facturae_service:
+            service = config.facturae_service
+        if service:
+            with transaction.set_context(
+                    # queue_scheduled_at=config.invoice_facturae_after,
+                    queue_batch=context.get('queue_batch', True)):
+                cls.__queue__.send_facturae(invoices, service)
+
+    @classmethod
+    def send_facturae(cls, invoices, service):
+        method = 'send_facturae_%s' % service
+        getattr(cls, method)(invoices)
 
     def get_facturae(self):
         jinja_env = Environment(
@@ -459,31 +474,20 @@ class Invoice(metaclass=PoolMeta):
                     invoice=self.rec_name, message=e))
         return True
 
-    def _sign_facturae(self, xml_string, service='default', certificate=None,
-            certificate_password=None):
+    def _sign_facturae(self, xml_string, service='default', certificate=None):
         """
         Inspired by https://github.com/pedrobaeza/l10n-spain/blob/d01d049934db55130471e284012be7c860d987eb/l10n_es_facturae/wizard/create_facturae.py
         """
-        CertificateService = Pool().get('certificate.service')
+        Configuration = Pool().get('account.configuration')
 
         if not certificate:
-            certificate_services = CertificateService.search([
-                ('service', '=', service),
-                ('is_default', '=', True),
-                ], limit=1)
-            if not certificate_services:
+            certificate = Configuration(1).facturae_certificate
+            if not certificate:
                 raise UserError(gettext(
-                        'account_invoice_facturae.msg_missing_certificate_service',
-                        service=service))
-            certificate = certificate_services[0].certificate
+                        'account_invoice_facturae.msg_missing_certificate'))
 
         certificate_facturae = certificate.pem_certificate
-
-        certificate_password = certificate_password or certificate.certificate_password
-        if not certificate_password:
-            raise UserError(gettext(
-                'account_invoice_facturae.msg_missing_password_certificate_service',
-                service=service))
+        certificate_password = certificate.certificate_password
 
         logger = logging.getLogger('account_invoice_facturae')
 
@@ -777,15 +781,17 @@ class GenerateFacturaeStart(ModelView):
     'Generate Factura-e file - Start'
     __name__ = 'account.invoice.generate_facturae.start'
     service = fields.Selection([
-        ('default', 'Default'),
-        ], 'Service', required=True)
+        (None, ''),
+        ], 'Service')
     certificate_facturae = fields.Many2One('certificate.manager',
-        'Certificate Factura-e')
-    certificate_password = fields.Char('Certificate Password')
+        'Certificate Factura-e',
+        states={
+            'invisible': ~Bool(Eval('service')),
+        }, depends=['service'])
 
     @staticmethod
     def default_service():
-        return 'default'
+        return None
 
 
 class GenerateFacturae(Wizard):
@@ -802,7 +808,7 @@ class GenerateFacturae(Wizard):
         Invoice = Pool().get('account.invoice')
 
         invoices = Invoice.browse(Transaction().context['active_ids'])
-        service = 'generate_facturae_%s' % self.start.service
-        getattr(Invoice, service)(invoices,
-            self.start.certificate_facturae, self.start.certificate_password)
+        Invoice.generate_facturae(invoices,
+                                  certificate=self.start.certificate_facturae,
+                                  service=self.start.service)
         return 'end'

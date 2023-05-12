@@ -12,7 +12,5 @@
         <field name="service"/>
         <label name="certificate_facturae"/>
         <field name="certificate_facturae"/>
-        <label name="certificate_password"/>
-        <field name="certificate_password" widget="password"/>
     </group>
 </form>

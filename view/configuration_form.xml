@@ -4,8 +4,10 @@ copyright notices and license types. -->
 <data>
     <xpath expr="/form/separator[@id='invoice']" position="before">
         <separator id="facturae" string="Factura-e" colspan="4"/>
-        <label name="certificate_service_facturae"/>
-        <field name="certificate_service_facturae"/>
+        <label name="facturae_certificate"/>
+        <field name="facturae_certificate"/>
+        <label name="facturae_service"/>
+        <field name="facturae_service"/>
         <label name="invoice_facturae_after"/>
         <field name="invoice_facturae_after"/>
         <newline/>

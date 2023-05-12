@@ -195,21 +195,13 @@ msgstr ""
 " a la factura \"%(invoice)s\"."
 
 msgctxt "model:ir.message,text:msg_missing_certificate"
-msgid "Missing Factura-e Certificate in company \"%(company)s\"."
-msgstr "Falta el Certificat Factura-e a l'empresa \"%(company)s\"."
-
-msgctxt "model:ir.message,text:msg_missing_certificate_service"
-msgid "Missing default \"%(service)s\" Factura-e Certificate."
-msgstr "Falta el per defecte del servei \"%(service)s\" de certificat Factura-e."
+msgid "Missing default configuration Factura-e Certificate."
+msgstr "Falta la configuració del Certificat Factura-e"
 
 msgctxt "model:ir.message,text:msg_missing_password_certificate"
 msgid "Missing Password Factura-e Certificate in company \"%(company)s\"."
 msgstr ""
 "Falta la contrasenya del certificat Factura-e a l'empresa \"%(company)s\"."
-
-msgctxt "model:ir.message,text:msg_missing_password_certificate_service"
-msgid "Missing default \"%(service)s\" Password Factura-e Certificate."
-msgstr "Falta la contrasenya del servei \"%(service)s\" de certificat Factura-e."
 
 msgctxt "model:ir.message,text:no_rate"
 msgid "No rate found for currency \"%(currency)s\" on \"%(date)s\""

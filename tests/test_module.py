@@ -25,7 +25,6 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         pool = Pool()
         Configuration = pool.get('account.configuration')
         CertificateManager = pool.get('certificate.manager')
-        CertificateService = pool.get('certificate.service')
         Account = pool.get('account.account')
         FiscalYear = pool.get('account.fiscalyear')
         Invoice = pool.get('account.invoice')
@@ -72,12 +71,6 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
                         CURRENT_PATH, 'certificate.pfx'), 'rb') as cert_file:
                 certificate.pem_certificate = cert_file.read()
             certificate.save()
-
-            certificate_service = CertificateService()
-            certificate_service.certificate = certificate
-            certificate_service.service = 'default'
-            certificate_service.is_default = True
-            certificate_service.save()
 
             create_chart(company, tax=True)
 
@@ -211,7 +204,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
                 invoice.save()
                 Invoice.post([invoice])
 
-            Invoice.generate_facturae_default([invoice], 'privatepassword')
+            Invoice.generate_facturae([invoice])
             self.assertNotEqual(invoice.invoice_facturae, None)
             self.assertEqual(invoice.invoice_facturae_filename, 'facturae-1.xsig')
 

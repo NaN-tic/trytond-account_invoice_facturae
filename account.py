@@ -3,7 +3,6 @@
 from trytond.model import ModelSQL, fields
 from trytond.pool import Pool, PoolMeta
 from trytond.modules.company.model import CompanyValueMixin
-from trytond.pyson import Eval
 
 REPORT_TYPES = [
     (None, ""),
@@ -44,9 +43,11 @@ REPORT_TYPES = [
 
 class Configuration(metaclass=PoolMeta):
     __name__ = 'account.configuration'
-    certificate_service_facturae = fields.MultiValue(
-        fields.Many2One('certificate.service',
-        'Certificate Service Post Factura-e',
+    facturae_certificate = fields.MultiValue(
+        fields.Many2One('certificate.manager', "Factura-e Certificate",
+        help='Certificate Manager to sign Factura-e'))
+    facturae_service = fields.MultiValue(
+        fields.Selection('get_facturae_service', "Factura-e Service",
         help='Service to be used when post the invoice'))
     invoice_facturae_after = fields.TimeDelta("Send Factura-e after",
         help="The grace period during can still to send to service when "
@@ -54,9 +55,19 @@ class Configuration(metaclass=PoolMeta):
         "Applied if a worker queue is activated.")
 
     @classmethod
+    def default_facturae_service(cls, **pattern):
+        return cls.multivalue_model('facturae_service').default_facturae_service()
+
+    @classmethod
+    def get_facturae_service(cls):
+        pool = Pool()
+        ConfigurationFacturae = pool.get('account.configuration.facturae')
+        return ConfigurationFacturae.fields_get(['facturae_service'])['facturae_service']['selection']
+
+    @classmethod
     def multivalue_model(cls, field):
         pool = Pool()
-        if field in 'certificate_service_facturae':
+        if field in {'facturae_certificate', 'facturae_service'}:
             return pool.get('account.configuration.facturae')
         return super().multivalue_model(field)
 
@@ -64,11 +75,15 @@ class Configuration(metaclass=PoolMeta):
 class ConfigurationFacturae(ModelSQL, CompanyValueMixin):
     "Account Configuration Factura-e"
     __name__ = 'account.configuration.facturae'
-    certificate_service_facturae = fields.Many2One(
-        'certificate.service', 'Certificate Service Post Factura-e',
-        domain=[
-            ('certificate.company', 'in', [Eval('company', -1), None]),
-            ])
+    facturae_certificate = fields.Many2One('certificate.manager', "Factura-e Certificate",
+        help='Certificate Manager to sign Factura-e')
+    facturae_service =  fields.Selection([
+        (None, ''),
+        ], "Factura-e Service")
+
+    @staticmethod
+    def default_facturae_service():
+        return None
 
 
 class TaxTemplate(metaclass=PoolMeta):

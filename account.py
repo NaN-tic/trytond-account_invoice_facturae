@@ -50,9 +50,8 @@ class Configuration(metaclass=PoolMeta):
         fields.Selection('get_facturae_service', "Factura-e Service",
         help='Service to be used when post the invoice'))
     invoice_facturae_after = fields.TimeDelta("Send Factura-e after",
-        help="The grace period during can still to send to service when "
-        "post invoice.\n"
-        "Applied if a worker queue is activated.")
+        help="Grace period after which the invoice will be sent to the facturae "
+        "service. Applies only if a worker queue is activated.")
 
     @classmethod
     def default_facturae_service(cls, **pattern):

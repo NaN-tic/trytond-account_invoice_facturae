@@ -44,8 +44,8 @@ REPORT_TYPES = [
 class Configuration(metaclass=PoolMeta):
     __name__ = 'account.configuration'
     facturae_certificate = fields.MultiValue(
-        fields.Many2One('certificate.manager', "Factura-e Certificate",
-        help='Certificate Manager to sign Factura-e'))
+        fields.Many2One('certificate', "Factura-e Certificate",
+        help='Certificate to sign Factura-e'))
     facturae_service = fields.MultiValue(
         fields.Selection('get_facturae_service', "Factura-e Service",
         help='Service to be used when post the invoice'))
@@ -74,8 +74,8 @@ class Configuration(metaclass=PoolMeta):
 class ConfigurationFacturae(ModelSQL, CompanyValueMixin):
     "Account Configuration Factura-e"
     __name__ = 'account.configuration.facturae'
-    facturae_certificate = fields.Many2One('certificate.manager', "Factura-e Certificate",
-        help='Certificate Manager to sign Factura-e')
+    facturae_certificate = fields.Many2One('certificate', "Factura-e Certificate",
+        help='Certificate to sign Factura-e')
     facturae_service =  fields.Selection([
         (None, ''),
         ], "Factura-e Service")

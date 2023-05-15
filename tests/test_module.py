@@ -24,7 +24,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
 
         pool = Pool()
         Configuration = pool.get('account.configuration')
-        CertificateManager = pool.get('certificate.manager')
+        Certificate = pool.get('certificate')
         Account = pool.get('account.account')
         FiscalYear = pool.get('account.fiscalyear')
         Invoice = pool.get('account.invoice')
@@ -64,7 +64,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         company.save()
 
         with set_company(company):
-            certificate = CertificateManager()
+            certificate = Certificate()
             certificate.name = 'dummy Certificate'
             # Save certificate
             with open(os.path.join(

@@ -783,7 +783,7 @@ class GenerateFacturaeStart(ModelView):
     service = fields.Selection([
         (None, ''),
         ], 'Service')
-    certificate_facturae = fields.Many2One('certificate.manager',
+    certificate_facturae = fields.Many2One('certificate',
         'Certificate Factura-e',
         states={
             'invisible': ~Bool(Eval('service')),

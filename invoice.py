@@ -144,20 +144,17 @@ class Invoice(metaclass=PoolMeta):
         filename='invoice_facturae_filename')
     invoice_facturae_filename = fields.Function(fields.Char(
         'Factura-e filename'), 'get_invoice_facturae_filename')
-    invoice_facturae_send = fields.Boolean('Factura-e send')
-        # states={
-        #     'readonly': True,
-        # })
+    invoice_facturae_sent = fields.Boolean('Factura-e Sent')
 
     @classmethod
     def __setup__(cls):
         super(Invoice, cls).__setup__()
-        cls._check_modify_exclude |= {'invoice_facturae', 'invoice_facturae_send'}
+        cls._check_modify_exclude |= {'invoice_facturae', 'invoice_facturae_sent'}
         cls._buttons.update({
                 'generate_facturae_wizard': {
                     'invisible': ((Eval('type') != 'out')
                         | ~Eval('state').in_(['posted', 'paid'])),
-                    'readonly': Bool(Eval('invoice_facturae_send')),
+                    'readonly': Bool(Eval('invoice_facturae_sent')),
                     }
                 })
 

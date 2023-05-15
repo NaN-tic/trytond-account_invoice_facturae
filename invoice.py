@@ -221,7 +221,6 @@ class Invoice(metaclass=PoolMeta):
         super(Invoice, cls).post(invoices)
 
         with transaction.set_context(
-                queue_scheduled_at=config.invoice_facturae_after,
                 queue_batch=context.get('queue_batch', True)):
             cls.__queue__.generate_facturae(invoices)
 
@@ -268,7 +267,7 @@ class Invoice(metaclass=PoolMeta):
             service = config.facturae_service
         if service:
             with transaction.set_context(
-                    # queue_scheduled_at=config.invoice_facturae_after,
+                    queue_scheduled_at=config.invoice_facturae_after,
                     queue_batch=context.get('queue_batch', True)):
                 cls.__queue__.send_facturae(invoices, service)
 

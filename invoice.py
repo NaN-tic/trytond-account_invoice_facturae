@@ -212,9 +212,6 @@ class Invoice(metaclass=PoolMeta):
 
     @classmethod
     def post(cls, invoices):
-        Config = Pool().get('account.configuration')
-
-        config = Config(1)
         transaction = Transaction()
         context = transaction.context
 
@@ -487,13 +484,11 @@ class Invoice(metaclass=PoolMeta):
 
         logger = logging.getLogger('account_invoice_facturae')
 
-        unsigned_file = NamedTemporaryFile(suffix='.xml', delete=False)
-        unsigned_file.write(xml_string)
-        unsigned_file.close()
+        with NamedTemporaryFile(suffix='.xml', delete=False) as unsigned_file:
+            unsigned_file.write(xml_string)
 
-        cert_file = NamedTemporaryFile(suffix='.pfx', delete=False)
-        cert_file.write(certificate_facturae)
-        cert_file.close()
+        with NamedTemporaryFile(suffix='.pfx', delete=False) as cert_file:
+            cert_file.write(certificate_facturae)
 
         def _sign_file(cert, password, request):
             # get key and certificates from PCK12 file

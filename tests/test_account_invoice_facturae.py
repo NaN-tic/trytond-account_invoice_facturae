@@ -172,7 +172,7 @@ class TestAccountInvoiceFacturaeCase(ModuleTestCase):
                 invoice.payment_term = term
                 invoice.currency = currency
                 invoice.company = company
-                invoice.account = invoice.on_change_with_account()
+                invoice._update_account()
 
                 line1 = InvoiceLine()
                 line1.company = company

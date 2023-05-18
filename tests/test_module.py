@@ -204,7 +204,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
                 invoice.save()
                 Invoice.post([invoice])
 
-            Invoice.generate_facturae([invoice])
+            invoice.generate_facturae()
             self.assertNotEqual(invoice.invoice_facturae, None)
             self.assertEqual(invoice.invoice_facturae_filename, 'facturae-1.xsig')
 

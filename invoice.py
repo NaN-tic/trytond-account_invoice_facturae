@@ -166,6 +166,7 @@ class Invoice(metaclass=PoolMeta):
             default = default.copy()
         default.setdefault('invoice_facturae', None)
         default.setdefault('rectificative_reason_code', None)
+        default.setdefault('invoice_facturae_sent', None)
         return super(Invoice, cls).copy(invoices, default=default)
 
     def get_credited_invoices(self, name):
@@ -211,15 +212,29 @@ class Invoice(metaclass=PoolMeta):
             key=attrgetter('maturity_date'))
 
     @classmethod
+    def draft(cls, invoices):
+        invoice_facturae_sends = [invoice for invoice in invoices if invoice.invoice_facturae_sent]
+        if invoice_facturae_sends:
+            names = ', '.join(m.rec_name for m in invoice_facturae_sends[:5])
+            if len(invoice_facturae_sends) > 5:
+                names += '...'
+            raise UserError(gettext('account_invoice_facturae.msg_draft_invoice_facturae_sent',
+                invoices=names))
+
+        cls.write(invoices, {
+            'invoice_facturae': None,
+            })
+        super(Invoice, cls).draft(invoices)
+
+    @classmethod
     def post(cls, invoices):
         transaction = Transaction()
         context = transaction.context
 
         super(Invoice, cls).post(invoices)
 
-        with transaction.set_context(
-                queue_batch=context.get('queue_batch', True)):
-            cls.__queue__.generate_facturae(invoices)
+        for invoice in invoices:
+            cls.__queue__.generate_facturae(invoice)
 
     def _credit(self, **values):
         credit = super(Invoice, self)._credit(**values)
@@ -235,43 +250,39 @@ class Invoice(metaclass=PoolMeta):
     def generate_facturae_wizard(cls, invoices):
         pass
 
-    @classmethod
-    def generate_facturae(cls, invoices, certificate=None, service=None):
-        Configuration = Pool().get('account.configuration')
+    def generate_facturae(self, certificate=None, service=None):
+        pool = Pool()
+        Configuration = pool.get('account.configuration')
+        Invoice = pool.get('account.invoice')
 
         config = Configuration(1)
         transaction = Transaction()
         context = transaction.context
 
-        to_write = ([],)
-        for invoice in invoices:
-            if invoice.invoice_facturae:
-                continue
-            facturae_content = invoice.get_facturae()
-            invoice._validate_facturae(facturae_content)
+        if not self.invoice_facturae:
+            facturae_content = self.get_facturae()
+            self._validate_facturae(facturae_content)
             if backend.name != 'sqlite':
-                invoice_facturae = invoice._sign_facturae(facturae_content,
+                invoice_facturae = self._sign_facturae(facturae_content,
                     'default', certificate)
             else:
                 invoice_facturae = facturae_content
-            to_write[0].append(invoice)
-            to_write += ({'invoice_facturae': invoice_facturae},)
-        if to_write[0]:
-            cls.write(*to_write)
+            self.invoice_facturae = invoice_facturae
+            self.save()
 
         # send facturae to service
         if not service and config.facturae_service:
             service = config.facturae_service
         if service:
             with transaction.set_context(
-                    queue_scheduled_at=config.invoice_facturae_after,
-                    queue_batch=context.get('queue_batch', True)):
-                cls.__queue__.send_facturae(invoices, service)
+                    queue_scheduled_at=config.invoice_facturae_after):
+                Invoice.__queue__.send_facturae(self, service)
 
-    @classmethod
-    def send_facturae(cls, invoices, service):
+    def send_facturae(self, service):
+        Invoice = Pool().get('account.invoice')
+
         method = 'send_facturae_%s' % service
-        getattr(cls, method)(invoices)
+        getattr(Invoice, method)(self)
 
     def get_facturae(self):
         jinja_env = Environment(
@@ -799,7 +810,7 @@ class GenerateFacturae(Wizard):
         Invoice = Pool().get('account.invoice')
 
         invoices = Invoice.browse(Transaction().context['active_ids'])
-        Invoice.generate_facturae(invoices,
-                                  certificate=self.start.certificate_facturae,
-                                  service=self.start.service)
+        for invoice in invoices:
+            invoice.generate_facturae(certificate=self.start.certificate_facturae,
+                                      service=self.start.service)
         return 'end'

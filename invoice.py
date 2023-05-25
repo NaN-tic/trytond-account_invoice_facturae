@@ -228,9 +228,6 @@ class Invoice(metaclass=PoolMeta):
 
     @classmethod
     def post(cls, invoices):
-        transaction = Transaction()
-        context = transaction.context
-
         super(Invoice, cls).post(invoices)
 
         for invoice in invoices:
@@ -257,7 +254,6 @@ class Invoice(metaclass=PoolMeta):
 
         config = Configuration(1)
         transaction = Transaction()
-        context = transaction.context
 
         if not self.invoice_facturae:
             facturae_content = self.get_facturae()

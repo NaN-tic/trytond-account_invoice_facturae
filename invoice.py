@@ -269,7 +269,7 @@ class Invoice(metaclass=PoolMeta):
         # send facturae to service
         if not service and config.facturae_service:
             service = config.facturae_service
-        if service:
+        if self.invoice_facturae and service:
             with transaction.set_context(
                     queue_scheduled_at=config.invoice_facturae_after):
                 Invoice.__queue__.send_facturae(self, service)

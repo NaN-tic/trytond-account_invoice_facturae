@@ -398,12 +398,6 @@ class Invoice(metaclass=PoolMeta):
                 'euro': euro,
                 'exchange_rate': exchange_rate,
                 'exchange_rate_date': exchange_rate_date,
-                'invoice': self,
-                'Decimal': Decimal,
-                'Currency': Currency,
-                'euro': euro,
-                'exchange_rate': exchange_rate,
-                'exchange_rate_date': exchange_rate_date,
                 'UOM_CODE2TYPE': UOM_CODE2TYPE,
                 }
 

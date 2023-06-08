@@ -727,6 +727,23 @@ class InvoiceLine(metaclass=PoolMeta):
     __name__ = 'account.invoice.line'
 
     @property
+    def facturae_article_code(self):
+        return self.product and self.product.code or ''
+
+    @property
+    def facturae_item_description(self):
+        return (
+            (self.description and self.description[:2500])
+            or (self.product and self.product.rec_name[:2500])
+            or '#'+str(self.id)
+            )
+
+    @property
+    def facturae_receiver_transaction_reference(self):
+        # TODO Issuer/ReceiverTransactionDate (sale, contract...)
+        return ''
+
+    @property
     def taxes_outputs(self):
         """Return list of 'impuestos repecutidos'"""
         return [inv_tax for inv_tax in self.invoice_taxes

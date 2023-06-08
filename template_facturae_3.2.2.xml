@@ -141,7 +141,7 @@
                         <StartDate>{{ invoice.credited_invoices[0].move.period.start_date.isoformat() }}</StartDate>
                         <EndDate>{{ invoice.credited_invoices[0].move.period.end_date.isoformat() }}</EndDate>
                     </TaxPeriod>
-                    {# TODO: Methods not supported: 
+                    {# TODO: Methods not supported:
                     - 02 (solo se anotan los detalles ya rectificados)
                     - 03 (Rectificación por descuento por volumen de operaciones durante un periodo)
                     - 04 (Autorizadas por la Agencia Tributaria)
@@ -167,6 +167,7 @@
                 {% endif %}
                 <TaxCurrencyCode>EUR</TaxCurrencyCode>
                 <LanguageName>{{ invoice.party_lang[:2] if invoice.party_lang else 'es' }}</LanguageName>
+                <ReceiverTransactionReference>{{ invoice.reference and invoice.reference[:20] or '' }}</ReceiverTransactionReference>
             </InvoiceIssueData>
             <TaxesOutputs>
                 {% for invoice_tax in invoice.taxes_outputs %}
@@ -247,14 +248,14 @@
                 <InvoiceLine>
                     {# TODO: optional, not supported
                     - Issuer/ReceiverContractReference, Issuer/ReceiverContractDate (contract)
-                    - Issuer/ReceiverTransactionReference, Issuer/ReceiverTransactionDate (sale, contract...)
                     - FileReference, FileDate
                     - SequenceNumber
                     - DeliveryNotesReferences (account_invoice_stock)
                     - TransactionDate
                     - Extensions
                     #}
-                    <ItemDescription>{{ (line.description and line.description[:2500]) or (line.product and line.product.rec_name[:2500]) or '#'+line.id|string }}</ItemDescription>
+                    <ReceiverTransactionReference>{{ line.facturae_receiver_transaction_reference }}</ReceiverTransactionReference>
+                    <ItemDescription>{{ line.facturae_item_description }}</ItemDescription>
                     <Quantity>{{ line.quantity }}</Quantity>
                     <UnitOfMeasure>{{ UOM_CODE2TYPE.get(line.unit.symbol, '05') if line.unit else '05' }}</UnitOfMeasure>
                     <UnitPriceWithoutTax>{{ Currency.compute(invoice.currency, line.unit_price, euro) }}</UnitPriceWithoutTax>
@@ -339,7 +340,7 @@
                     {% endif %}
                     {# TODO: SpecialTaxableEvent not supported #}
                     {% if line.product and line.product.code %}
-                    <ArticleCode>{{ line.product.code }}</ArticleCode>
+                    <ArticleCode>{{ line.facturae_article_code }}</ArticleCode>
                     {% endif %}
                 </InvoiceLine>
                 {% endfor %}

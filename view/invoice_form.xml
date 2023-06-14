@@ -14,6 +14,11 @@
         <label name="invoice_facturae"/>
         <field name="invoice_facturae"/>
     </xpath>
+    <xpath expr="/form/notebook/page[@id='info']/field[@name='cancel_move']"
+            position="after">
+        <label name="invoice_facturae_sent"/>
+        <field name="invoice_facturae_sent"/>
+    </xpath>
     <xpath expr="/form/group[@id='buttons']" position="inside">
         <button name="generate_facturae_wizard"
             string="Generate Factura-e" icon="tryton-lock"/>

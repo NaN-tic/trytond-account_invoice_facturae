@@ -1,10 +1,8 @@
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
-from trytond.model import fields
-from trytond.pool import PoolMeta
-
-__all__ = ['TaxTemplate', 'Tax']
-
+from trytond.model import ModelSQL, fields
+from trytond.pool import Pool, PoolMeta
+from trytond.modules.company.model import CompanyValueMixin
 
 REPORT_TYPES = [
     (None, ""),
@@ -41,6 +39,50 @@ REPORT_TYPES = [
     ("28", "IRNR: Non-resident Income Tax"),
     ("29", "Corporation Tax"),
     ]
+
+
+class Configuration(metaclass=PoolMeta):
+    __name__ = 'account.configuration'
+    facturae_certificate = fields.MultiValue(
+        fields.Many2One('certificate', "Factura-e Certificate",
+        help='Certificate to sign Factura-e'))
+    facturae_service = fields.MultiValue(
+        fields.Selection('get_facturae_service', "Factura-e Service",
+        help='Service to be used when post the invoice'))
+    invoice_facturae_after = fields.TimeDelta("Send Factura-e after",
+        help="Grace period after which the invoice will be sent to the facturae "
+        "service. Applies only if a worker queue is activated.")
+
+    @classmethod
+    def default_facturae_service(cls, **pattern):
+        return cls.multivalue_model('facturae_service').default_facturae_service()
+
+    @classmethod
+    def get_facturae_service(cls):
+        pool = Pool()
+        ConfigurationFacturae = pool.get('account.configuration.facturae')
+        return ConfigurationFacturae.fields_get(['facturae_service'])['facturae_service']['selection']
+
+    @classmethod
+    def multivalue_model(cls, field):
+        pool = Pool()
+        if field in {'facturae_certificate', 'facturae_service'}:
+            return pool.get('account.configuration.facturae')
+        return super().multivalue_model(field)
+
+
+class ConfigurationFacturae(ModelSQL, CompanyValueMixin):
+    "Account Configuration Factura-e"
+    __name__ = 'account.configuration.facturae'
+    facturae_certificate = fields.Many2One('certificate', "Factura-e Certificate",
+        help='Certificate to sign Factura-e')
+    facturae_service =  fields.Selection([
+        (None, ''),
+        ], "Factura-e Service")
+
+    @staticmethod
+    def default_facturae_service():
+        return None
 
 
 class TaxTemplate(metaclass=PoolMeta):

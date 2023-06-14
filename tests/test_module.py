@@ -23,6 +23,8 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         'Test invoice generation'
 
         pool = Pool()
+        Configuration = pool.get('account.configuration')
+        Certificate = pool.get('certificate')
         Account = pool.get('account.account')
         FiscalYear = pool.get('account.fiscalyear')
         Invoice = pool.get('account.invoice')
@@ -61,12 +63,15 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         company.party.save()
         company.save()
 
-        # Save certificate into company
-        with open(os.path.join(
-                    CURRENT_PATH, 'certificate.pfx'), 'rb') as cert_file:
-            company.facturae_certificate = cert_file.read()
-
         with set_company(company):
+            certificate = Certificate()
+            certificate.name = 'dummy Certificate'
+            # Save certificate
+            with open(os.path.join(
+                        CURRENT_PATH, 'certificate.pfx'), 'rb') as cert_file:
+                certificate.pem_certificate = cert_file.read()
+            certificate.save()
+
             create_chart(company, tax=True)
 
             fiscalyear = set_invoice_sequences(get_fiscalyear(company))
@@ -199,7 +204,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
                 invoice.save()
                 Invoice.post([invoice])
 
-            Invoice.generate_facturae_default([invoice], 'privatepassword')
+            invoice.generate_facturae()
             self.assertNotEqual(invoice.invoice_facturae, None)
             self.assertEqual(invoice.invoice_facturae_filename, 'facturae-1.xsig')
 

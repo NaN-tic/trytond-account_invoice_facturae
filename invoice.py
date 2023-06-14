@@ -25,6 +25,8 @@ from trytond import backend
 from trytond.i18n import gettext
 from trytond.exceptions import UserError
 
+FACTURAE_SCHEMA_VERSION = '3.2.2'
+
 # Get from XSD scheme of Facturae 3.2.2
 # http://www.facturae.gob.es/formato/Versiones/Facturaev3_2_2.xml
 RECTIFICATIVE_REASON_CODES = [
@@ -142,16 +144,17 @@ class Invoice(metaclass=PoolMeta):
         filename='invoice_facturae_filename')
     invoice_facturae_filename = fields.Function(fields.Char(
         'Factura-e filename'), 'get_invoice_facturae_filename')
+    invoice_facturae_sent = fields.Boolean('Factura-e Sent')
 
     @classmethod
     def __setup__(cls):
         super(Invoice, cls).__setup__()
-        cls._check_modify_exclude.add('invoice_facturae')
+        cls._check_modify_exclude |= {'invoice_facturae', 'invoice_facturae_sent'}
         cls._buttons.update({
                 'generate_facturae_wizard': {
                     'invisible': ((Eval('type') != 'out')
                         | ~Eval('state').in_(['posted', 'paid'])),
-                    'readonly': Bool(Eval('invoice_facturae')),
+                    'readonly': Bool(Eval('invoice_facturae_sent')),
                     }
                 })
 
@@ -163,6 +166,7 @@ class Invoice(metaclass=PoolMeta):
             default = default.copy()
         default.setdefault('invoice_facturae', None)
         default.setdefault('rectificative_reason_code', None)
+        default.setdefault('invoice_facturae_sent', None)
         return super(Invoice, cls).copy(invoices, default=default)
 
     def get_credited_invoices(self, name):
@@ -207,6 +211,28 @@ class Invoice(metaclass=PoolMeta):
                 if ml.account.type.receivable],
             key=attrgetter('maturity_date'))
 
+    @classmethod
+    def draft(cls, invoices):
+        invoice_facturae_sends = [invoice for invoice in invoices if invoice.invoice_facturae_sent]
+        if invoice_facturae_sends:
+            names = ', '.join(m.rec_name for m in invoice_facturae_sends[:5])
+            if len(invoice_facturae_sends) > 5:
+                names += '...'
+            raise UserError(gettext('account_invoice_facturae.msg_draft_invoice_facturae_sent',
+                invoices=names))
+
+        cls.write(invoices, {
+            'invoice_facturae': None,
+            })
+        super(Invoice, cls).draft(invoices)
+
+    @classmethod
+    def post(cls, invoices):
+        super(Invoice, cls).post(invoices)
+
+        for invoice in invoices:
+            cls.__queue__.generate_facturae(invoice)
+
     def _credit(self, **values):
         credit = super(Invoice, self)._credit(**values)
         rectificative_reason_code = Transaction().context.get(
@@ -221,23 +247,38 @@ class Invoice(metaclass=PoolMeta):
     def generate_facturae_wizard(cls, invoices):
         pass
 
-    @classmethod
-    def generate_facturae_default(cls, invoices, certificate_password):
-        to_write = ([],)
-        for invoice in invoices:
-            if invoice.invoice_facturae:
-                continue
-            facturae_content = invoice.get_facturae()
-            invoice._validate_facturae(facturae_content)
+    def generate_facturae(self, certificate=None, service=None):
+        pool = Pool()
+        Configuration = pool.get('account.configuration')
+        Invoice = pool.get('account.invoice')
+
+        config = Configuration(1)
+        transaction = Transaction()
+
+        if not self.invoice_facturae:
+            facturae_content = self.get_facturae()
+            self._validate_facturae(facturae_content)
             if backend.name != 'sqlite':
-                invoice_facturae = invoice._sign_facturae(
-                    facturae_content, certificate_password)
+                invoice_facturae = self._sign_facturae(facturae_content,
+                    'default', certificate)
             else:
                 invoice_facturae = facturae_content
-            to_write[0].append(invoice)
-            to_write += ({'invoice_facturae': invoice_facturae},)
-        if to_write[0]:
-            cls.write(*to_write)
+            self.invoice_facturae = invoice_facturae
+            self.save()
+
+        # send facturae to service
+        if not service and config.facturae_service:
+            service = config.facturae_service
+        if self.invoice_facturae and service:
+            with transaction.set_context(
+                    queue_scheduled_at=config.invoice_facturae_after):
+                Invoice.__queue__.send_facturae(self, service)
+
+    def send_facturae(self, service):
+        Invoice = Pool().get('account.invoice')
+
+        method = 'send_facturae_%s' % service
+        getattr(Invoice, method)(self)
 
     def get_facturae(self):
         jinja_env = Environment(
@@ -427,32 +468,41 @@ class Invoice(metaclass=PoolMeta):
                     invoice=self.rec_name, message=e))
         return True
 
-    def _sign_facturae(self, xml_string, certificate_password):
+    def _sign_facturae(self, xml_string, service='default', certificate=None):
         """
         Inspired by https://github.com/pedrobaeza/l10n-spain/blob/d01d049934db55130471e284012be7c860d987eb/l10n_es_facturae/wizard/create_facturae.py
         """
-        if not self.company.facturae_certificate:
-            raise UserError(gettext(
-                'account_invoice_facturae.missing_certificate',
-                company=self.company.rec_name))
+        Configuration = Pool().get('account.configuration')
+
+        if not certificate:
+            certificate = Configuration(1).facturae_certificate
+            if not certificate:
+                raise UserError(gettext(
+                        'account_invoice_facturae.msg_missing_certificate'))
+
+        certificate_facturae = certificate.pem_certificate
+        certificate_password = certificate.certificate_password
 
         logger = logging.getLogger('account_invoice_facturae')
 
-        unsigned_file = NamedTemporaryFile(suffix='.xml', delete=False)
-        unsigned_file.write(xml_string)
-        unsigned_file.close()
+        with NamedTemporaryFile(suffix='.xml', delete=False) as unsigned_file:
+            unsigned_file.write(xml_string)
 
-        cert_file = NamedTemporaryFile(suffix='.pfx', delete=False)
-        cert_file.write(self.company.facturae_certificate)
-        cert_file.close()
+        with NamedTemporaryFile(suffix='.pfx', delete=False) as cert_file:
+            cert_file.write(certificate_facturae)
 
         def _sign_file(cert, password, request):
             # get key and certificates from PCK12 file
-            (
-                private_key,
-                certificate,
-                additional_certificates,
-                ) = pkcs12.load_key_and_certificates(cert, password)
+            try:
+                (
+                    private_key,
+                    certificate,
+                    additional_certificates,
+                    ) = pkcs12.load_key_and_certificates(cert, password)
+            except ValueError as e:
+                logger.warning("Error load_key_and_certificates file",
+                    exc_info=True)
+                raise UserError(str(e))
 
             # DER is an ASN.1 encoding type
             crt = certificate.public_bytes(serialization.Encoding.DER)
@@ -656,7 +706,7 @@ class Invoice(metaclass=PoolMeta):
             return etree.tostring(root, xml_declaration=True, encoding="UTF-8")
 
         signed_file_content = _sign_file(
-            self.company.facturae_certificate,
+            certificate_facturae,
             certificate_password.encode(),
             xml_string,
             )
@@ -669,6 +719,23 @@ class Invoice(metaclass=PoolMeta):
 
 class InvoiceLine(metaclass=PoolMeta):
     __name__ = 'account.invoice.line'
+
+    @property
+    def facturae_article_code(self):
+        return self.product and self.product.code or ''
+
+    @property
+    def facturae_item_description(self):
+        return (
+            (self.description and self.description[:2500])
+            or (self.product and self.product.rec_name[:2500])
+            or '#'+str(self.id)
+            )
+
+    @property
+    def facturae_receiver_transaction_reference(self):
+        # TODO Issuer/ReceiverTransactionDate (sale, contract...)
+        return ''
 
     @property
     def taxes_outputs(self):
@@ -723,17 +790,17 @@ class GenerateFacturaeStart(ModelView):
     'Generate Factura-e file - Start'
     __name__ = 'account.invoice.generate_facturae.start'
     service = fields.Selection([
-        ('default', 'Default'),
-        ], 'Service', required=True)
-    certificate_password = fields.Char('Certificate Password',
+        (None, ''),
+        ], 'Service')
+    certificate_facturae = fields.Many2One('certificate',
+        'Certificate Factura-e',
         states={
-            'required': Eval('service') == 'default',
-            'invisible': Eval('service') != 'default',
+            'invisible': ~Bool(Eval('service')),
         }, depends=['service'])
 
     @staticmethod
     def default_service():
-        return 'default'
+        return None
 
 
 class GenerateFacturae(Wizard):
@@ -750,6 +817,7 @@ class GenerateFacturae(Wizard):
         Invoice = Pool().get('account.invoice')
 
         invoices = Invoice.browse(Transaction().context['active_ids'])
-        service = 'generate_facturae_%s' % self.start.service
-        getattr(Invoice, service)(invoices, self.start.certificate_password)
+        for invoice in invoices:
+            invoice.generate_facturae(certificate=self.start.certificate_facturae,
+                                      service=self.start.service)
         return 'end'

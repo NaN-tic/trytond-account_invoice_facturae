@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+copyright notices and license types. -->
+<data>
+    <xpath expr="/form/separator[@id='invoice']" position="before">
+        <separator id="facturae" string="Factura-e" colspan="4"/>
+        <label name="facturae_certificate"/>
+        <field name="facturae_certificate"/>
+        <label name="facturae_service"/>
+        <field name="facturae_service"/>
+        <label name="invoice_facturae_after"/>
+        <field name="invoice_facturae_after"/>
+        <newline/>
+    </xpath>
+</data>

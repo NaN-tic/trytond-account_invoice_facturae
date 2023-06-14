@@ -10,7 +10,7 @@
             yalign="0.0" xalign="0.0" xexpand="1"/>
         <label name="service"/>
         <field name="service"/>
-        <label name="certificate_password"/>
-        <field name="certificate_password" widget="password"/>
+        <label name="certificate_facturae"/>
+        <field name="certificate_facturae"/>
     </group>
 </form>

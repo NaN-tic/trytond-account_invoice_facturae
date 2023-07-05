@@ -56,5 +56,8 @@ Message returned by signing process: %(process_output)s</field>
           <field name="text">The Factura-e Type and Account Bank Kind of Payment Type "%(payment_type)s" are not compatible.</field>
       </record>
 
+      <record model="ir.message" id="msg_incorrect_password">
+          <field name="text">Incorrect password.</field>
+      </record>
     </data>
 </tryton>

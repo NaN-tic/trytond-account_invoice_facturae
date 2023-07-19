@@ -463,7 +463,7 @@ class Invoice(metaclass=PoolMeta):
             except ValueError as e:
                 raise UserError(gettext(
                     'account_invoice_facturae.msg_certificate_error',
-                    error=e))
+                    error=str(e)))
             # DER is an ASN.1 encoding type
             crt = certificate.public_bytes(serialization.Encoding.DER)
 

@@ -502,7 +502,9 @@ class Invoice(metaclass=PoolMeta):
             except ValueError as e:
                 logger.warning("Error load_key_and_certificates file",
                     exc_info=True)
-                raise UserError(str(e))
+                raise UserError(gettext(
+                    'account_invoice_facturae.msg_certificate_error',
+                    error=str(e)))
 
             # DER is an ASN.1 encoding type
             crt = certificate.public_bytes(serialization.Encoding.DER)

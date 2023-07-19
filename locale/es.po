@@ -200,6 +200,11 @@ msgstr ""
 "Falta la contraseña del certificado Factura-e Certificate en la empresa "
 "\"%(company)s\"."
 
+msgctxt "model:ir.message,text:msg_certificate_error"
+msgid "Error while getting the certificate: \"%(error)s\"."
+msgstr ""
+"Se ha producido un error mientras se obtenía el certificado: \"%(error)s\"."
+
 msgctxt "model:ir.message,text:no_rate"
 msgid "No rate found for currency \"%(currency)s\" on \"%(date)s\""
 msgstr ""
@@ -779,6 +784,14 @@ msgstr ""
 msgctxt "view:account.invoice:"
 msgid "Generate Factura-e"
 msgstr "Generar Factura-e"
+
+msgctxt "view:account.tax.template:"
+msgid "Factura-e"
+msgstr "Factura-e"
+
+msgctxt "view:account.tax:"
+msgid "Factura-e"
+msgstr "Factura-e"
 
 msgctxt "view:party.party:"
 msgid "Factura-e"

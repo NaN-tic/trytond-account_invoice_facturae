@@ -195,6 +195,10 @@ msgid "Missing Password Factura-e Certificate in company \"%(company)s\"."
 msgstr ""
 "Falta la contrasenya del certificat Factura-e a l'empresa \"%(company)s\"."
 
+msgctxt "model:ir.message,text:msg_certificate_error"
+msgid "Error while getting the certificate: \"%(error)s\"."
+msgstr "S'ha produït un error mentre s'obtenia el certificat: \"%(error)s\"."
+
 msgctxt "model:ir.message,text:no_rate"
 msgid "No rate found for currency \"%(currency)s\" on \"%(date)s\""
 msgstr ""

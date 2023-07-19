@@ -454,12 +454,16 @@ class Invoice(metaclass=PoolMeta):
 
         def _sign_file(cert, password, request):
             # get key and certificates from PCK12 file
-            (
-                private_key,
-                certificate,
-                additional_certificates,
-                ) = pkcs12.load_key_and_certificates(cert, password)
-
+            try:
+                (
+                    private_key,
+                    certificate,
+                    additional_certificates,
+                    ) = pkcs12.load_key_and_certificates(cert, password)
+            except ValueError as e:
+                raise UserError(gettext(
+                    'account_invoice_facturae.msg_certificate_error',
+                    error=str(e)))
             # DER is an ASN.1 encoding type
             crt = certificate.public_bytes(serialization.Encoding.DER)
 

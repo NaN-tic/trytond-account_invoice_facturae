@@ -61,5 +61,8 @@ Message returned by signing process: %(process_output)s</field>
       <record model="ir.message" id="msg_draft_invoice_facturae_sent">
           <field name="text">Can not draft "%(invoices)s" that have been sent to Factura-e.</field>
       </record>
+      <record model="ir.message" id="msg_certificate_error">
+          <field name="text">Error while getting the certificate: "%(error)s".</field>
+      </record>
     </data>
 </tryton>

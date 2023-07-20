@@ -9,6 +9,7 @@ import random
 import xmlsig
 import hashlib
 import datetime
+import math
 from decimal import Decimal
 from jinja2 import Environment, FileSystemLoader
 from lxml import etree
@@ -297,6 +298,7 @@ class Invoice(metaclass=PoolMeta):
         """Return the content to render in factura-e XML file"""
         pool = Pool()
         Currency = pool.get('currency.currency')
+        Invoice = pool.get('account.invoice')
         Date = pool.get('ir.date')
         Rate = pool.get('currency.currency.rate')
 
@@ -436,6 +438,7 @@ class Invoice(metaclass=PoolMeta):
                 'invoice': self,
                 'Decimal': Decimal,
                 'Currency': Currency,
+                'Invoice': Invoice,
                 'euro': euro,
                 'exchange_rate': exchange_rate,
                 'exchange_rate_date': exchange_rate_date,
@@ -717,6 +720,24 @@ class Invoice(metaclass=PoolMeta):
             self.rec_name, self.id)
 
         return signed_file_content
+
+    @classmethod
+    def double_up_to_eight(cls, value):
+        # return max 8 digits in DoubleUpToEightDecimalType
+        _TOTAL_DIGITS = 8
+        def digits_decimal(value):
+            num_str = str(value)
+            if '.' in num_str:
+                num_digits = num_str[::-1].find('.')
+            else:
+                num_digits = 0
+
+            return num_digits
+
+        if digits_decimal(value) > _TOTAL_DIGITS:
+            precision = 10 ** -_TOTAL_DIGITS
+            return math.floor(float(value) / precision) * precision
+        return value
 
 
 class InvoiceLine(metaclass=PoolMeta):

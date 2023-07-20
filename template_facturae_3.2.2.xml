@@ -161,7 +161,7 @@
                 <InvoiceCurrencyCode>{{ invoice.currency.code.upper() }}</InvoiceCurrencyCode>
                 {% if invoice.currency != euro %}
                 <ExchangeRateDetails>
-                    <ExchangeRate>{{ Currency.compute(invoice.currency, exchange_rate, euro) }}</ExchangeRate>
+                    <ExchangeRate>{{ Invoice.double_up_to_eight(exchange_rate) }}</ExchangeRate>
                     <ExchangeRateDate>{{ exchange_rate_date }}</ExchangeRateDate>
                 </ExchangeRateDetails>
                 {% endif %}
@@ -173,15 +173,15 @@
                 {% for invoice_tax in invoice.taxes_outputs %}
                 <Tax>
                     <TaxTypeCode>{{ invoice_tax.tax.report_type }}</TaxTypeCode>
-                    <TaxRate>{{ Currency.compute(invoice.currency, invoice_tax.tax.rate * 100, euro) }}</TaxRate>
+                    <TaxRate>{{ Invoice.double_up_to_eight(invoice_tax.tax.rate * 100) }}</TaxRate>
                     <TaxableBase>
-                        <TotalAmount>{{ Currency.compute(invoice.currency, invoice_tax.base, euro) }}</TotalAmount>
+                        <TotalAmount>{{ Invoice.double_up_to_eight(invoice_tax.base) }}</TotalAmount>
                         {% if invoice.currency != euro %}
-                        <EquivalentInEuros>{{ Currency.compute(invoice.currency, invoice_tax.base, euro) }}</EquivalentInEuros>
+                        <EquivalentInEuros>{{ Invoice.double_up_to_eight(invoice_tax.base) }}</EquivalentInEuros>
                         {% endif %}
                     </TaxableBase>
                     <TaxAmount>
-                        <TotalAmount>{{ Currency.compute(invoice.currency, invoice_tax.amount, euro) }}</TotalAmount>
+                        <TotalAmount>{{ Invoice.double_up_to_eight(invoice_tax.amount) }}</TotalAmount>
                         {% if invoice.currency != euro %}
                         <EquivalentInEuros>{{ Currency.compute(invoice.currency, invoice_tax.amount, euro) }}</EquivalentInEuros>
                         {% endif %}
@@ -208,7 +208,7 @@
                 {% for invoice_tax in invoice.taxes_withheld %}
                 <Tax>
                     <TaxTypeCode>{{ invoice_tax.tax.report_type }}</TaxTypeCode>
-                    <TaxRate>{{ Currency.compute(invoice.currency, invoice_tax.tax.rate * 100, euro) }}</TaxRate>
+                    <TaxRate>{{ Invoice.double_up_to_eight(invoice_tax.tax.rate * 100) }}</TaxRate>
                     <TaxableBase>
                         <TotalAmount>{{ Currency.compute(invoice.currency, invoice_tax.base, euro) }}</TotalAmount>
                         {% if invoice.currency != euro %}
@@ -226,13 +226,13 @@
             </TaxesWithheld>
             {% endif %}
             <InvoiceTotals>
-                <TotalGrossAmount>{{ Currency.compute(invoice.currency, invoice.untaxed_amount, euro) }}</TotalGrossAmount>
+                <TotalGrossAmount>{{ Invoice.double_up_to_eight(invoice.untaxed_amount) }}</TotalGrossAmount>
                 {# TODO: GeneralDiscounts and TotalGeneralDiscounts (account_invoice_discount_global) not supported #}
                 {# TODO: GeneralSurcharges and TotalGeneralSurcharges not supported #}
-                <TotalGrossAmountBeforeTaxes>{{ Currency.compute(invoice.currency, invoice.untaxed_amount, euro) }}</TotalGrossAmountBeforeTaxes>
-                <TotalTaxOutputs>{{ Currency.compute(invoice.currency, invoice.taxes_outputs | sum(attribute='amount', start=Decimal(0)), euro) }}</TotalTaxOutputs>
-                <TotalTaxesWithheld>{{ Currency.compute(invoice.currency, invoice.taxes_withheld | sum(attribute='amount', start=Decimal(0)), euro) }}</TotalTaxesWithheld>
-                <InvoiceTotal>{{ Currency.compute(invoice.currency, invoice.total_amount, euro) }}</InvoiceTotal>
+                <TotalGrossAmountBeforeTaxes>{{ Invoice.double_up_to_eight(invoice.untaxed_amount) }}</TotalGrossAmountBeforeTaxes>
+                <TotalTaxOutputs>{{ Invoice.double_up_to_eight(invoice.taxes_outputs | sum(attribute='amount', start=Decimal(0))) }}</TotalTaxOutputs>
+                <TotalTaxesWithheld>{{ Invoice.double_up_to_eight(invoice.taxes_withheld | sum(attribute='amount', start=Decimal(0))) }}</TotalTaxesWithheld>
+                <InvoiceTotal>{{ Invoice.double_up_to_eight(invoice.total_amount) }}</InvoiceTotal>
                 {# TODO: optional, not supported
                 - Subsidies
                 - PaymentsOnAccount, TotalPaymentsOnAccount
@@ -240,8 +240,8 @@
                 - TotalFinancialExpenses (account_payment_type_cost?)
                 - AmountsWithheld
                 #}
-                <TotalOutstandingAmount>{{ Currency.compute(invoice.currency, invoice.total_amount, euro) }}</TotalOutstandingAmount>
-                <TotalExecutableAmount>{{ Currency.compute(invoice.currency, invoice.total_amount, euro) }}</TotalExecutableAmount>
+                <TotalOutstandingAmount>{{ Invoice.double_up_to_eight(invoice.total_amount) }}</TotalOutstandingAmount>
+                <TotalExecutableAmount>{{ Invoice.double_up_to_eight(invoice.total_amount) }}</TotalExecutableAmount>
             </InvoiceTotals>
             <Items>
                 {% for line in invoice.lines if line.type == 'line' %}
@@ -258,19 +258,19 @@
                     <ItemDescription>{{ line.facturae_item_description }}</ItemDescription>
                     <Quantity>{{ line.quantity }}</Quantity>
                     <UnitOfMeasure>{{ UOM_CODE2TYPE.get(line.unit.symbol, '05') if line.unit else '05' }}</UnitOfMeasure>
-                    <UnitPriceWithoutTax>{{ Currency.compute(invoice.currency, line.unit_price, euro) }}</UnitPriceWithoutTax>
-                    <TotalCost>{{ Currency.compute(invoice.currency, line.amount, euro) }}</TotalCost>
+                    <UnitPriceWithoutTax>{{ Invoice.double_up_to_eight(line.unit_price) }}</UnitPriceWithoutTax>
+                    <TotalCost>{{ Invoice.double_up_to_eight(line.amount) }}</TotalCost>
                     {# TODO: optional, not supported
                     - DiscountsAndRebates (account_invoice_discount)
                     - Charges
                     #}
-                    <GrossAmount>{{ Currency.compute(invoice.currency, line.amount, euro) }}</GrossAmount>
+                    <GrossAmount>{{ Invoice.double_up_to_eight(line.amount) }}</GrossAmount>
                     {% if line.taxes_withheld %}
                     <TaxesWithheld>
                         {% for line_tax in invoice.taxes_withheld %}
                         <Tax>
                             <TaxTypeCode>{{ line_tax.tax.report_type }}</TaxTypeCode>
-                            <TaxRate>{{ Currency.compute(invoice.currency, line_tax.tax.rate * 100, euro) }}</TaxRate>
+                            <TaxRate>{{ Invoice.double_up_to_eight(line_tax.tax.rate * 100) }}</TaxRate>
                             <TaxableBase>
                                 <TotalAmount>{{ Currency.compute(invoice.currency, line.amount, euro) }}</TotalAmount>
                                 {% if invoice.currency != euro %}

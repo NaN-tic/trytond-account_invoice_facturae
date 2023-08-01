@@ -4,10 +4,10 @@ this repository contains the full copyright notices and license terms. -->
 <tryton>
     <data depends="account_es" grouped="1">
         <record model="account.tax.template" id="account_es.iva_X0_compras_bc">
-            <field name="report_type">01</field>
+            <field name="report_type">05</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_X0_compras_bi">
-            <field name="report_type">01</field>
+            <field name="report_type">05</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_X4_compras_bc">
             <field name="report_type">01</field>
@@ -114,12 +114,6 @@ this repository contains the full copyright notices and license terms. -->
         <record model="account.tax.template" id="account_es.iva_sop_21_inv">
             <field name="report_type">01</field>
         </record>
-        <record model="account.tax.template" id="account_es.iva_rep_ex">
-            <field name="report_type">01</field>
-        </record>
-        <record model="account.tax.template" id="account_es.iva_rep_ex_form">
-            <field name="report_type">01</field>
-        </record>
         <record model="account.tax.template" id="account_es.iva_rep_0">
             <field name="report_type">01</field>
         </record>
@@ -147,7 +141,7 @@ this repository contains the full copyright notices and license terms. -->
             <field name="report_type">01</field>
         </record>
 
-        <!-- services -->
+        <!-- Services -->
         <record model="account.tax.template" id="account_es.iva_IC_compras_10_servicios">
             <field name="report_type">01</field>
         </record>
@@ -177,6 +171,23 @@ this repository contains the full copyright notices and license terms. -->
         </record>
         <record model="account.tax.template" id="account_es.iva_ISP_compras_serv_1">
             <field name="report_type">01</field>
+        </record>
+
+        <!-- Exempt -->
+        <record model="account.tax.template" id="account_es.iva_rep_ex">
+            <field name="report_type">05</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_rep_ex_form">
+            <field name="report_type">05</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_rep_4_exento">
+            <field name="report_type">05</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_rep_10_exento">
+            <field name="report_type">05</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_rep_21_exento">
+            <field name="report_type">05</field>
         </record>
     </data>
 </tryton>

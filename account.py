@@ -77,7 +77,7 @@ class ConfigurationFacturae(ModelSQL, CompanyValueMixin):
     facturae_certificate = fields.Many2One('certificate', "Factura-e Certificate",
         help='Certificate to sign Factura-e')
     facturae_service =  fields.Selection([
-        (None, ''),
+        (None, 'Only Generate Facturae'),
         ], "Factura-e Service")
 
     @staticmethod

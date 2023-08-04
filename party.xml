@@ -3,10 +3,10 @@
      copyright notices and license terms. -->
 <tryton>
     <data>
-        <record model="ir.ui.view" id="party_view_form">
-            <field name="model">party.party</field>
-            <field name="inherit" ref="party.party_view_form"/>
-            <field name="name">party_form</field>
+        <record model="ir.ui.view" id="address_view_form">
+            <field name="model">party.address</field>
+            <field name="inherit" ref="party.address_view_form"/>
+            <field name="name">address_form</field>
         </record>
     </data>
 </tryton>

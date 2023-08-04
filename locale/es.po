@@ -38,17 +38,25 @@ msgctxt "field:account.invoice.credit.start,rectificative_reason_code:"
 msgid "Rectificative Reason Code"
 msgstr "Código motivo rectificación"
 
-msgctxt "field:account.invoice.generate_facturae.start,certificate_facturae:"
-msgid "Certificate Factura-e"
-msgstr "Certificado Factura-e"
-
 msgctxt "field:account.invoice.generate_facturae.start,certificate_password:"
 msgid "Certificate Password"
 msgstr "Contraseña certificado"
 
 msgctxt "field:account.invoice.generate_facturae.start,service:"
-msgid "Service"
-msgstr "Servicio"
+msgid "Factura-e Service"
+msgstr "Servicio Factura-e"
+
+msgctxt "field:account.invoice.generate_facturae.start,certificate:"
+msgid "Factura-e Certificate"
+msgstr "Certificado Factura-e"
+
+msgctxt "field:account.configuration,facturae_certificate:"
+msgid "Factura-e Certificate"
+msgstr "Certificado Factura-e"
+
+msgctxt "field:account.configuration,facturae_service:"
+msgid "Factura-e Service"
+msgstr "Servicio Factura-e"
 
 msgctxt "field:account.payment.type,facturae_type:"
 msgid "Factura-e Type"
@@ -62,27 +70,51 @@ msgctxt "field:account.tax.template,report_type:"
 msgid "Report Type"
 msgstr "Tipo informe"
 
-msgctxt "field:party.party,facturae_person_type:"
+msgctxt "field:company.company,facturae_person_type:"
 msgid "Person Type"
 msgstr "Tipo persona"
 
-msgctxt "field:party.party,facturae_residence_type:"
+msgctxt "field:company.company,facturae_residence_type:"
 msgid "Residence Type"
 msgstr "Tipo residencia"
 
-msgctxt "field:party.party,oficina_contable:"
+msgctxt "field:company.company,oficina_contable:"
 msgid "Oficina contable"
 msgstr "Oficina contable"
 
-msgctxt "field:party.party,organo_gestor:"
+msgctxt "field:company.company,organo_gestor:"
 msgid "Organo gestor"
 msgstr "Organo gestor"
 
-msgctxt "field:party.party,organo_proponente:"
+msgctxt "field:company.company,organo_proponente:"
 msgid "Organo proponente"
 msgstr "Organo proponente"
 
-msgctxt "field:party.party,unidad_tramitadora:"
+msgctxt "field:company.company,unidad_tramitadora:"
+msgid "Unidad tramitadora"
+msgstr "Unidad tramitadora"
+
+msgctxt "field:party.address,facturae_person_type:"
+msgid "Person Type"
+msgstr "Tipo persona"
+
+msgctxt "field:party.address,facturae_residence_type:"
+msgid "Residence Type"
+msgstr "Tipo residencia"
+
+msgctxt "field:party.address,oficina_contable:"
+msgid "Oficina contable"
+msgstr "Oficina contable"
+
+msgctxt "field:party.address,organo_gestor:"
+msgid "Organo gestor"
+msgstr "Organo gestor"
+
+msgctxt "field:party.address,organo_proponente:"
+msgid "Organo proponente"
+msgstr "Organo proponente"
+
+msgctxt "field:party.address,unidad_tramitadora:"
 msgid "Unidad tramitadora"
 msgstr "Unidad tramitadora"
 
@@ -751,23 +783,43 @@ msgctxt "selection:account.tax.template,report_type:"
 msgid "Value-Added Tax"
 msgstr ""
 
-msgctxt "selection:party.party,facturae_person_type:"
+msgctxt "selection:company.company,facturae_person_type:"
 msgid "Individual"
 msgstr "Persona física"
 
-msgctxt "selection:party.party,facturae_person_type:"
+msgctxt "selection:company.company,facturae_person_type:"
 msgid "Legal Entity"
 msgstr "Persona jurídica"
 
-msgctxt "selection:party.party,facturae_residence_type:"
+msgctxt "selection:company.company,facturae_residence_type:"
 msgid "Foreigner"
 msgstr "Extranjero (Fuera Unión Europea)"
 
-msgctxt "selection:party.party,facturae_residence_type:"
+msgctxt "selection:company.company,facturae_residence_type:"
 msgid "Resident in Spain"
 msgstr "Residente (en España)"
 
-msgctxt "selection:party.party,facturae_residence_type:"
+msgctxt "selection:company.company,facturae_residence_type:"
+msgid "Resident in other EU country"
+msgstr "Residente en la Unión Europea (excepto España)"
+
+msgctxt "selection:party.address,facturae_person_type:"
+msgid "Individual"
+msgstr "Persona física"
+
+msgctxt "selection:party.address,facturae_person_type:"
+msgid "Legal Entity"
+msgstr "Persona jurídica"
+
+msgctxt "selection:party.address,facturae_residence_type:"
+msgid "Foreigner"
+msgstr "Extranjero (Fuera Unión Europea)"
+
+msgctxt "selection:party.address,facturae_residence_type:"
+msgid "Resident in Spain"
+msgstr "Residente (en España)"
+
+msgctxt "selection:party.address,facturae_residence_type:"
 msgid "Resident in other EU country"
 msgstr "Residente en la Unión Europea (excepto España)"
 
@@ -793,7 +845,11 @@ msgctxt "view:account.tax:"
 msgid "Factura-e"
 msgstr "Factura-e"
 
-msgctxt "view:party.party:"
+msgctxt "view:company.company:"
+msgid "Factura-e"
+msgstr "Factura-e"
+
+msgctxt "view:party.address:"
 msgid "Factura-e"
 msgstr "Factura-e"
 
@@ -804,3 +860,11 @@ msgstr "Cancelar"
 msgctxt "wizard_button:account.invoice.generate_facturae,start,generate:"
 msgid "Generate"
 msgstr "Generar"
+
+msgctxt "selection:account.configuration.facturae,service:"
+msgid "Only Generate Facturae"
+msgstr "Solo genera la Factura-e"
+
+msgctxt "selection:account.invoice.generate_facturae.start,service:"
+msgid "Only Generate Facturae"
+msgstr "Solo genera la Factura-e"

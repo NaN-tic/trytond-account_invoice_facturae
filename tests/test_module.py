@@ -58,8 +58,8 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         company.header = 'Report Header'
         company.party.name = 'Seller'
         company.party.identifiers = [tax_identifier]
-        company.party.facturae_person_type = 'J'
-        company.party.facturae_residence_type = 'R'
+        company.facturae_person_type = 'J'
+        company.facturae_residence_type = 'R'
         company.party.save()
         company.save()
 
@@ -108,8 +108,6 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
             company_address.country = country
             company_address.save()
             party = Party(name='Buyer')
-            party.facturae_person_type = 'J'
-            party.facturae_residence_type = 'R'
             tax_identifier = PartyIdentifier()
             tax_identifier.type = 'eu_vat'
             tax_identifier.code = 'BE0897290877'
@@ -123,6 +121,8 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
                 'postal_code': '08201',
                 'subdivision': subdivision.id,
                 'country': country.id,
+                'address.facturae_person_type': 'J',
+                'address.facturae_residence_type': 'R',
                 }
 
             address, = Address.create([address_dict])

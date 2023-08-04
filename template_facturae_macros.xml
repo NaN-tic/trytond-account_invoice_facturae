@@ -1,19 +1,19 @@
-{% macro administrative_center(centre_code, role_type_code, party) %}
+{% macro administrative_center(centre_code, role_type_code, person_type, addrs) %}
         <AdministrativeCentre>
             <CentreCode>{{ centre_code }}</CentreCode>
             <RoleTypeCode>{{ role_type_code }}</RoleTypeCode>
-            <Name>{% if party.facturae_person_type == 'J' %}{{ party.name and party.name[:40] }}{% else %}{{ party.name and party.name.split(' ', 2)[0][:40] or party.code[:40] }}{% endif %}</Name>
-            {% if party.facturae_person_type == 'F' %}
-            <FirstSurname>{{ party.name and party.name.split(' ', 2)[1][:40] }}</FirstSurname>
+            <Name>{% if person_type == 'J' %}{{ addrs.party.name and addrs.party.name[:40] }}{% else %}{{ addrs.party.name and addrs.party.name.split(' ', 2)[0][:40] or addrs.party.code[:40] }}{% endif %}</Name>
+            {% if person_type == 'F' %}
+            <FirstSurname>{{ addrs.party.name and addrs.party.name.split(' ', 2)[1][:40] }}</FirstSurname>
             {% endif %}
-            {% if party.facturae_person_type == 'F' and party.name.split(' ') | length > 2 %}
-            <SecondSurname>{{ party.name and party.name.split(' ', 2)[2][:40] }}</SecondSurname>
+            {% if person_type == 'F' and addrs.party.name.split(' ') | length > 2 %}
+            <SecondSurname>{{ addrs.party.name and addrs.party.name.split(' ', 2)[2][:40] }}</SecondSurname>
             {% endif %}
-            {% if party.addresses %}{{ address(party.addresses[0]) }}{% endif %}
-            {% if party.contact_mechanisms %}{{ contact(party) }}{% endif %}
+            {% if addrs %}{{ address(addrs) }}{% endif %}
+            {% if addrs.party.contact_mechanisms %}{{ contact(addrs.party) }}{% endif %}
             <PhysicalGLN/>
             <LogicalOperationalPoint/>
-            <CentreDescription>{{ party.name and party.name.split(' ', 2)[0][:40] or party.code[:40] }}</CentreDescription>
+            <CentreDescription>{{ addrs.party.name and addrs.party.name.split(' ', 2)[0][:40] or addrs.party.code[:40] }}</CentreDescription>
         </AdministrativeCentre>
 {% endmacro %}
 

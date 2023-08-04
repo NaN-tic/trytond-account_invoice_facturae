@@ -14,9 +14,6 @@ from decimal import Decimal
 from jinja2 import Environment, FileSystemLoader
 from lxml import etree
 from operator import attrgetter
-from tempfile import NamedTemporaryFile
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.serialization import pkcs12
 from trytond.model import ModelView, fields
 from trytond.pool import Pool, PoolMeta
 from trytond.pyson import Bool, Eval
@@ -25,6 +22,8 @@ from trytond.wizard import Wizard, StateView, StateTransition, Button
 from trytond import backend
 from trytond.i18n import gettext
 from trytond.exceptions import UserError
+from trytond.modules.certificate_manager.certificate_manager import (
+    ENCODING_DER)
 
 FACTURAE_SCHEMA_VERSION = '3.2.2'
 
@@ -319,13 +318,13 @@ class Invoice(metaclass=PoolMeta):
             "Missing some tax in invoice %s" % self.id)
 
         for field in FACe_REQUIRED_FIELDS:
-            for party in [self.party, self.company.party]:
-                if not getattr(party, field):
-                    raise UserError(gettext(
-                            'account_invoice_facturae.party_facturae_fields',
-                            party=party.rec_name,
-                            invoice=self.rec_name,
-                            field=field))
+            if (not getattr(self.invoice_address, field)
+                    or not getattr(self.company, field)):
+                raise UserError(gettext(
+                        'account_invoice_facturae.party_facturae_fields',
+                        party=party.rec_name,
+                        invoice=self.rec_name,
+                        field=field))
         if (not self.company.party.tax_identifier
                 or len(self.company.party.tax_identifier.code) < 3
                 or len(self.company.party.tax_identifier.code) > 30):
@@ -351,7 +350,7 @@ class Invoice(metaclass=PoolMeta):
                     'account_invoice_facturae.party_vat_identifier',
                     party=self.party.rec_name,
                     invoice=self.rec_name))
-        if (self.party.facturae_person_type == 'F'
+        if (self.invoice_address.facturae_person_type == 'F'
                 and len(self.party.name.split(' ', 2)) < 2):
             raise UserError(gettext(
                     'account_invoice_facturae.party_name_surname',
@@ -475,7 +474,8 @@ class Invoice(metaclass=PoolMeta):
         """
         Inspired by https://github.com/pedrobaeza/l10n-spain/blob/d01d049934db55130471e284012be7c860d987eb/l10n_es_facturae/wizard/create_facturae.py
         """
-        Configuration = Pool().get('account.configuration')
+        pool = Pool()
+        Configuration = pool.get('account.configuration')
 
         if not certificate:
             certificate = Configuration(1).facturae_certificate
@@ -483,34 +483,14 @@ class Invoice(metaclass=PoolMeta):
                 raise UserError(gettext(
                         'account_invoice_facturae.msg_missing_certificate'))
 
-        certificate_facturae = certificate.pem_certificate
-        certificate_password = certificate.certificate_password
-
         logger = logging.getLogger('account_invoice_facturae')
 
-        with NamedTemporaryFile(suffix='.xml', delete=False) as unsigned_file:
-            unsigned_file.write(xml_string)
-
-        with NamedTemporaryFile(suffix='.pfx', delete=False) as cert_file:
-            cert_file.write(certificate_facturae)
-
-        def _sign_file(cert, password, request):
-            # get key and certificates from PCK12 file
-            try:
-                (
-                    private_key,
-                    certificate,
-                    additional_certificates,
-                    ) = pkcs12.load_key_and_certificates(cert, password)
-            except ValueError as e:
-                logger.warning("Error load_key_and_certificates file",
-                    exc_info=True)
-                raise UserError(gettext(
-                    'account_invoice_facturae.msg_certificate_error',
-                    error=str(e)))
+        def _sign_file(cert, request):
+            key = cert.load_pem_key()
+            pem = cert.load_pem_certificate()
 
             # DER is an ASN.1 encoding type
-            crt = certificate.public_bytes(serialization.Encoding.DER)
+            crt = pem.public_bytes(ENCODING_DER)
 
             # Set variables values
             rand_min = 1
@@ -574,10 +554,9 @@ class Invoice(metaclass=PoolMeta):
 
             # Set the certificate values
             ctx = xmlsig.SignatureContext()
-            ctx.private_key = private_key
-            ctx.x509 = certificate
-            ctx.ca_certificates = additional_certificates
-            ctx.public_key = certificate.public_key()
+            ctx.private_key = key
+            ctx.x509 = pem
+            ctx.public_key = pem.public_key()
 
             # Set the footer validation
             object_node = etree.SubElement(
@@ -632,11 +611,11 @@ class Invoice(metaclass=PoolMeta):
             etree.SubElement(
                 issuer_serial, etree.QName(xmlsig.constants.DSigNs,
                     "X509IssuerName")
-                ).text = xmlsig.utils.get_rdns_name(certificate.issuer.rdns)
+                ).text = xmlsig.utils.get_rdns_name(pem.issuer.rdns)
             etree.SubElement(
                 issuer_serial, etree.QName(xmlsig.constants.DSigNs,
                     "X509SerialNumber")
-                ).text = str(certificate.serial_number)
+                ).text = str(pem.serial_number)
 
             signature_policy_identifier = etree.SubElement(
                 signed_signature_properties,
@@ -710,11 +689,7 @@ class Invoice(metaclass=PoolMeta):
 
             return etree.tostring(root, xml_declaration=True, encoding="UTF-8")
 
-        signed_file_content = _sign_file(
-            certificate_facturae,
-            certificate_password.encode(),
-            xml_string,
-            )
+        signed_file_content = _sign_file(certificate, xml_string)
 
         logger.info("Factura-e for invoice %s (%s) generated and signed",
             self.rec_name, self.id)
@@ -750,8 +725,8 @@ class InvoiceLine(metaclass=PoolMeta):
     @property
     def facturae_item_description(self):
         return (
-            (self.description and self.description[:2500])
-            or (self.product and self.product.rec_name[:2500])
+            (self.description and self.description)
+            or (self.product and self.product.rec_name)
             or '#'+str(self.id)
             )
 
@@ -759,6 +734,34 @@ class InvoiceLine(metaclass=PoolMeta):
     def facturae_receiver_transaction_reference(self):
         # TODO Issuer/ReceiverTransactionDate (sale, contract...)
         return ''
+
+    @property
+    def facturae_start_date(self):
+        try:
+            pool = Pool()
+            Consumption = pool.get('contract.consumption')
+        except:
+            Consumption = None
+
+        if (self.origin and Consumption
+                and isinstance(self.origin, Consumption)):
+            return self.origin.start_date
+        return None
+
+    @property
+    def facturae_end_date(self):
+        try:
+            pool = Pool()
+            Consumption = pool.get('contract.consumption')
+        except:
+            Consumption = None
+
+        if (self.origin and Consumption
+                and isinstance(self.origin, Consumption)):
+            return self.origin.end_date
+        elif self.facturae_start_date:
+            return self.facturae_start_date
+        return None
 
     @property
     def taxes_outputs(self):
@@ -813,17 +816,10 @@ class GenerateFacturaeStart(ModelView):
     'Generate Factura-e file - Start'
     __name__ = 'account.invoice.generate_facturae.start'
     service = fields.Selection([
-        (None, ''),
-        ], 'Service')
-    certificate_facturae = fields.Many2One('certificate',
-        'Certificate Factura-e',
-        states={
-            'invisible': ~Bool(Eval('service')),
-        }, depends=['service'])
-
-    @staticmethod
-    def default_service():
-        return None
+        (None, 'Only generate facturae'),
+        ], 'Factura-e Service')
+    certificate = fields.Many2One('certificate',
+        'Factura-e Certificate', depends=['service'])
 
 
 class GenerateFacturae(Wizard):
@@ -836,11 +832,26 @@ class GenerateFacturae(Wizard):
             ])
     generate = StateTransition()
 
+    def default_start(self, fields):
+        pool = Pool()
+        Configuration = pool.get('account.configuration')
+
+        default = {
+            'service': None,
+            'certificate': None,
+            }
+
+        config = Configuration(1)
+        if config.facturae_certificate:
+            default['certificate'] = config.facturae_certificate.id
+
+        return default
+
     def transition_generate(self):
         Invoice = Pool().get('account.invoice')
 
         invoices = Invoice.browse(Transaction().context['active_ids'])
         for invoice in invoices:
-            invoice.generate_facturae(certificate=self.start.certificate_facturae,
+            invoice.generate_facturae(certificate=self.start.certificate,
                                       service=self.start.service)
         return 'end'

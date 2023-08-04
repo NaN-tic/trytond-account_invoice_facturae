@@ -38,20 +38,20 @@
     <Parties>
         <SellerParty>
             <TaxIdentification>
-                <PersonTypeCode>{{ invoice.company.party.facturae_person_type }}</PersonTypeCode>
-                <ResidenceTypeCode>{{ invoice.company.party.facturae_residence_type }}</ResidenceTypeCode>
+                <PersonTypeCode>{{ invoice.company.facturae_person_type }}</PersonTypeCode>
+                <ResidenceTypeCode>{{ invoice.company.facturae_residence_type }}</ResidenceTypeCode>
                 <TaxIdentificationNumber>{{ invoice.company.party.tax_identifier.code[:30] }}</TaxIdentificationNumber>
             </TaxIdentification>
             {# Optional. It could be the ID or the code #}
             {% if invoice.company.party.code and invoice.company.party.code | length < 10 %}
             <PartyIdentification>{{ invoice.company.party.code|int or invoice.company.party.id }}</PartyIdentification>
             {% endif %}
-            {% if invoice.company.party.oficina_contable or invoice.company.party.organo_gestor or invoice.company.party.unidad_tramitadora or invoice.company.party.organo_proponente %}
+            {% if invoice.company.oficina_contable or invoice.company.organo_gestor or invoice.company.unidad_tramitadora or invoice.company.organo_proponente %}
             <AdministrativeCentres>
-                {% if invoice.company.party.oficina_contable %}{{ administrative_center(invoice.company.party.oficina_contable, '01', invoice.company.party) }}{% endif %}
-                {% if invoice.company.party.organo_gestor %}{{ administrative_center(invoice.company.party.organo_gestor, '02', invoice.company.party) }}{% endif %}
-                {% if invoice.company.party.unidad_tramitadora %}{{ administrative_center(invoice.company.party.unidad_tramitadora, '03', invoice.company.party) }}{% endif %}
-                {% if invoice.company.party.organo_proponente %}{{ administrative_center(invoice.company.party.organo_proponente, '04', invoice.company.party) }}{% endif %}
+                {% if invoice.company.oficina_contable %}{{ administrative_center(invoice.company.oficina_contable, '01', invoice.company.facturae_person_type, invoice.company.party.address_get('invoice')) }}{% endif %}
+                {% if invoice.company.organo_gestor %}{{ administrative_center(invoice.company.organo_gestor, '02', invoice.company.facturae_person_type, invoice.company.party.address_get('invoice')) }}{% endif %}
+                {% if invoice.company.unidad_tramitadora %}{{ administrative_center(invoice.company.unidad_tramitadora, '03', invoice.company.facturae_person_type, invoice.company.party.address_get('invoice')) }}{% endif %}
+                {% if invoice.company.organo_proponente %}{{ administrative_center(invoice.company.organo_proponente, '04', invoice.company.facturae_person_type, invoice.company.party.address_get('invoice')) }}{% endif %}
             </AdministrativeCentres>
             {% endif %}
             <LegalEntity>
@@ -73,23 +73,23 @@
 
         <BuyerParty>
             <TaxIdentification>
-                <PersonTypeCode>{{ invoice.party.facturae_person_type }}</PersonTypeCode>
-                <ResidenceTypeCode>{{ invoice.party.facturae_residence_type }}</ResidenceTypeCode>
+                <PersonTypeCode>{{ invoice.invoice_address.facturae_person_type }}</PersonTypeCode>
+                <ResidenceTypeCode>{{ invoice.invoice_address.facturae_residence_type }}</ResidenceTypeCode>
                 <TaxIdentificationNumber>{{ invoice.party.tax_identifier.code[:30] }}</TaxIdentificationNumber>
             </TaxIdentification>
             {# Optional. It could be the ID or the code #}
             {% if invoice.party.code and invoice.party.code | length < 10 %}
             <PartyIdentification>{{ invoice.party.code|int or invoice.party.id }}</PartyIdentification>
             {% endif %}
-            {% if invoice.party.oficina_contable or invoice.party.organo_gestor or invoice.party.unidad_tramitadora or invoice.party.organo_proponente %}
+            {% if invoice.invoice_address.oficina_contable or invoice.invoice_address.organo_gestor or invoice.invoice_address.unidad_tramitadora or invoice.invoice_address.organo_proponente %}
             <AdministrativeCentres>
-                {% if invoice.party.oficina_contable %}{{ administrative_center(invoice.party.oficina_contable, '01', invoice.party) }}{% endif %}
-                {% if invoice.party.organo_gestor %}{{ administrative_center(invoice.party.organo_gestor, '02', invoice.party) }}{% endif %}
-                {% if invoice.party.unidad_tramitadora %}{{ administrative_center(invoice.party.unidad_tramitadora, '03', invoice.party) }}{% endif %}
-                {% if invoice.party.organo_proponente %}{{ administrative_center(invoice.party.organo_proponente, '04', invoice.party) }}{% endif %}
+                {% if invoice.invoice_address.oficina_contable %}{{ administrative_center(invoice.invoice_address.oficina_contable, '01', invoice.invoice_address.facturae_person_type, invoice.invoice_address) }}{% endif %}
+                {% if invoice.invoice_address.organo_gestor %}{{ administrative_center(invoice.invoice_address.organo_gestor, '02', invoice.invoice_address.facturae_person_type, invoice.invoice_address) }}{% endif %}
+                {% if invoice.invoice_address.unidad_tramitadora %}{{ administrative_center(invoice.invoice_address.unidad_tramitadora, '03', invoice.invoice_address.facturae_person_type, invoice.invoice_address) }}{% endif %}
+                {% if invoice.invoice_address.organo_proponente %}{{ administrative_center(invoice.invoice_address.organo_proponente, '04', invoice.invoice_address.facturae_person_type, invoice.invoice_address) }}{% endif %}
             </AdministrativeCentres>
             {% endif %}
-            {% if invoice.party.facturae_person_type == 'J' %}
+            {% if invoice.invoice_address.facturae_person_type == 'J' %}
             <LegalEntity>
                 <CorporateName>{{ invoice.party.name and invoice.party.name[:80] or invoice.party.code[:80] }}</CorporateName>
                 {% if invoice.party.trade_name %}
@@ -162,7 +162,7 @@
                 {% if invoice.currency != euro %}
                 <ExchangeRateDetails>
                     <ExchangeRate>{{ Invoice.double_up_to_eight(exchange_rate) }}</ExchangeRate>
-                    <ExchangeRateDate>{{ exchange_rate_date }}</ExchangeRateDate>
+                    <ExchangeRateDate>{% if exchange_rate_date %}{{ exchange_rate_date.isoformat() }}{% endif %}</ExchangeRateDate>
                 </ExchangeRateDetails>
                 {% endif %}
                 <TaxCurrencyCode>EUR</TaxCurrencyCode>
@@ -255,7 +255,7 @@
                     - Extensions
                     #}
                     <ReceiverTransactionReference>{{ line.facturae_receiver_transaction_reference }}</ReceiverTransactionReference>
-                    <ItemDescription>{{ line.facturae_item_description }}</ItemDescription>
+                    <ItemDescription>{{ line.facturae_item_description[:2500] }}</ItemDescription>
                     <Quantity>{{ line.quantity }}</Quantity>
                     <UnitOfMeasure>{{ UOM_CODE2TYPE.get(line.unit.symbol, '05') if line.unit else '05' }}</UnitOfMeasure>
                     <UnitPriceWithoutTax>{{ Invoice.double_up_to_eight(line.unit_price) }}</UnitPriceWithoutTax>
@@ -321,10 +321,10 @@
                         </Tax>
                         {% endfor %}
                     </TaxesOutputs>
-                    {% if line.origin and line.origin.contract %}
+                    {% if line.facturae_start_date %}
                     <LineItemPeriod>
-                        <StartDate>{{ line.origin.start_date }}</StartDate>
-                        <EndDate>{{ line.origin.end_date }}</EndDate>
+                        <StartDate>{{ line.facturae_start_date.isoformat() }}</StartDate>
+                        <EndDate>{{ line.facturae_end_date.isoformat() }}</EndDate>
                     </LineItemPeriod>
                     {% endif %}
                     {% if line.taxes_additional_line_item_information or line.note %}

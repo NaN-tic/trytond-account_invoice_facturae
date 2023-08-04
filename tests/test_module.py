@@ -121,8 +121,8 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
                 'postal_code': '08201',
                 'subdivision': subdivision.id,
                 'country': country.id,
-                'address.facturae_person_type': 'J',
-                'address.facturae_residence_type': 'R',
+                'facturae_person_type': 'J',
+                'facturae_residence_type': 'R',
                 }
 
             address, = Address.create([address_dict])

@@ -322,7 +322,7 @@ class Invoice(metaclass=PoolMeta):
                     or not getattr(self.company, field)):
                 raise UserError(gettext(
                         'account_invoice_facturae.party_facturae_fields',
-                        party=party.rec_name,
+                        party=self.party.rec_name,
                         invoice=self.rec_name,
                         field=field))
         if (not self.company.party.tax_identifier

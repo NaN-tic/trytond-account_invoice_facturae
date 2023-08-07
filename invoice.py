@@ -842,6 +842,8 @@ class GenerateFacturae(Wizard):
             }
 
         config = Configuration(1)
+        if config.facturae_service:
+            default['certificate'] = config.facturae_service.id
         if config.facturae_certificate:
             default['certificate'] = config.facturae_certificate.id
 

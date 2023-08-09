@@ -19,6 +19,13 @@ class Address(metaclass=PoolMeta):
             ('U', 'Resident in other EU country'),
             ('E', 'Foreigner'),
             ], 'Residence Type', sort=False)
+    facturae_outchannel = fields.Selection([
+            (None, 'Service Default'),
+            ('AOC', 'AOC'),
+            ('FACe', 'FACe'),
+            ('FACeB2B', 'FACeB2B'),
+            ('Osakidetza', 'Osakidetza'),
+            ], 'Send Channel Used', sort=False)
     oficina_contable = fields.Char('Oficina contable')
     organo_gestor = fields.Char('Organo gestor')
     unidad_tramitadora = fields.Char('Unidad tramitadora')
@@ -100,3 +107,7 @@ class Address(metaclass=PoolMeta):
             party.drop_column('organo_gestor')
             party.drop_column('unidad_tramitadora')
             party.drop_column('organo_proponente')
+
+        @staticmethod
+        def default_facturae_outchannel():
+            return None

@@ -843,7 +843,7 @@ class GenerateFacturae(Wizard):
 
         config = Configuration(1)
         if config.facturae_service:
-            default['service'] = config.facturae_service.id
+            default['service'] = config.facturae_service
         if config.facturae_certificate:
             default['certificate'] = config.facturae_certificate.id
 

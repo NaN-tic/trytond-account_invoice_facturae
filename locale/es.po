@@ -94,6 +94,10 @@ msgctxt "field:company.company,unidad_tramitadora:"
 msgid "Unidad tramitadora"
 msgstr "Unidad tramitadora"
 
+msgctxt "field:party.address,facturae_outchannel:"
+msgid "Send Channel Used"
+msgstr "Canal de envío"
+
 msgctxt "field:party.address,facturae_person_type:"
 msgid "Person Type"
 msgstr "Tipo persona"
@@ -802,6 +806,26 @@ msgstr "Residente (en España)"
 msgctxt "selection:company.company,facturae_residence_type:"
 msgid "Resident in other EU country"
 msgstr "Residente en la Unión Europea (excepto España)"
+
+msgctxt "selection:party.address,facturae_outchannel:"
+msgid "Service Default"
+msgstr "Per defecte de la plataforma"
+
+msgctxt "selection:party.address,facturae_outchannel:"
+msgid "AOC"
+msgstr "AOC"
+
+msgctxt "selection:party.address,facturae_outchannel:"
+msgid "FACe"
+msgstr "FACe"
+
+msgctxt "selection:party.address,facturae_outchannel:"
+msgid "FACeB2B"
+msgstr "FACeB2B"
+
+msgctxt "selection:party.address,facturae_outchannel:"
+msgid "Osakidetza"
+msgstr "Osakidetza"
 
 msgctxt "selection:party.address,facturae_person_type:"
 msgid "Individual"

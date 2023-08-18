@@ -255,24 +255,24 @@ class Invoice(metaclass=PoolMeta):
         config = Configuration(1)
         transaction = Transaction()
 
-        if not self.invoice_facturae:
-            facturae_content = self.get_facturae()
-            self._validate_facturae(facturae_content)
-            if backend.name != 'sqlite':
-                invoice_facturae = self._sign_facturae(facturae_content,
-                    'default', certificate)
-            else:
-                invoice_facturae = facturae_content
-            self.invoice_facturae = invoice_facturae
-            self.save()
-
         # send facturae to service
         if not service and config.facturae_service:
             service = config.facturae_service
-        if self.invoice_facturae and service:
-            with transaction.set_context(
-                    queue_scheduled_at=config.invoice_facturae_after):
-                Invoice.__queue__.send_facturae(self, service)
+            if not self.invoice_facturae:
+                facturae_content = self.get_facturae()
+                self._validate_facturae(facturae_content)
+                if backend.name != 'sqlite':
+                    invoice_facturae = self._sign_facturae(facturae_content,
+                        'default', certificate)
+                else:
+                    invoice_facturae = facturae_content
+                self.invoice_facturae = invoice_facturae
+                self.save()
+
+            if self.invoice_facturae and service and service != 'only_file':
+                with transaction.set_context(
+                        queue_scheduled_at=config.invoice_facturae_after):
+                    Invoice.__queue__.send_facturae(self, service)
 
     def send_facturae(self, service):
         Invoice = Pool().get('account.invoice')
@@ -816,7 +816,8 @@ class GenerateFacturaeStart(ModelView):
     'Generate Factura-e file - Start'
     __name__ = 'account.invoice.generate_facturae.start'
     service = fields.Selection([
-        (None, 'Only generate facturae'),
+        (None, 'None'),
+        ('only_file', 'Only Generate Facturae'),
         ], 'Factura-e Service')
     certificate = fields.Many2One('certificate',
         'Factura-e Certificate', depends=['service'])

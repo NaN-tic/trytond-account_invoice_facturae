@@ -885,11 +885,11 @@ msgctxt "wizard_button:account.invoice.generate_facturae,start,generate:"
 msgid "Generate"
 msgstr "Generar"
 
-msgctxt "selection:account.configuration.facturae,service:"
+msgctxt "selection:account.configuration.facturae,facturae_service:"
 msgid "Only Generate Facturae"
 msgstr "Solo genera la Factura-e"
 
-msgctxt "selection:account.configuration.facturae,service:"
+msgctxt "selection:account.configuration.facturae,facturae_service:"
 msgid "None"
 msgstr "Ninguno"
 

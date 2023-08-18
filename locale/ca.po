@@ -895,6 +895,14 @@ msgctxt "selection:account.configuration.facturae,facturae_service:"
 msgid "Only Generate Facturae"
 msgstr "Només genera la Factura-e"
 
+msgctxt "selection:account.configuration.facturae,service:"
+msgid "None"
+msgstr "Cap"
+
 msgctxt "selection:account.invoice.generate_facturae.start,service:"
 msgid "Only Generate Facturae"
 msgstr "Només genera la Factura-e"
+
+msgctxt "selection:account.invoice.generate_facturae.start,service:"
+msgid "None"
+msgstr "Cap"

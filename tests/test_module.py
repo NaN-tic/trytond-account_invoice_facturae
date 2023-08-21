@@ -166,6 +166,10 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
             currency = create_currency('Eur')
             add_currency_rate(currency, 1)
 
+            configuration = Configuration(1)
+            configuration.facturae_service = 'only_file'
+            configuration.save()
+
             with Transaction().set_user(0):
                 invoice = Invoice()
                 invoice.type = 'out'

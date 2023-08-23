@@ -255,6 +255,8 @@ class Invoice(metaclass=PoolMeta):
         config = Configuration(1)
         transaction = Transaction()
 
+        if self.type != 'out' or self.state not in ('posted', 'paid'):
+            return
         # send facturae to service
         if not service and config.facturae_service:
             service = config.facturae_service
@@ -300,11 +302,6 @@ class Invoice(metaclass=PoolMeta):
         Invoice = pool.get('account.invoice')
         Date = pool.get('ir.date')
         Rate = pool.get('currency.currency.rate')
-
-        if self.type != 'out':
-            return
-        if self.state not in ('posted', 'paid'):
-            return
 
         # These are an assert because it shouldn't happen
         assert self.invoice_date <= Date.today(), (

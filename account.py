@@ -50,18 +50,20 @@ class Configuration(metaclass=PoolMeta):
         fields.Selection('get_facturae_service', "Factura-e Service",
         help='Service to be used when post the invoice'))
     invoice_facturae_after = fields.TimeDelta("Send Factura-e after",
-        help="Grace period after which the invoice will be sent to the facturae "
-        "service. Applies only if a worker queue is activated.")
+        help="Grace period after which the invoice will be sent to the "
+        "facturae service. Applies only if a worker queue is activated.")
 
     @classmethod
     def default_facturae_service(cls, **pattern):
-        return cls.multivalue_model('facturae_service').default_facturae_service()
+        return cls.multivalue_model(
+            'facturae_service').default_facturae_service()
 
     @classmethod
     def get_facturae_service(cls):
         pool = Pool()
         ConfigurationFacturae = pool.get('account.configuration.facturae')
-        return ConfigurationFacturae.fields_get(['facturae_service'])['facturae_service']['selection']
+        return ConfigurationFacturae.fields_get(['facturae_service'])[
+            'facturae_service']['selection']
 
     @classmethod
     def multivalue_model(cls, field):

@@ -260,6 +260,7 @@ class Invoice(metaclass=PoolMeta):
         # send facturae to service
         if not service and config.facturae_service:
             service = config.facturae_service
+        if service:
             if not self.invoice_facturae:
                 facturae_content = self.get_facturae()
                 self._validate_facturae(facturae_content)
@@ -271,7 +272,7 @@ class Invoice(metaclass=PoolMeta):
                 self.invoice_facturae = invoice_facturae
                 self.save()
 
-            if self.invoice_facturae and service and service != 'only_file':
+            if self.invoice_facturae and service != 'only_file':
                 with transaction.set_context(
                         queue_scheduled_at=config.invoice_facturae_after):
                     Invoice.__queue__.send_facturae(self, service)

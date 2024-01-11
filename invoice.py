@@ -139,7 +139,7 @@ class Invoice(metaclass=PoolMeta):
             'invisible': ~Bool(Eval('credited_invoices')),
             'required': (Bool(Eval('credited_invoices'))
                 & (Eval('state').in_(['posted', 'paid']))),
-            }, depends=['credited_invoices'])
+            })
     invoice_facturae = fields.Binary('Factura-e',
         filename='invoice_facturae_filename')
     invoice_facturae_filename = fields.Function(fields.Char(
@@ -818,7 +818,7 @@ class GenerateFacturaeStart(ModelView):
         ('only_file', 'Only Generate Facturae'),
         ], 'Factura-e Service')
     certificate = fields.Many2One('certificate',
-        'Factura-e Certificate', depends=['service'])
+        'Factura-e Certificate')
 
 
 class GenerateFacturae(Wizard):

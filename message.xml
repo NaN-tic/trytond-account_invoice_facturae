@@ -55,6 +55,9 @@ The payment type "%(payment_type)s" used in invoice "%(invoice)s" is configured 
           <field name="text">Error signing invoice "%(invoice)s".
 Message returned by signing process: %(process_output)s</field>
       </record>
+      <record model="ir.message" id="msg_future_facturae_warning">
+        <field name="text">Invoice date of invoice %(id)s is set in the future. Are you sure you want to proceed?</field>
+      </record>
       <record model="ir.message" id="incompatible_facturae_type_account_bank">
           <field name="text">The Factura-e Type and Account Bank Kind of Payment Type "%(payment_type)s" are not compatible.</field>
       </record>

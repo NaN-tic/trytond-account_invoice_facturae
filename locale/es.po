@@ -2,21 +2,31 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
-msgctxt "field:account.configuration,certificate_service_facturae:"
-msgid "Certificate Service Post Factura-e"
-msgstr "Servicio certificado contabilizar Factura-e"
+msgctxt "field:account.configuration,facturae_certificate:"
+msgid "Factura-e Certificate"
+msgstr "Certificado Factura-e"
+
+msgctxt "field:account.configuration,facturae_service:"
+msgid "Factura-e Service"
+msgstr "Servicio Factura-e"
 
 msgctxt "field:account.configuration,invoice_facturae_after:"
 msgid "Send Factura-e after"
 msgstr "Enviar Factura-e después de"
 
-msgctxt "field:account.configuration.facturae,certificate_service_facturae:"
-msgid "Certificate Service Post Factura-e"
-msgstr "Servicio certificado contabilizar Factura-e"
-
 msgctxt "field:account.configuration.facturae,company:"
 msgid "Company"
 msgstr "Empresa"
+
+#, fuzzy
+msgctxt "field:account.configuration.facturae,facturae_certificate:"
+msgid "Factura-e Certificate"
+msgstr "Certificado Factura-e"
+
+#, fuzzy
+msgctxt "field:account.configuration.facturae,facturae_service:"
+msgid "Factura-e Service"
+msgstr "Servicio Factura-e"
 
 msgctxt "field:account.invoice,credited_invoices:"
 msgid "Credited Invoices"
@@ -30,6 +40,11 @@ msgctxt "field:account.invoice,invoice_facturae_filename:"
 msgid "Factura-e filename"
 msgstr "Nombre fichero Factura-e"
 
+#, fuzzy
+msgctxt "field:account.invoice,invoice_facturae_sent:"
+msgid "Factura-e Sent"
+msgstr "Factura-e Enviada"
+
 msgctxt "field:account.invoice,rectificative_reason_code:"
 msgid "Rectificative Reason Code"
 msgstr "Código motivo rectificación"
@@ -38,23 +53,11 @@ msgctxt "field:account.invoice.credit.start,rectificative_reason_code:"
 msgid "Rectificative Reason Code"
 msgstr "Código motivo rectificación"
 
-msgctxt "field:account.invoice.generate_facturae.start,certificate_password:"
-msgid "Certificate Password"
-msgstr "Contraseña certificado"
-
-msgctxt "field:account.invoice.generate_facturae.start,service:"
-msgid "Factura-e Service"
-msgstr "Servicio Factura-e"
-
 msgctxt "field:account.invoice.generate_facturae.start,certificate:"
 msgid "Factura-e Certificate"
 msgstr "Certificado Factura-e"
 
-msgctxt "field:account.configuration,facturae_certificate:"
-msgid "Factura-e Certificate"
-msgstr "Certificado Factura-e"
-
-msgctxt "field:account.configuration,facturae_service:"
+msgctxt "field:account.invoice.generate_facturae.start,service:"
 msgid "Factura-e Service"
 msgstr "Servicio Factura-e"
 
@@ -122,9 +125,25 @@ msgctxt "field:party.address,unidad_tramitadora:"
 msgid "Unidad tramitadora"
 msgstr "Unidad tramitadora"
 
-msgctxt "help:account.configuration,certificate_service_facturae:"
+msgctxt "help:account.configuration,facturae_certificate:"
+msgid "Certificate to sign Factura-e"
+msgstr "Certificado de firma Factura-e"
+
+msgctxt "help:account.configuration,facturae_service:"
 msgid "Service to be used when post the invoice"
-msgstr "El servicio que se utilitzará cuando se contabilize una factura"
+msgstr "Servicio usado al contabilizar la factura."
+
+msgctxt "help:account.configuration,invoice_facturae_after:"
+msgid ""
+"Grace period after which the invoice will be sent to the facturae service. "
+"Applies only if a worker queue is activated."
+msgstr ""
+"Período de gracia tras el cual la factura será enviada al servicio "
+"factura-e. Se aplica solo si una worker queue es activada."
+
+msgctxt "help:account.configuration.facturae,facturae_certificate:"
+msgid "Certificate to sign Factura-e"
+msgstr "Certificado de firma Factura-e"
 
 msgctxt "model:account.configuration.facturae,name:"
 msgid "Account Configuration Factura-e"
@@ -221,25 +240,32 @@ msgstr ""
 "Falta el Tipo Factura-e en el tipo de pago \"%(payment_type)s\" usado en la "
 "factura \"%(invoice)s\""
 
+msgctxt "model:ir.message,text:msg_certificate_error"
+msgid "Error while getting the certificate: \"%(error)s\"."
+msgstr ""
+"Se ha producido un error mientras se obtenía el certificado: \"%(error)s\"."
+
+msgctxt "model:ir.message,text:msg_draft_invoice_facturae_sent"
+msgid "Can not draft \"%(invoices)s\" that have been sent to Factura-e."
+msgstr "No se pueden pasar a borrador \"%(facturas)s\" que han sido enviadas a Factura-e."
+
+msgctxt "model:ir.message,text:msg_future_facturae_warning"
+msgid ""
+"Invoice date of invoice %(id)s is set in the future. Are you sure you want"
+" to proceed?"
+msgstr ""
+"La fecha de factura %(id)s está establecida en el futuro. ¿Seguro que "
+"quieres continuar?"
+
 msgctxt "model:ir.message,text:msg_missing_certificate"
 msgid "Missing default configuration Factura-e Certificate."
 msgstr "Falta la configuració del Certificat Factura-e"
-
-msgctxt "model:ir.message,text:msg_missing_certificate_service"
-msgid "Missing default \"%(service)s\" Factura-e Certificate."
-msgstr ""
-"Falta el por defecto del servicio \"%(service)s\" del certificado Factura-e."
 
 msgctxt "model:ir.message,text:msg_missing_password_certificate"
 msgid "Missing Password Factura-e Certificate in company \"%(company)s\"."
 msgstr ""
 "Falta la contraseña del certificado Factura-e Certificate en la empresa "
 "\"%(company)s\"."
-
-msgctxt "model:ir.message,text:msg_certificate_error"
-msgid "Error while getting the certificate: \"%(error)s\"."
-msgstr ""
-"Se ha producido un error mientras se obtenía el certificado: \"%(error)s\"."
 
 msgctxt "model:ir.message,text:no_rate"
 msgid "No rate found for currency \"%(currency)s\" on \"%(date)s\""
@@ -274,6 +300,14 @@ msgstr ""
 msgctxt "model:ir.model.button,string:generate_facturae_button"
 msgid "Generate Facturae"
 msgstr "Crear Facturae"
+
+msgctxt "selection:account.configuration.facturae,facturae_service:"
+msgid "None"
+msgstr "Ninguno"
+
+msgctxt "selection:account.configuration.facturae,facturae_service:"
+msgid "Only Generate Facturae"
+msgstr "Solo genera Factura-e"
 
 msgctxt "selection:account.invoice,rectificative_reason_code:"
 msgid "Applicable Date/Period"
@@ -466,8 +500,12 @@ msgstr ""
 "declaración de concurso"
 
 msgctxt "selection:account.invoice.generate_facturae.start,service:"
-msgid "Default"
-msgstr "Por defecto"
+msgid "None"
+msgstr "Ninguno"
+
+msgctxt "selection:account.invoice.generate_facturae.start,service:"
+msgid "Only Generate Facturae"
+msgstr "Solo genera Factura-e"
 
 msgctxt "selection:account.payment.type,facturae_type:"
 msgid "Accepted bill of exchange"
@@ -545,247 +583,319 @@ msgctxt "selection:account.payment.type,facturae_type:"
 msgid "Transferable promissory note"
 msgstr "Pagaré a la  Orden"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "Corporation Tax"
-msgstr ""
+msgstr "Impuesto de sociedades"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "Excise duty applied to manufactured tobacco in Canaries"
-msgstr ""
+msgstr "Impuesto especial aplicado al tabaco manufacturado en Canarias"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "ICIO: Tax on construction, installation and works"
-msgstr ""
+msgstr "ICIO: Impuesto sobre la construcción, instalación y obras"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "IDEC: Tax on bank deposits"
-msgstr ""
+msgstr "IDEC: Impuesto a los depósitos bancarios"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "IE: Excise duties and consumption taxes"
-msgstr ""
+msgstr "IE: Impuestos especiales e impuestos al consumo"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "IECDPCAC: Excise duties on oil derivates in Canaries"
 msgstr ""
+"IECDPCAC: Impuestos Especiales sobre los derivados del petróleo en Canarias"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "IGFEI: Tax on Fluorinated Greenhouse Gases"
-msgstr ""
+msgstr "IGFEI: Impuesto a los Gases Fluorados de Efecto Invernadero"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "IGIC:Canaries General Indirect Tax"
-msgstr ""
+msgstr "IGIC: Impuesto General Indirecto de Canarias"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "IGTECM: Sales tax in Ceuta and Melilla"
-msgstr ""
+msgstr "IGTECM: Impuesto sobre las ventas en Ceuta y Melilla"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid ""
 "IIIMAB: Tax on premises that affect the environment in the Balearic Islands"
 msgstr ""
+"IIIMAB: Impuesto sobre locales que afectan al medio ambiente en Baleares"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "IMGSN: Local sumptuary tax in Navarre"
-msgstr ""
+msgstr "IMGSN: Impuesto local suntuario en Navarra"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "IMPN: Local tax on advertising in Navarre"
-msgstr ""
+msgstr "IMPN: Impuesto local sobre la publicidad en Navarra"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "IMSN: Local tax on building plots in Navarre"
-msgstr ""
+msgstr "IMSN: Impuesto local sobre solares edificables en Navarra"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "IMVDN: Local tax on unoccupied homes in Navarre"
-msgstr ""
+msgstr "IMVDN: Impuesto local sobre viviendas desocupadas en Navarra"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "IPS: Insurance premiums Tax"
-msgstr ""
+msgstr "IPS: Impuesto a las primas de seguros"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "IRNR: Non-resident Income Tax"
-msgstr ""
+msgstr "IRNR: Impuesto sobre la Renta de No Residentes"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "IRPF:Personal Income Tax"
-msgstr ""
+msgstr "IRPF: Impuesto sobre la Renta de las Personas Físicas"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "ITPAJD:Tax on wealth transfers and stamp duty"
-msgstr ""
+msgstr "ITPAJD: Impuesto sobre transmisiones patrimoniales y timbres"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "IVPEE: Tax on the value of electricity generation"
-msgstr ""
+msgstr "IVPEE: Impuesto sobre el valor de la generación eléctrica"
 
 msgctxt "selection:account.tax,report_type:"
 msgid "Other"
 msgstr "Otro"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "REIGIC: Special IGIC: for travel agencies"
-msgstr ""
+msgstr "REIGIC: IGIC especial: para agencias de viajes"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "REIPSI: Special IPSI for travel agencies"
-msgstr ""
+msgstr "REIPSI: IPSI especial para agencias de viajes"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "REIVA: Special VAT for travel agencies"
-msgstr ""
+msgstr "REIVA: IVA especial para agencias de viajes"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "Ra: Customs duties"
-msgstr ""
+msgstr "Ra: derechos de aduana"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "SWUA: Surcharge for Winding Up Activity"
-msgstr ""
+msgstr "SWUA: Recargo por Actividad de Liquidación"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid ""
 "Tax on the production of spent nuclear fuel and radioactive waste from the "
 "generation of nuclear electric power"
 msgstr ""
+"Impuesto sobre la producción de combustible nuclear gastado y residuos "
+"radiactivos procedentes de la generación de energía eléctrica nuclear"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid ""
 "Tax on the storage of spent nuclear energy and radioactive waste in "
 "centralised facilities"
 msgstr ""
+"Impuesto sobre el almacenamiento de energía nuclear gastada y residuos "
+"radiactivos en instalaciones centralizadas"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "Taxes on production, services and imports in Ceuta and Melilla"
 msgstr ""
+"Impuestos sobre la producción, los servicios y las importaciones en Ceuta y "
+"Melilla"
 
+#, fuzzy
 msgctxt "selection:account.tax,report_type:"
 msgid "Value-Added Tax"
-msgstr ""
+msgstr "Impuesto al valor agregado"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "Corporation Tax"
-msgstr ""
+msgstr "Impuesto de sociedades"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "Excise duty applied to manufactured tobacco in Canaries"
-msgstr ""
+msgstr "Impuesto especial aplicado a las labores del tabaco en Canarias"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "ICIO: Tax on construction, installation and works"
-msgstr ""
+msgstr "ICIO: Impuesto sobre la construcción, instalación y obras"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "IDEC: Tax on bank deposits"
-msgstr ""
+msgstr "IDEC: Impuesto a los depósitos bancarios"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "IE: Excise duties and consumption taxes"
-msgstr ""
+msgstr "IE: Impuestos especiales e impuestos al consumo"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "IECDPCAC: Excise duties on oil derivates in Canaries"
 msgstr ""
+"IECDPCAC: Impuestos Especiales sobre los derivados del petróleo en Canarias"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "IGFEI: Tax on Fluorinated Greenhouse Gases"
-msgstr ""
+msgstr "IGFEI: Impuesto a los Gases Fluorados de Efecto Invernadero"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "IGIC:Canaries General Indirect Tax"
-msgstr ""
+msgstr "IGIC: Impuesto General Indirecto de Canarias"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "IGTECM: Sales tax in Ceuta and Melilla"
-msgstr ""
+msgstr "IGTECM: Impuesto sobre las ventas en Ceuta y Melilla"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid ""
 "IIIMAB: Tax on premises that affect the environment in the Balearic Islands"
 msgstr ""
+"IIIMAB: Impuesto sobre locales que afectan al medio ambiente en Baleares"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "IMGSN: Local sumptuary tax in Navarre"
-msgstr ""
+msgstr "IMGSN: Impuesto local suntuario en Navarra"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "IMPN: Local tax on advertising in Navarre"
-msgstr ""
+msgstr "IMPN: Impuesto local sobre la publicidad en Navarra"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "IMSN: Local tax on building plots in Navarre"
-msgstr ""
+msgstr "IMSN: Impuesto local sobre solares edificables en Navarra"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "IMVDN: Local tax on unoccupied homes in Navarre"
-msgstr ""
+msgstr "IMVDN: Impuesto local sobre viviendas desocupadas en Navarra"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "IPS: Insurance premiums Tax"
-msgstr ""
+msgstr "IPS: Impuesto a las primas de seguros"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "IRNR: Non-resident Income Tax"
-msgstr ""
+msgstr "IRNR: Impuesto sobre la Renta de No Residentes"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "IRPF:Personal Income Tax"
-msgstr ""
+msgstr "IRPF: Impuesto sobre la Renta de las Personas Físicas"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "ITPAJD:Tax on wealth transfers and stamp duty"
-msgstr ""
+msgstr "ITPAJD: Impuesto sobre transmisiones patrimoniales y timbres"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "IVPEE: Tax on the value of electricity generation"
-msgstr ""
+msgstr "IVPEE: Impuesto sobre el valor de la generación eléctrica"
 
 msgctxt "selection:account.tax.template,report_type:"
 msgid "Other"
 msgstr "Otro"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "REIGIC: Special IGIC: for travel agencies"
-msgstr ""
+msgstr "REIGIC: IGIC especial: para agencias de viajes"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "REIPSI: Special IPSI for travel agencies"
-msgstr ""
+msgstr "REIPSI: IPSI especial para agencias de viajes"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "REIVA: Special VAT for travel agencies"
-msgstr ""
+msgstr "REIVA: IVA especial para agencias de viajes"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "Ra: Customs duties"
-msgstr ""
+msgstr "Ra: derechos de aduana"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "SWUA: Surcharge for Winding Up Activity"
-msgstr ""
+msgstr "SWUA: Recargo por Actividad de Liquidación"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid ""
 "Tax on the production of spent nuclear fuel and radioactive waste from the "
 "generation of nuclear electric power"
 msgstr ""
+"Impuesto sobre la producción de combustible nuclear gastado y residuos "
+"radiactivos procedentes de la generación de energía eléctrica nuclear"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid ""
 "Tax on the storage of spent nuclear energy and radioactive waste in "
 "centralised facilities"
 msgstr ""
+"Impuesto sobre el almacenamiento de energía nuclear gastada y residuos "
+"radiactivos en instalaciones centralizadas"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "Taxes on production, services and imports in Ceuta and Melilla"
 msgstr ""
+"Impuestos sobre la producción, los servicios y las importaciones en Ceuta y "
+"Melilla"
 
+#, fuzzy
 msgctxt "selection:account.tax.template,report_type:"
 msgid "Value-Added Tax"
-msgstr ""
+msgstr "Impuesto al valor agregado"
 
 msgctxt "selection:company.company,facturae_person_type:"
 msgid "Individual"
@@ -806,10 +916,6 @@ msgstr "Residente (en España)"
 msgctxt "selection:company.company,facturae_residence_type:"
 msgid "Resident in other EU country"
 msgstr "Residente en la Unión Europea (excepto España)"
-
-msgctxt "selection:party.address,facturae_outchannel:"
-msgid "Service Default"
-msgstr "Per defecte de la plataforma"
 
 msgctxt "selection:party.address,facturae_outchannel:"
 msgid "AOC"
@@ -827,6 +933,10 @@ msgctxt "selection:party.address,facturae_outchannel:"
 msgid "Osakidetza"
 msgstr "Osakidetza"
 
+msgctxt "selection:party.address,facturae_outchannel:"
+msgid "Service Default"
+msgstr "Servicio por defecto"
+
 msgctxt "selection:party.address,facturae_person_type:"
 msgid "Individual"
 msgstr "Persona física"
@@ -846,6 +956,10 @@ msgstr "Residente (en España)"
 msgctxt "selection:party.address,facturae_residence_type:"
 msgid "Resident in other EU country"
 msgstr "Residente en la Unión Europea (excepto España)"
+
+msgctxt "view:account.configuration:"
+msgid "Factura-e"
+msgstr "Factura-e"
 
 msgctxt "view:account.invoice.generate_facturae.start:"
 msgid ""
@@ -884,19 +998,3 @@ msgstr "Cancelar"
 msgctxt "wizard_button:account.invoice.generate_facturae,start,generate:"
 msgid "Generate"
 msgstr "Generar"
-
-msgctxt "selection:account.configuration.facturae,facturae_service:"
-msgid "Only Generate Facturae"
-msgstr "Solo genera la Factura-e"
-
-msgctxt "selection:account.configuration.facturae,facturae_service:"
-msgid "None"
-msgstr "Ninguno"
-
-msgctxt "selection:account.invoice.generate_facturae.start,service:"
-msgid "Only Generate Facturae"
-msgstr "Solo genera la Factura-e"
-
-msgctxt "selection:account.invoice.generate_facturae.start,service:"
-msgid "None"
-msgstr "Ninguno"

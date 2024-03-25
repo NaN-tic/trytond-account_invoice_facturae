@@ -21,7 +21,7 @@ from trytond.transaction import Transaction
 from trytond.wizard import Wizard, StateView, StateTransition, Button
 from trytond import backend
 from trytond.i18n import gettext
-from trytond.exceptions import UserError
+from trytond.exceptions import UserError, UserWarning
 from trytond.modules.certificate_manager.certificate_manager import (
     ENCODING_DER)
 
@@ -303,10 +303,9 @@ class Invoice(metaclass=PoolMeta):
         Invoice = pool.get('account.invoice')
         Date = pool.get('ir.date')
         Rate = pool.get('currency.currency.rate')
+        Warning = pool.get('res.user.warning')
 
         # These are an assert because it shouldn't happen
-        assert self.invoice_date <= Date.today(), (
-            "Invoice date of invoice %s is in the future" % self.id)
         assert len(self.credited_invoices) < 2, (
             "Too much credited invoices for invoice %s" % self.id)
         assert not self.credited_invoices or self.rectificative_reason_code, (
@@ -314,6 +313,13 @@ class Invoice(metaclass=PoolMeta):
             "invoices" % self.id)
         assert len(self.taxes_outputs) > 0, (
             "Missing some tax in invoice %s" % self.id)
+
+        if self.invoice_date > Date.today():
+            key = Warning.format('future_facturae', [self.id])
+            if Warning.check(key):
+                raise UserWarning(key, gettext(
+                    'account_invoice_facturae.msg_future_facturae_warning',
+                    id=self.id))
 
         for field in FACe_REQUIRED_FIELDS:
             if (not getattr(self.invoice_address, field)

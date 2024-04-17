@@ -53,7 +53,7 @@
         <record model="ir.model.button" id="generate_facturae_button">
             <field name="name">generate_facturae_wizard</field>
             <field name="string">Generate Facturae</field>
-            <field name="model" search="[('model', '=', 'account.invoice')]"/>
+            <field name="model">account.invoice</field>
         </record>
         <record model="ir.model.button-res.group"
             id="generate_facturae_button_group_account">

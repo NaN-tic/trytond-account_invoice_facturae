@@ -387,6 +387,9 @@
                 - Extensions
                 #}
                 <InvoiceAdditionalInformation> # [:2500]
+                  {% if invoice.reference and 'Kit Digital' in invoice.reference %}
+                  {{ invoice.description[:2445] }}
+                  {% endif %}
                   Factura generada con Tryton (https://www.tryton.org)
                 </InvoiceAdditionalInformation>
             </AdditionalData>

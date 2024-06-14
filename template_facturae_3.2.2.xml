@@ -93,7 +93,7 @@
             <LegalEntity>
                 <CorporateName>{{ invoice.party.name and invoice.party.name[:80] or invoice.party.code[:80] }}</CorporateName>
                 {% if invoice.party.trade_name %}
-                <TradeName>{{ invoice.party.trade_name[:40] }}</TradeName>
+                <TradeName>{{ invoice.invoice_address.party_name and invoice.invoice_address.party_name[:40] or invoice.party.trade_name[:40] }}</TradeName>
                 {% endif %}
                 {{ address(invoice.invoice_address) }}
                 {% if invoice.party.contact_mechanisms %}

@@ -244,7 +244,7 @@ msgstr "S'ha produït un error mentre s'obtenia el certificat: \"%(error)s\"."
 
 msgctxt "model:ir.message,text:msg_draft_invoice_facturae_sent"
 msgid "Can not draft \"%(invoices)s\" that have been sent to Factura-e."
-msgstr "No es poden tornar a esborrany \"%(factures)s\" que s'han enviat a Factura-e."
+msgstr "No es poden tornar a esborrany \"%(invoices)s\" que s'han enviat a Factura-e."
 
 msgctxt "model:ir.message,text:msg_future_facturae_warning"
 msgid ""

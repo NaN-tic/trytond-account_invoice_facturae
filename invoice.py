@@ -820,11 +820,10 @@ class GenerateFacturaeStart(ModelView):
     'Generate Factura-e file - Start'
     __name__ = 'account.invoice.generate_facturae.start'
     service = fields.Selection([
-        (None, 'None'),
-        ('only_file', 'Only Generate Facturae'),
-        ], 'Factura-e Service')
-    certificate = fields.Many2One('certificate',
-        'Factura-e Certificate')
+            (None, 'None'),
+            ('only_file', 'Only Generate Facturae'),
+            ], 'Factura-e Service')
+    certificate = fields.Many2One('certificate', 'Factura-e Certificate')
 
 
 class GenerateFacturae(Wizard):

@@ -858,6 +858,6 @@ class GenerateFacturae(Wizard):
 
         invoices = Invoice.browse(Transaction().context['active_ids'])
         for invoice in invoices:
-            invoice.generate_facturae(certificate=self.start.certificate,
-                                      service=self.start.service)
+            invoice.generate_facturae(certificate=getattr(self.start,
+                'certificate', None), service=self.start.service)
         return 'end'

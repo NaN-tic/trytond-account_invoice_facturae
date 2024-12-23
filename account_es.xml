@@ -36,6 +36,18 @@ this repository contains the full copyright notices and license terms. -->
         <record model="account.tax.template" id="account_es.iva_IO">
             <field name="report_type">01</field>
         </record>
+        <record model="account.tax.template" id="account_es.iva_IC_compras_2_bc_1">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_IC_compras_2_bc_2">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_IC_compras_2_bi_1">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_IC_compras_2_bi_2">
+            <field name="report_type">01</field>
+        </record>
         <record model="account.tax.template" id="account_es.iva_IC_compras_4_bc_1">
             <field name="report_type">01</field>
         </record>
@@ -46,6 +58,18 @@ this repository contains the full copyright notices and license terms. -->
             <field name="report_type">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_IC_compras_4_bi_2">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_IC_compras_75_bc_1">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_IC_compras_75_bc_2">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_IC_compras_75_bi_1">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_IC_compras_75_bi_2">
             <field name="report_type">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_IC_compras_10_bc_1">
@@ -70,12 +94,6 @@ this repository contains the full copyright notices and license terms. -->
             <field name="report_type">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_IC_compras_21_bi_2">
-            <field name="report_type">01</field>
-        </record>
-        <record model="account.tax.template" id="account_es.iva_IC_compras_21_ser_1">
-            <field name="report_type">01</field>
-        </record>
-        <record model="account.tax.template" id="account_es.iva_IC_compras_21_ser_2">
             <field name="report_type">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_ISP_compras_1">
@@ -142,25 +160,37 @@ this repository contains the full copyright notices and license terms. -->
         </record>
 
         <!-- Services -->
-        <record model="account.tax.template" id="account_es.iva_IC_compras_10_servicios">
+        <record model="account.tax.template" id="account_es.iva_IC_compras_2_ser_1">
             <field name="report_type">01</field>
         </record>
+        <record model="account.tax.template" id="account_es.iva_IC_compras_2_ser_2">
+            <field name="report_type">01</field>
+        </record>
+
+        <record model="account.tax.template" id="account_es.iva_IC_compras_4_servicios_1">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_IC_compras_4_servicios_2">
+            <field name="report_type">01</field>
+        </record>
+
+        <record model="account.tax.template" id="account_es.iva_IC_compras_75_ser_1">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_IC_compras_75_ser_2">
+            <field name="report_type">01</field>
+        </record>
+
         <record model="account.tax.template" id="account_es.iva_IC_compras_10_servicios_1">
             <field name="report_type">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_IC_compras_10_servicios_2">
             <field name="report_type">01</field>
         </record>
-        <record model="account.tax.template" id="account_es.iva_IC_compras_21_ser">
+        <record model="account.tax.template" id="account_es.iva_IC_compras_21_ser_1">
             <field name="report_type">01</field>
         </record>
-        <record model="account.tax.template" id="account_es.iva_IC_compras_4_servicios">
-            <field name="report_type">01</field>
-        </record>
-        <record model="account.tax.template" id="account_es.iva_IC_compras_4_servicios_1">
-            <field name="report_type">01</field>
-        </record>
-        <record model="account.tax.template" id="account_es.iva_IC_compras_4_servicios_2">
+        <record model="account.tax.template" id="account_es.iva_IC_compras_21_ser_2">
             <field name="report_type">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_IO_serv">

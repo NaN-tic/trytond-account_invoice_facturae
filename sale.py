@@ -43,8 +43,9 @@ class Sale(metaclass=PoolMeta):
                     if line.origin.sale.receiver_contract_reference:
                         invoice.receiver_contract_reference = (
                             line.origin.sale.receiver_contract_reference)
-                    if line.origin.sale.receiver_transaction_reference:
-                        invoice.receiver_transaction_reference = (
+                    if (line.origin.sale.receiver_transaction_reference and
+                            not invoice.reference):
+                        invoice.reference = (
                             line.origin.sale.receiver_transaction_reference)
                     if line.origin.sale.invoice_description:
                         invoice.invoice_description = (

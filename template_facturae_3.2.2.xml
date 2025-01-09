@@ -170,7 +170,7 @@
                 {% if invoice.invoice_description %}
                     <InvoiceDescription>{{ invoice.invoice_description }}</InvoiceDescription>
                 {% endif %}
-                <ReceiverTransactionReference>{% if invoice.receiver_transaction_reference %} {{ invoice.receiver_transaction_reference }} {% else %} {{ invoice.reference and invoice.reference[:20] or '' }} {% endif %}</ReceiverTransactionReference>
+                <ReceiverTransactionReference>{{ invoice.reference and invoice.reference[:20] or '' }}</ReceiverTransactionReference>
                 {% if invoice.file_reference %}
                     <FileReference>{{ invoice.file_reference }}</FileReference>
                 {% endif %}

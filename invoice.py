@@ -151,9 +151,6 @@ class Invoice(metaclass=PoolMeta):
     receiver_contract_reference = fields.Char('Receiver Contract Reference',
         size=20, states={'readonly': (Eval('state') != 'draft'),},
         depends=['state'])
-    receiver_transaction_reference = fields.Char(
-        'Receiver Transaction Reference', size=20, states={
-            'readonly': (Eval('state') != 'draft'),}, depends=['state'])
     invoice_description = fields.Text('Invoice Description', size=2500,
         states={'readonly': (Eval('state') != 'draft'),}, depends=['state'])
 

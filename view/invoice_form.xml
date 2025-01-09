@@ -30,9 +30,6 @@
             <field name="file_reference"/>
             <label name="receiver_contract_reference"/>
             <field name="receiver_contract_reference"/>
-            <label name="receiver_transaction_reference"/>
-            <field name="receiver_transaction_reference"/>
-            <newline/>
             <separator name="invoice_description" colspan="4"/>
             <field name="invoice_description" colspan="4"/>
         </page>

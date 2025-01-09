@@ -67,9 +67,6 @@ Message returned by signing process: %(process_output)s</field>
       <record model="ir.message" id="msg_certificate_error">
           <field name="text">Error while getting the certificate: "%(error)s".</field>
       </record>
-      <record model="ir.message" id="msg_duplicated_sale_facturae_fields">
-          <field name="text">The field "file_reference" or "receiver_contract_reference" is duplicated in the processed sale "%(sale)s".</field>
-      </record>
       <record model="ir.message" id="msg_party_wrong_fields_filled">
           <field name="text">You cannot configure a party with the "Sales Invoice Grouping Method" set to Standard and the "File Reference" or "Receiver Contract Reference" fields filled.</field>
       </record>

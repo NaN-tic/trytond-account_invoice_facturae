@@ -190,7 +190,6 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
                 invoice.company = company
                 invoice.file_reference = 'FileReference'
                 invoice.receiver_contract_reference = 'ReceiverContract'
-                invoice.receiver_transaction_reference = 'Receiver Transac'
                 invoice.invoice_description = 'InvoiceDescription'
                 invoice.set_journal()
                 invoice._update_account()

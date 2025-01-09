@@ -2,10 +2,8 @@
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
 from trytond.model import fields
-from trytond.pool import PoolMeta, Pool
+from trytond.pool import PoolMeta
 from trytond.pyson import Eval
-from trytond.i18n import gettext
-from trytond.exceptions import UserWarning
 
 
 class Sale(metaclass=PoolMeta):
@@ -36,20 +34,26 @@ class Sale(metaclass=PoolMeta):
 
         if invoice:
             for line in invoice.lines:
-                if (line.origin and line.origin.__name__ == 'sale.line' and
-                        line.origin.sale):
-                    if line.origin.sale.file_reference:
-                        invoice.file_reference = line.origin.sale.file_reference
-                    if line.origin.sale.receiver_contract_reference:
-                        invoice.receiver_contract_reference = (
-                            line.origin.sale.receiver_contract_reference)
-                    if (line.origin.sale.receiver_transaction_reference and
-                            not invoice.reference):
-                        invoice.reference = (
-                            line.origin.sale.receiver_transaction_reference)
-                    if line.origin.sale.invoice_description:
-                        invoice.invoice_description = (
-                            line.origin.sale.invoice_description)
+                if (not line.origin or line.origin.__name__ != 'sale.line'
+                        or not line.origin.sale):
+                    continue
+                invoice.file_reference = (line.origin.sale.file_reference
+                    or None)
+                invoice.receiver_contract_reference = (
+                    line.origin.sale.receiver_contract_reference or None)
+                if invoice.reference:
+                    invoice.reference = (" - " + (
+                        line.origin.sale.receiver_transaction_reference or ""))
+                else:
+                    invoice.reference = (
+                        line.origin.sale.receiver_transaction_reference
+                        or None)
+                invoice.reference = (
+                    line.origin.sale.receiver_transaction_reference
+                    if (line.origin.sale.receiver_transaction_reference
+                        and not invoice.reference) else None)
+                invoice.invoice_description = (
+                    line.origin.sale.invoice_description or None)
             invoice.save()
         return invoice
 
@@ -58,34 +62,17 @@ class Sale(metaclass=PoolMeta):
     def on_change_party(self):
         super(Sale, self).on_change_party()
         if self.party and self.invoice_address:
-            if self.invoice_address.file_reference:
-                self.file_reference = self.invoice_address.file_reference
-            if self.invoice_address.receiver_contract_reference:
-                self.receiver_contract_reference = (
-                    self.invoice_address.receiver_contract_reference)
-
-    @classmethod
-    def quote(cls, sales):
-        for sale in sales:
-            sale.check_facturae_fields()
+            self.file_reference = (self.invoice_address.file_reference or None)
+            self.receiver_contract_reference = (
+                self.invoice_address.receiver_contract_reference or None)
 
 
-    def check_facturae_fields(self):
-        pool = Pool()
-        Sale = pool.get('sale.sale')
-        Warning = pool.get('res.user.warning')
+class ModifyHeader(metaclass=PoolMeta):
+    __name__ = 'sale.modify_header'
 
-        sales = Sale.search([
-            ('state', 'in', ['processing', 'done']),
-            ['OR',
-                ('file_reference', '=', self.file_reference),
-                ('receiver_contract_reference', '=',
-                    self.receiver_contract_reference)
-             ]], limit=1)
-
-        if sales:
-            key = 'sale_facturae_duplicated_%s' % sales[0].id
-            if Warning.check(key):
-                raise UserWarning(key, gettext(
-                    'account_invoice_facturae.msg_duplicated_sale_facturae_fields',
-                    sale=sales[0].rec_name))
+    def value_start(self, fields):
+        values = super().value_start(fields)
+        for field in ['receiver_transaction_reference', 'invoice_description']:
+            if values.get(field):
+                values[field] = None
+        return values

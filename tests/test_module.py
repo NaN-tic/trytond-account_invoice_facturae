@@ -84,11 +84,18 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
                     'company': company.id,
                     'facturae_type': '01',
                     }])
-            revenue, = Account.search([('type.revenue', '=', True)])
-            expense, = Account.search([('type.expense', '=', True)])
+            revenue, = Account.search([
+                ('type.revenue', '=', True),
+                ('closed', '=', False),
+                ], limit=1)
+            expense, = Account.search([
+                ('type.expense', '=', True),
+                ('closed', '=', False),
+                ], limit=1)
             tax_account, = Account.search([
-                    ('name', '=', 'Main Tax'),
-                    ])
+                    ('code', '=', '6.3.6'), # Main Tax
+                    ('closed', '=', False),
+                    ], limit=1)
             with Transaction().set_user(0):
                 vat21 = Tax()
                 vat21.name = vat21.description = '21% VAT'

@@ -167,7 +167,16 @@
                 {% endif %}
                 <TaxCurrencyCode>EUR</TaxCurrencyCode>
                 <LanguageName>{{ invoice.party_lang[:2] if invoice.party_lang else 'es' }}</LanguageName>
-                <ReceiverTransactionReference>{{ invoice.reference and invoice.reference[:20] or '' }}</ReceiverTransactionReference>
+                {% if invoice.invoice_description %}
+                    <InvoiceDescription>{{ invoice.invoice_description }}</InvoiceDescription>
+                {% endif %}
+                <ReceiverTransactionReference>{% if invoice.receiver_transaction_reference %} {{ invoice.receiver_transaction_reference }} {% else %} {{ invoice.reference and invoice.reference[:20] or '' }} {% endif %}</ReceiverTransactionReference>
+                {% if invoice.file_reference %}
+                    <FileReference>{{ invoice.file_reference }}</FileReference>
+                {% endif %}
+                {% if invoice.receiver_contract_reference %}
+                    <ReceiverContractReference>{{ invoice.receiver_contract_reference }}</ReceiverContractReference>
+                {% endif %}
             </InvoiceIssueData>
             <TaxesOutputs>
                 {% for invoice_tax in invoice.taxes_outputs %}

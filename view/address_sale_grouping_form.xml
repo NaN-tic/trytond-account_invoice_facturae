@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+     copyright notices and license terms. -->
+<data>
+    <xpath expr="/form/notebook/page[@id='facturae']/field[@name='organo_proponente']" position="after">
+        <label name="file_reference"/>
+        <field name="file_reference"/>
+        <label name="receiver_contract_reference"/>
+        <field name="receiver_contract_reference"/>
+    </xpath>
+</data>

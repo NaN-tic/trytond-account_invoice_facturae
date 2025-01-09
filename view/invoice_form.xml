@@ -23,4 +23,18 @@
         <button name="generate_facturae_wizard"
             string="Generate Factura-e" icon="tryton-lock"/>
     </xpath>
+
+    <xpath expr="/form/notebook" position="inside">
+        <page id="facturae" string="Factura-e">
+            <label name="file_reference"/>
+            <field name="file_reference"/>
+            <label name="receiver_contract_reference"/>
+            <field name="receiver_contract_reference"/>
+            <label name="receiver_transaction_reference"/>
+            <field name="receiver_transaction_reference"/>
+            <newline/>
+            <separator name="invoice_description" colspan="4"/>
+            <field name="invoice_description" colspan="4"/>
+        </page>
+    </xpath>
 </data>

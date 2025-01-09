@@ -145,6 +145,14 @@ class Invoice(metaclass=PoolMeta):
     invoice_facturae_filename = fields.Function(fields.Char(
         'Factura-e filename'), 'get_invoice_facturae_filename')
     invoice_facturae_sent = fields.Boolean('Factura-e Sent')
+    file_reference = fields.Char('File Reference', size=20, states={
+            'readonly': (Eval('state') != 'draft'),
+        }, depends=['state'])
+    receiver_contract_reference = fields.Char('Receiver Contract Reference',
+        size=20, states={'readonly': (Eval('state') != 'draft'),},
+        depends=['state'])
+    invoice_description = fields.Text('Invoice Description', size=2500,
+        states={'readonly': (Eval('state') != 'draft'),}, depends=['state'])
 
     @classmethod
     def __setup__(cls):
@@ -264,7 +272,7 @@ class Invoice(metaclass=PoolMeta):
             if not self.invoice_facturae:
                 facturae_content = self.get_facturae()
                 self._validate_facturae(facturae_content, service=service)
-                if backend.name != 'sqlite':
+                if backend.name != 'sqlite' and certificate:
                     invoice_facturae = self._sign_facturae(facturae_content,
                         'default', certificate)
                 else:

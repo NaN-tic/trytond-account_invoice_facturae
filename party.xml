@@ -9,4 +9,11 @@
             <field name="name">address_form</field>
         </record>
     </data>
+    <data depends="sale_invoice_grouping">
+        <record model="ir.ui.view" id="address_sale_grouping_view_form">
+            <field name="model">party.address</field>
+            <field name="inherit" ref="party.address_view_form"/>
+            <field name="name">address_sale_grouping_form</field>
+        </record>
+    </data>
 </tryton>

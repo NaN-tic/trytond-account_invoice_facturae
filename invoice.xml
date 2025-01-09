@@ -67,9 +67,9 @@
             <field name="action" ref="wizard_generate_signed_facturae"/>
         </record>-->
 
-	<record model="ir.ui.icon" id="lock_icon">
-	    <field name="name">tryton-lock</field>
-	    <field name="path">icons/tryton-lock.svg</field>
-	</record>
+	    <record model="ir.ui.icon" id="lock_icon">
+	        <field name="name">tryton-lock</field>
+	        <field name="path">icons/tryton-lock.svg</field>
+	    </record>
     </data>
 </tryton>

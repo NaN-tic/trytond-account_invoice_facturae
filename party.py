@@ -3,6 +3,8 @@
 from trytond.model import fields
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
+from trytond.exceptions import UserError
+from trytond.i18n import gettext
 
 
 class Address(metaclass=PoolMeta):
@@ -111,3 +113,35 @@ class Address(metaclass=PoolMeta):
         @staticmethod
         def default_facturae_outchannel():
             return None
+
+
+class AddressSaleGrouping(metaclass=PoolMeta):
+    __name__ = 'party.address'
+
+    file_reference = fields.Char('File Reference', size=20)
+    receiver_contract_reference = fields.Char('Receiver Contract Reference',
+        size=20)
+
+    @classmethod
+    def create(cls, vlist):
+        addresses = super().create(vlist)
+        cls.check_facturae_fields(addresses)
+        return addresses
+
+    @classmethod
+    def write(cls, *args):
+        super().write(*args)
+
+        actions = iter(args)
+        for addresses, values in zip(actions, actions):
+            cls.check_facturae_fields(addresses)
+
+    @classmethod
+    def check_facturae_fields(cls, addresses):
+        for address in addresses:
+            if (address.party
+                    and address.party.sale_invoice_grouping_method == 'standard'
+                    and (address.file_reference is not None or
+                        address.receiver_contract_reference is not None)):
+                raise UserError(gettext(
+                    'account_invoice_facturae.msg_party_wrong_fields_filled'))

@@ -6,9 +6,11 @@ import os.path
 from decimal import Decimal
 from trytond.pool import Pool
 from trytond.transaction import Transaction
-from trytond.tests.test_tryton import ModuleTestCase, with_transaction
+from trytond.tests.test_tryton import (ModuleTestCase, with_transaction,
+    activate_module)
 from trytond.modules.account.tests import get_fiscalyear, create_chart
-from trytond.modules.company.tests import create_company, set_company, CompanyTestMixin
+from trytond.modules.company.tests import (create_company, set_company,
+    CompanyTestMixin)
 from trytond.modules.account_invoice.tests import set_invoice_sequences
 from trytond.modules.currency.tests import create_currency, add_currency_rate
 CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
@@ -17,6 +19,13 @@ CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
 class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
     'Test AccountInvoiceFacturae module'
     module = 'account_invoice_facturae'
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        activate_module('account_invoice_facturae')
+        activate_module('sale')
+        activate_module('sale_invoice_grouping')
 
     @with_transaction()
     def test_invoice_generation(self):
@@ -179,6 +188,9 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
                 invoice.payment_term = term
                 invoice.currency = currency
                 invoice.company = company
+                invoice.file_reference = 'FileReference'
+                invoice.receiver_contract_reference = 'ReceiverContract'
+                invoice.invoice_description = 'InvoiceDescription'
                 invoice.set_journal()
                 invoice._update_account()
 

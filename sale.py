@@ -57,14 +57,16 @@ class Sale(metaclass=PoolMeta):
             invoice.save()
         return invoice
 
-    @fields.depends('party', 'invoice_address', 'receiver_contract_reference',
+    @fields.depends('invoice_address', 'receiver_contract_reference',
         'file_reference')
-    def on_change_party(self):
-        super(Sale, self).on_change_party()
-        if self.party and self.invoice_address:
+    def on_change_invoice_address(self):
+        if self.invoice_address:
             self.file_reference = (self.invoice_address.file_reference or None)
             self.receiver_contract_reference = (
                 self.invoice_address.receiver_contract_reference or None)
+        else:
+            self.file_reference = None
+            self.receiver_contract_reference = None
 
 
 class ModifyHeader(metaclass=PoolMeta):

@@ -141,7 +141,7 @@ class AddressSaleGrouping(metaclass=PoolMeta):
         for address in addresses:
             if (address.party
                     and address.party.sale_invoice_grouping_method == 'standard'
-                    and (address.file_reference is not None or
-                        address.receiver_contract_reference is not None)):
+                    and (address.file_reference or
+                        address.receiver_contract_reference)):
                 raise UserError(gettext(
                     'account_invoice_facturae.msg_party_wrong_fields_filled'))

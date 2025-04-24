@@ -270,7 +270,11 @@ class Invoice(metaclass=PoolMeta):
             service = config.facturae_service
         if service:
             if not self.invoice_facturae:
-                facturae_content = self.get_facturae()
+                lang = (self.party.lang and self.party.lang.code
+                    or Transaction().language)
+                with Transaction().set_context(language=lang):
+                    invoice = Invoice(self.id)
+                    facturae_content = invoice.get_facturae()
                 self._validate_facturae(facturae_content, service=service)
                 if backend.name != 'sqlite' and certificate:
                     invoice_facturae = self._sign_facturae(facturae_content,

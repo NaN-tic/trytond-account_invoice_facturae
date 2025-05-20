@@ -9,9 +9,7 @@ from configparser import ConfigParser
 
 MODULE = 'account_invoice_facturae'
 PREFIX = 'nantic'
-MODULE2PREFIX = {
-    'account_es': 'trytonspain',
-    }
+MODULE2PREFIX = {}
 
 
 def read(fname):
@@ -58,8 +56,7 @@ if minor_version % 2:
 else:
     branch = series
 
-dependency_links = [
-    ]
+dependency_links = []
 
 if minor_version % 2:
     # Add development index for testing with proteus
@@ -119,3 +116,4 @@ setup(name='%s_%s' % (PREFIX, MODULE),
     test_suite='tests',
     test_loader='trytond.test_loader:Loader',
     tests_require=tests_require,
+    )

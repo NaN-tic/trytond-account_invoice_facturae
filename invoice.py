@@ -3,7 +3,6 @@
 # copyright notices and license terms.
 import logging
 import os
-import re
 import base64
 import random
 import xmlsig
@@ -24,6 +23,7 @@ from trytond.i18n import gettext
 from trytond.exceptions import UserError, UserWarning
 from trytond.modules.certificate_manager.certificate_manager import (
     ENCODING_DER)
+from trytond.tools import slugify
 
 FACTURAE_SCHEMA_VERSION = '3.2.2'
 
@@ -109,18 +109,8 @@ UOM_CODE2TYPE = {
 # "35", Watt-WTT
 FACe_REQUIRED_FIELDS = ['facturae_person_type', 'facturae_residence_type']
 
-_slugify_strip_re = re.compile(r'[^\w\s-]')
-_slugify_hyphenate_re = re.compile(r'[-\s]+')
-
 DEFAULT_FACTURAE_TEMPLATE = 'template_facturae_3.2.2.xml'
 DEFAULT_FACTURAE_SCHEMA = 'Facturaev3_2_2-offline.xml'
-
-
-def slugify(value):
-    if not isinstance(value, str):
-        value = str(value)
-    value = str(_slugify_strip_re.sub('', value).strip().lower())
-    return _slugify_hyphenate_re.sub('-', value)
 
 
 def module_path():

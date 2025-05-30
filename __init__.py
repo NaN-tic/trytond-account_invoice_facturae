@@ -34,3 +34,6 @@ def register():
     Pool.register(
         sale.ModifyHeader,
         module='account_invoice_facturae', type_='wizard', depends=['sale'])
+    Pool.register(
+        invoice.InvoiceFacturaeReport,
+        module='account_invoice_facturae', type_='report')

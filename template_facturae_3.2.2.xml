@@ -75,7 +75,7 @@
             <TaxIdentification>
                 <PersonTypeCode>{{ invoice.invoice_address.facturae_person_type }}</PersonTypeCode>
                 <ResidenceTypeCode>{{ invoice.invoice_address.facturae_residence_type }}</ResidenceTypeCode>
-                <TaxIdentificationNumber>{{ invoice.party.tax_identifier.code[:30] }}</TaxIdentificationNumber>
+                <TaxIdentificationNumber>{{ invoice.party_tax_identifier and invoice.party_tax_identifier.code[:30] or '' }}</TaxIdentificationNumber>
             </TaxIdentification>
             {# Optional. It could be the ID or the code #}
             {% if invoice.party.code and invoice.party.code | length < 10 %}
@@ -91,7 +91,7 @@
             {% endif %}
             {% if invoice.invoice_address.facturae_person_type == 'J' %}
             <LegalEntity>
-                <CorporateName>{{ invoice.party.name and invoice.party.name[:80] or invoice.party.code[:80] }}</CorporateName>
+                <CorporateName>{{ (invoice.invoice_address and invoice.invoice_address.party_name and invoice.invoice_address.party_name[:80]) or (invoice.party.name and invoice.party.name[:80] or invoice.party.code[:80]) }}</CorporateName>
                 {% if invoice.party.trade_name %}
                 <TradeName>{{ invoice.invoice_address.party_name and invoice.invoice_address.party_name[:40] or invoice.party.trade_name[:40] }}</TradeName>
                 {% endif %}

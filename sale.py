@@ -3,7 +3,7 @@
 # copyright notices and license terms.
 from trytond.model import fields
 from trytond.pool import PoolMeta
-from trytond.pyson import Eval
+from trytond.pyson import Bool, Eval
 
 
 class Sale(metaclass=PoolMeta):
@@ -11,23 +11,23 @@ class Sale(metaclass=PoolMeta):
 
     # Número d'expedient (Invoice Issue Data Type)
     file_reference = fields.Char('File Reference', size=20, states={
-            'readonly': (Eval('state') != 'draft'),
-        }, depends=['state'])
+            'readonly': Bool(Eval('invoices')),
+        }, depends=['invoices'])
     # Número de contracte (Inovice Issue Data Type)
     receiver_contract_reference = fields.Char('Receiver Contract Reference',
         size=20, states={
-            'readonly': (Eval('state') != 'draft'),
-        }, depends=['state'])
+            'readonly': Bool(Eval('invoices')),
+        }, depends=['invoices'])
     # Operació (Invoice Issue Data Type)
     receiver_transaction_reference = fields.Char(
         'Receiver Transaction Reference', size=20, states={
-            'readonly': (Eval('state') != 'draft')
-        }, depends=['state'])
+            'readonly': Bool(Eval('invoices')),
+        }, depends=['invoices'])
     # Observacions (Invoice Issue Data Type)
     invoice_description = fields.Text('Invoice Description', size=2500,
         states={
-            'readonly': (Eval('state') != 'draft')
-        }, depends=['state'])
+            'readonly': Bool(Eval('invoices')),
+        }, depends=['invoices'])
 
     def create_invoice(self):
         invoice = super(Sale, self).create_invoice()

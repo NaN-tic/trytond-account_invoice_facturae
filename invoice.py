@@ -209,6 +209,14 @@ class Invoice(metaclass=PoolMeta):
                 if ml.account.type.receivable],
             key=attrgetter('maturity_date'))
 
+    @property
+    def facturae_additional_information(self):
+        info = []
+        if self.reference and 'Kit Digital' in self.reference and self.description:
+            info.append(invoice.description[:2445])
+        info.append('Factura generada con Tryton (https://www.tryton.org)')
+        return '\n'.join(info)
+
     @classmethod
     def draft(cls, invoices):
         invoice_facturae_sends = [invoice for invoice in invoices if invoice.invoice_facturae_sent]

@@ -307,10 +307,8 @@ msgstr ""
 "\"%(company)s\"."
 
 msgctxt "model:ir.message,text:msg_no_facturae"
-msgid ""
-"Invoice %(invoice)s has no factura-e file."
-msgstr ""
-"La factura %(factura)s no tiene ningún fichero Factura-E."
+msgid "Invoice %(invoice)s has no factura-e file."
+msgstr "La factura %(factura)s no tiene ningún fichero Factura-E."
 
 msgctxt "model:ir.message,text:msg_party_wrong_fields_filled"
 msgid ""

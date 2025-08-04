@@ -211,11 +211,7 @@ class Invoice(metaclass=PoolMeta):
 
     @property
     def facturae_additional_information(self):
-        info = []
-        if self.reference and 'Kit Digital' in self.reference and self.description:
-            info.append(invoice.description[:2445])
-        info.append('Factura generada con Tryton (https://www.tryton.org)')
-        return '\n'.join(info)
+        return ''
 
     @classmethod
     def draft(cls, invoices):

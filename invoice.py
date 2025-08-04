@@ -24,6 +24,7 @@ from trytond.exceptions import UserError, UserWarning
 from trytond.modules.certificate_manager.certificate_manager import (
     ENCODING_DER)
 from trytond.tools import slugify
+from trytond.report import Report
 
 FACTURAE_SCHEMA_VERSION = '3.2.2'
 
@@ -867,3 +868,30 @@ class GenerateFacturae(Wizard):
             invoice.generate_facturae(certificate=getattr(self.start,
                 'certificate', None), service=self.start.service)
         return 'end'
+
+
+class InvoiceFacturaeReport(Report):
+    __name__ = 'account.invoice.facturae'
+
+    @classmethod                           
+    def __setup__(cls):
+        super().__setup__()
+        # Make transaction read-write in case invoice_facturae field is
+        # None and we need to compute and store it.
+        cls.__rpc__['execute'] = RPC(False)
+
+    @classmethod
+    def _execute(cls, records, header, data, action):
+        pool = Pool()
+        Invoice = pool.get('account.invoice')
+        invoice, = Invoice.browse(records)
+        if not invoice.invoice_facturae:
+            invoice.generate_facturae(service='only_file')
+        if invoice.invoice_facturae:
+            return (
+                'xsig',
+                invoice.invoice_facturae)
+        else:
+            raise UserError(gettext(
+                    'account_invoice_facturae.msg_no_facturae',
+                    invoice=invoice.rec_name))

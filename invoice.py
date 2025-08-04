@@ -869,11 +869,20 @@ class GenerateFacturae(Wizard):
 class InvoiceFacturaeReport(Report):
     __name__ = 'account.invoice.facturae'
 
+    @classmethod                           
+    def __setup__(cls):
+        super().__setup__()
+        # Make transaction read-write in case invoice_facturae field is
+        # None and we need to compute and store it.
+        cls.__rpc__['execute'] = RPC(False)
+
     @classmethod
     def _execute(cls, records, header, data, action):
         pool = Pool()
         Invoice = pool.get('account.invoice')
         invoice, = Invoice.browse(records)
+        if not invoice.invoice_facturae:
+            invoice.generate_facturae(service='only_file')
         if invoice.invoice_facturae:
             return (
                 'xsig',

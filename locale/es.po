@@ -308,11 +308,9 @@ msgstr ""
 
 msgctxt "model:ir.message,text:msg_no_facturae"
 msgid ""
-"Invoice %(invoice)s has no avaliable factura-e. Please Generate Factura-E "
-"and try again"
+"Invoice %(invoice)s has no factura-e file."
 msgstr ""
-"La factura %(factura)s no tiene Factura-E disponible. Genere la Factura-E e "
-"inténtelo de nuevo."
+"La factura %(factura)s no tiene ningún fichero Factura-E."
 
 msgctxt "model:ir.message,text:msg_party_wrong_fields_filled"
 msgid ""

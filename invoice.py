@@ -209,6 +209,10 @@ class Invoice(metaclass=PoolMeta):
                 if ml.account.type.receivable],
             key=attrgetter('maturity_date'))
 
+    @property
+    def facturae_additional_information(self):
+        return ''
+
     @classmethod
     def draft(cls, invoices):
         invoice_facturae_sends = [invoice for invoice in invoices if invoice.invoice_facturae_sent]

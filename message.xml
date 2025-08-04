@@ -71,7 +71,7 @@ Message returned by signing process: %(process_output)s</field>
           <field name="text">You cannot configure a party with the "Sales Invoice Grouping Method" set to Standard and the "File Reference" or "Receiver Contract Reference" fields filled.</field>
       </record>
       <record model="ir.message" id="msg_no_facturae">
-          <field name="text">Invoice %(invoice)s has no avaliable factura-e. Please Generate Factura-E and try again.</field>
+          <field name="text">Invoice %(invoice)s has no factura-e file.</field>
       </record>
     </data>
 </tryton>

@@ -25,6 +25,7 @@ from trytond.modules.certificate_manager.certificate_manager import (
     ENCODING_DER)
 from trytond.tools import slugify
 from trytond.report import Report
+from trytond.rpc import RPC
 
 FACTURAE_SCHEMA_VERSION = '3.2.2'
 
@@ -873,7 +874,7 @@ class GenerateFacturae(Wizard):
 class InvoiceFacturaeReport(Report):
     __name__ = 'account.invoice.facturae'
 
-    @classmethod                           
+    @classmethod
     def __setup__(cls):
         super().__setup__()
         # Make transaction read-write in case invoice_facturae field is

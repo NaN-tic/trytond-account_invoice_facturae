@@ -121,9 +121,9 @@ def module_path():
 
 class Invoice(metaclass=PoolMeta):
     __name__ = 'account.invoice'
-    credited_invoices = fields.Function(fields.One2Many('account.invoice',
-            None, 'Credited Invoices'),
-        'get_credited_invoices', searcher='search_credited_invoices')
+    credited_invoices = fields.Function(fields.Many2Many('account.invoice',
+            None, None, 'Credited Invoices'), 'get_credited_invoices',
+        searcher='search_credited_invoices')
     rectificative_reason_code = fields.Selection(
         [(None, "")] + [(x[0], x[1]) for x in RECTIFICATIVE_REASON_CODES],
         'Rectificative Reason Code', sort=False,

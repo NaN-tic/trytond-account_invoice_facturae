@@ -136,6 +136,11 @@ class Invoice(metaclass=PoolMeta):
         filename='invoice_facturae_filename')
     invoice_facturae_filename = fields.Function(fields.Char(
         'Factura-e filename'), 'get_invoice_facturae_filename')
+    invoice_facturae_filetype = fields.Selection([
+            (None, ""),
+            ('xml', "XML"),
+            ('xsig', "XSIG"),
+            ], 'Factura-e filetype', sort=False)
     invoice_facturae_sent = fields.Boolean('Factura-e Sent')
     file_reference = fields.Char('File Reference', size=20, states={
             'readonly': (Eval('state') != 'draft'),
@@ -149,7 +154,8 @@ class Invoice(metaclass=PoolMeta):
     @classmethod
     def __setup__(cls):
         super(Invoice, cls).__setup__()
-        cls._check_modify_exclude |= {'invoice_facturae', 'invoice_facturae_sent'}
+        cls._check_modify_exclude |= {'invoice_facturae', 'invoice_facturae_sent',
+            'invoice_facturae_filetype'}
         cls._buttons.update({
                 'generate_facturae_wizard': {
                     'invisible': ((Eval('type') != 'out')
@@ -184,7 +190,8 @@ class Invoice(metaclass=PoolMeta):
             + ('account.invoice.line',) + tuple(clause[3:])]
 
     def get_invoice_facturae_filename(self, name):
-        return 'facturae-%s.xsig' % slugify(self.number)
+        return 'facturae-%s.%s' % (slugify(self.number),
+            self.invoice_facturae_filetype or 'xsig')
 
     @property
     def rectificative_reason_spanish_description(self):
@@ -275,8 +282,10 @@ class Invoice(metaclass=PoolMeta):
                 if backend.name != 'sqlite' and certificate:
                     invoice_facturae = self._sign_facturae(facturae_content,
                         'default', certificate)
+                    self.invoice_facturae_filetype = 'xsig'
                 else:
                     invoice_facturae = facturae_content
+                    self.invoice_facturae_filetype = 'xml'
                 self.invoice_facturae = invoice_facturae
                 self.save()
 
@@ -890,7 +899,7 @@ class InvoiceFacturaeReport(Report):
             invoice.generate_facturae(service='only_file')
         if invoice.invoice_facturae:
             return (
-                'xsig',
+                invoice.invoice_facturae_filetype or 'xsig',
                 invoice.invoice_facturae)
         else:
             raise UserError(gettext(

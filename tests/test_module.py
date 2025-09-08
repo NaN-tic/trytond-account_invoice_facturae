@@ -229,7 +229,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
 
             invoice.generate_facturae()
             self.assertNotEqual(invoice.invoice_facturae, None)
-            self.assertEqual(invoice.invoice_facturae_filename, 'facturae-1.xsig')
+            self.assertEqual(invoice.invoice_facturae_filename, 'facturae-1.xml')
 
 
 del ModuleTestCase

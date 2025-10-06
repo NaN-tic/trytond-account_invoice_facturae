@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+     copyright notices and license terms. -->
+ <data>
+     <xpath expr="/form" position="inside">
+        <group id="facturae" string="Factura-e" colspan="4">
+            <label name="facturae_person_type"/>
+            <field name="facturae_person_type"/>
+            <label name="facturae_residence_type"/>
+            <field name="facturae_residence_type"/>
+            <label name="facturae_outchannel"/>
+            <field name="facturae_outchannel"/>
+            <newline/>
+            <label name="oficina_contable"/>
+            <field name="oficina_contable"/>
+            <label name="organo_gestor"/>
+            <field name="organo_gestor"/>
+            <label name="unidad_tramitadora"/>
+            <field name="unidad_tramitadora"/>
+            <label name="organo_proponente"/>
+            <field name="organo_proponente"/>
+        </group>
+     </xpath>
+ </data>

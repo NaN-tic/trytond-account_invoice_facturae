@@ -8,8 +8,6 @@
             <field name="facturae_person_type"/>
             <label name="facturae_residence_type"/>
             <field name="facturae_residence_type"/>
-            <label name="facturae_outchannel"/>
-            <field name="facturae_outchannel"/>
             <newline/>
             <label name="oficina_contable"/>
             <field name="oficina_contable"/>

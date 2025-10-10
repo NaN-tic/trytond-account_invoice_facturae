@@ -1,9 +1,39 @@
 <?xml version="1.0"?>
 <!-- The COPYRIGHT file at the top level of this repository contains the full
      copyright notices and license terms. -->
- <data>
-     <xpath expr="/form" position="inside">
-        <group id="facturae" string="Factura-e" colspan="4">
+<form col="6">
+    <notebook>
+        <page id="general" string="General">
+            <label name="party"/>
+            <field name="party" colspan="5"/>
+            <label name="party_name"/>
+            <field name="party_name"/>
+            <group colspan="2" col="-1" id="checkboxes">
+                <label name="active"/>
+                <field name="active"
+                    xexpand="0" width="25"/>
+                <!-- Add here some checkboxes ! -->
+                <label name="sequence"/>
+                <field name="sequence"/>
+            </group>
+            <newline/>
+            <label name="name"/>
+            <field name="name"/>
+            <newline/>
+            <label name="street" yalign="0"/>
+            <field name="street" colspan="3" height="80"/>
+            <newline/>
+            <label name="postal_code"/>
+            <field name="postal_code"/>
+            <label name="city"/>
+            <field name="city"/>
+            <newline/>
+            <label name="country"/>
+            <field name="country"/>
+            <label name="subdivision"/>
+            <field name="subdivision"/>
+        </page>
+        <page id="einvoice" string="eInvoice">
             <label name="facturae_person_type"/>
             <field name="facturae_person_type"/>
             <label name="facturae_residence_type"/>
@@ -17,6 +47,6 @@
             <field name="unidad_tramitadora"/>
             <label name="organo_proponente"/>
             <field name="organo_proponente"/>
-        </group>
-     </xpath>
- </data>
+        </page>
+    </notebook>
+</form>

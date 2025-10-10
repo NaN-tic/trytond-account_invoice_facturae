@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+     copyright notices and license terms. -->
+<data>
+  <xpath expr="/form/notebook/page[@id='general']/field[@name='addresses']" position="replace">
+        <field name="addresses" mode="form,tree" colspan="4"
+            view_ids="account_invoice_facturae.address_view_form_simple2,party.address_view_tree_sequence"/>
+    </xpath>
+</data>

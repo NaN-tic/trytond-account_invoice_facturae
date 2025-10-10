@@ -278,7 +278,7 @@ class Invoice(metaclass=PoolMeta):
                 with Transaction().set_context(language=lang):
                     invoice = Invoice(self.id)
                     facturae_content = invoice.get_facturae()
-                self._validate_facturae(facturae_content, service=service)
+                self._validate_facturae(facturae_content)
                 if backend.name != 'sqlite' and certificate:
                     invoice_facturae = self._sign_facturae(facturae_content,
                         'default', certificate)
@@ -465,7 +465,7 @@ class Invoice(metaclass=PoolMeta):
                 'UOM_CODE2TYPE': UOM_CODE2TYPE,
                 }
 
-    def _validate_facturae(self, xml_string, schema_file_path=None, service=None):
+    def _validate_facturae(self, xml_string, schema_file_path=None):
         """
         Inspired by https://github.com/pedrobaeza/l10n-spain/blob/d01d049934db55130471e284012be7c860d987eb/l10n_es_facturae/wizard/create_facturae.py
         """

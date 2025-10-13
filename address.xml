@@ -16,6 +16,14 @@
         </record>
     </data>
 
+    <data depends="stock">
+        <record model="ir.ui.view" id="address_view_form_simple2_stock">
+            <field name="model">party.address</field>
+            <field name="inherit" ref="account_invoice_facturae.address_view_form_simple2"/>
+            <field name="name">address_form_simple_stock</field>
+        </record>
+    </data>
+
     <data depends="sale_invoice_grouping">
         <record model="ir.ui.view" id="address_sale_grouping_view_form">
             <field name="model">party.address</field>

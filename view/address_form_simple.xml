@@ -17,11 +17,11 @@
                 <field name="sequence"/>
             </group>
             <newline/>
-            <label name="name"/>
-            <field name="name"/>
+            <label name="street_name"/>
+            <field name="street_name"/>
             <newline/>
-            <label name="street" yalign="0"/>
-            <field name="street" colspan="3" height="80"/>
+            <label name="building_name"/>
+            <field name="building_name" colspan="3"/>
             <newline/>
             <label name="postal_code"/>
             <field name="postal_code"/>

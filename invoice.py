@@ -3,15 +3,15 @@
 # copyright notices and license terms.
 import logging
 import os
-import base64
-import random
-import xmlsig
-import hashlib
-import datetime
 import math
+import hashlib
+import base64
 from decimal import Decimal
 from jinja2 import Environment, FileSystemLoader
 from lxml import etree
+from signxml import DigestAlgorithm, methods
+from signxml.xades import (XAdESSigner, XAdESSignaturePolicy,
+    XAdESDataObjectFormat, XAdESVerifier)
 from operator import attrgetter
 from trytond.model import ModelView, fields
 from trytond.pool import Pool, PoolMeta
@@ -21,8 +21,6 @@ from trytond.wizard import Wizard, StateView, StateTransition, Button
 from trytond import backend
 from trytond.i18n import gettext
 from trytond.exceptions import UserError, UserWarning
-from trytond.modules.certificate_manager.certificate_manager import (
-    ENCODING_DER)
 from trytond.tools import slugify
 from trytond.report import Report
 from trytond.rpc import RPC
@@ -281,7 +279,7 @@ class Invoice(metaclass=PoolMeta):
                 self._validate_facturae(facturae_content)
                 if backend.name != 'sqlite' and certificate:
                     invoice_facturae = self._sign_facturae(facturae_content,
-                        'default', certificate)
+                        certificate)
                     self.invoice_facturae_filetype = 'xsig'
                 else:
                     invoice_facturae = facturae_content
@@ -491,231 +489,85 @@ class Invoice(metaclass=PoolMeta):
                     invoice=self.rec_name, message=e))
         return True
 
-    def _sign_facturae(self, xml_string, service='default', certificate=None):
-        """
-        Inspired by https://github.com/pedrobaeza/l10n-spain/blob/d01d049934db55130471e284012be7c860d987eb/l10n_es_facturae/wizard/create_facturae.py
-        """
+    def _get_digest(self):
         pool = Pool()
         Configuration = pool.get('account.configuration')
 
-        if not certificate:
-            certificate = Configuration(1).facturae_certificate
-            if not certificate:
+        config = Configuration(1)
+        hash_object = hashlib.sha256(config.policy_file)
+        digest = hash_object.digest()
+        return base64.b64encode(digest).decode('utf-8')
+
+    def _sign_facturae(self, xml_string, cert=None):
+        pool = Pool()
+        Configuration = pool.get('account.configuration')
+
+        config = Configuration(1)
+        if not cert:
+            cert = config.facturae_certificate
+            if not cert:
                 raise UserError(gettext(
                         'account_invoice_facturae.msg_missing_certificate'))
 
         logger = logging.getLogger('account_invoice_facturae')
 
-        def _sign_file(cert, request):
-            key = cert.load_pem_key()
-            pem = cert.load_pem_certificate()
+        # Get XML file to sign
+        root = etree.fromstring(xml_string)
 
-            # DER is an ASN.1 encoding type
-            crt = pem.public_bytes(ENCODING_DER)
+        private_key = cert.load_pem_key()
+        certificate = cert.load_pem_certificate()
 
-            # Set variables values
-            rand_min = 1
-            rand_max = 99999
-            signature_id = "Signature%05d" % random.randint(rand_min, rand_max)
-            signed_properties_id = (
-                signature_id
-                + "-SignedProperties%05d" % random.randint(rand_min, rand_max)
-                )
-            key_info_id = "KeyInfo%05d" % random.randint(rand_min, rand_max)
-            reference_id = "Reference%05d" % random.randint(rand_min, rand_max)
-            object_id = "Object%05d" % random.randint(rand_min, rand_max)
-            etsi = "http://uri.etsi.org/01903/v1.3.2#"
-            sig_policy_identifier = (
-                "http://www.facturae.es/"
-                "politica_de_firma_formato_facturae/"
-                "politica_de_firma_formato_facturae_v3_1"
-                ".pdf"
-                )
-            sig_policy_hash_value = "Ohixl6upD6av8N7pEvDABhEL6hM="
+        # Define the sign politics (required for Facturae)
+        signature_policy = XAdESSignaturePolicy(
+            Identifier=config.policy_url,
+            Description="Política de firma Facturae XAdES",
+            DigestMethod=DigestAlgorithm.SHA256,
+            DigestValue=self._get_digest()
+            #DigestValue="Ohixl6upD6av8N7pEvDABhEL6hM=",
+            )
 
-            # Get XML file to edit
-            root = etree.fromstring(request)
+        data_object_format = XAdESDataObjectFormat(
+            Description="Factura electrónica Facturae",
+            MimeType="application/xml"
+            #MimeType="text/xml"
+            )
 
-            # Create a signature template for RSA-SHA1 enveloped signature.
-            sign = xmlsig.template.create(
-                c14n_method=xmlsig.constants.TransformInclC14N,
-                sign_method=xmlsig.constants.TransformRsaSha1,
-                name=signature_id,
-                ns="ds",
-                )
-            assert sign is not None
+        # Create the XAdES signer
+        signer = XAdESSigner(
+            signature_policy=signature_policy,
+            claimed_roles=["Emisor de factura"],  # Signer rol
+            data_object_format=data_object_format,
+            method=methods.enveloped,
+            signature_algorithm="rsa-sha256",
+            digest_algorithm="sha256"
+            #c14n_algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
+            )
 
-            # Add the <ds:Signature/> node to the document.
-            root.append(sign)
-
-            # Add the <ds:Reference/> node to the signature template.
-            ref = xmlsig.template.add_reference(
-                sign, xmlsig.constants.TransformSha1, name=reference_id, uri=""
-                )
-
-            # Add the enveloped transform descriptor.
-            xmlsig.template.add_transform(ref,
-                xmlsig.constants.TransformEnveloped)
-
-            # Add 2 new <ds:Reference/> node to the signature template.
-            xmlsig.template.add_reference(
-                sign,
-                xmlsig.constants.TransformSha1,
-                uri="#" + signed_properties_id,
-                uri_type="http://uri.etsi.org/01903#SignedProperties",
-                )
-            xmlsig.template.add_reference(
-                sign, xmlsig.constants.TransformSha1, uri="#" + key_info_id
-                )
-
-            # Add the <ds:KeyInfo/> and <ds:KeyName/> nodes.
-            key_info = xmlsig.template.ensure_key_info(sign, name=key_info_id)
-            x509_data = xmlsig.template.add_x509_data(key_info)
-            xmlsig.template.x509_data_add_certificate(x509_data)
-
-            # Set the certificate values
-            ctx = xmlsig.SignatureContext()
-            ctx.private_key = key
-            ctx.x509 = pem
-            ctx.public_key = pem.public_key()
-
-            # Set the footer validation
-            object_node = etree.SubElement(
-                sign,
-                etree.QName(xmlsig.constants.DSigNs, "Object"),
-                nsmap={"etsi": etsi},
-                attrib={xmlsig.constants.ID_ATTR: object_id},
-                )
-            qualifying_properties = etree.SubElement(
-                object_node,
-                etree.QName(etsi, "QualifyingProperties"),
-                attrib={"Target": "#" + signature_id},
-                )
-            signed_properties = etree.SubElement(
-                qualifying_properties,
-                etree.QName(etsi, "SignedProperties"),
-                attrib={xmlsig.constants.ID_ATTR: signed_properties_id},
-                )
-            signed_signature_properties = etree.SubElement(
-                signed_properties, etree.QName(etsi,
-                    "SignedSignatureProperties")
-                )
-            now = datetime.datetime.now()
-            etree.SubElement(
-                signed_signature_properties, etree.QName(etsi, "SigningTime")
-                ).text = now.isoformat()
-            signing_certificate = etree.SubElement(
-                signed_signature_properties, etree.QName(etsi,
-                    "SigningCertificate")
-                )
-            signing_certificate_cert = etree.SubElement(
-                signing_certificate, etree.QName(etsi, "Cert")
-                )
-            cert_digest = etree.SubElement(
-                signing_certificate_cert, etree.QName(etsi, "CertDigest")
-                )
-            etree.SubElement(
-                cert_digest,
-                etree.QName(xmlsig.constants.DSigNs, "DigestMethod"),
-                attrib={"Algorithm": "http://www.w3.org/2000/09/xmldsig#sha1"},
-                )
-
-            hash_cert = hashlib.sha1(crt)
-            etree.SubElement(
-                cert_digest, etree.QName(xmlsig.constants.DSigNs,
-                    "DigestValue")
-                ).text = base64.b64encode(hash_cert.digest())
-
-            issuer_serial = etree.SubElement(
-                signing_certificate_cert, etree.QName(etsi, "IssuerSerial")
-                )
-            etree.SubElement(
-                issuer_serial, etree.QName(xmlsig.constants.DSigNs,
-                    "X509IssuerName")
-                ).text = xmlsig.utils.get_rdns_name(pem.issuer.rdns)
-            etree.SubElement(
-                issuer_serial, etree.QName(xmlsig.constants.DSigNs,
-                    "X509SerialNumber")
-                ).text = str(pem.serial_number)
-
-            signature_policy_identifier = etree.SubElement(
-                signed_signature_properties,
-                etree.QName(etsi, "SignaturePolicyIdentifier"),
-                )
-            signature_policy_id = etree.SubElement(
-                signature_policy_identifier, etree.QName(etsi,
-                    "SignaturePolicyId")
-                )
-            sig_policy_id = etree.SubElement(
-                signature_policy_id, etree.QName(etsi, "SigPolicyId")
-                )
-            etree.SubElement(
-                sig_policy_id, etree.QName(etsi, "Identifier")
-                ).text = sig_policy_identifier
-            etree.SubElement(
-                sig_policy_id, etree.QName(etsi, "Description")
-                ).text = "Política de Firma FacturaE v3.1"
-            sig_policy_hash = etree.SubElement(
-                signature_policy_id, etree.QName(etsi, "SigPolicyHash")
-                )
-            etree.SubElement(
-                sig_policy_hash,
-                etree.QName(xmlsig.constants.DSigNs, "DigestMethod"),
-                attrib={"Algorithm": "http://www.w3.org/2000/09/xmldsig#sha1"},
-                )
-            hash_value = sig_policy_hash_value
-            etree.SubElement(
-                sig_policy_hash, etree.QName(xmlsig.constants.DSigNs,
-                    "DigestValue")
-                ).text = hash_value
-            signer_role = etree.SubElement(
-                signed_signature_properties, etree.QName(etsi, "SignerRole")
-                )
-            claimed_roles = etree.SubElement(
-                signer_role, etree.QName(etsi, "ClaimedRoles")
-                )
-            etree.SubElement(
-                claimed_roles, etree.QName(etsi, "ClaimedRole")
-                ).text = "supplier"
-            signed_data_object_properties = etree.SubElement(
-                signed_properties, etree.QName(etsi,
-                    "SignedDataObjectProperties")
-                )
-            data_object_format = etree.SubElement(
-                signed_data_object_properties,
-                etree.QName(etsi, "DataObjectFormat"),
-                attrib={"ObjectReference": "#" + reference_id},
-                )
-            etree.SubElement(
-                data_object_format, etree.QName(etsi, "Description")
-                ).text = "Factura"
-            data_object_format_identifier = etree.SubElement(
-                data_object_format, etree.QName(etsi, "ObjectIdentifier")
-                )
-            etree.SubElement(
-                data_object_format_identifier,
-                etree.QName(etsi, "Identifier"),
-                attrib={"Qualifier": "OIDAsURN"}
-                ).text = "urn:oid:1.2.840.10003.5.109.10"
-            etree.SubElement(
-                data_object_format_identifier, etree.QName(etsi, "Description")
-                )
-            etree.SubElement(
-                data_object_format, etree.QName(etsi, "MimeType")
-                ).text = "text/xml"
-
-            # Sign the file and verify the sign.
-            ctx.sign(sign)
-            ctx.verify(sign)
-
-            return etree.tostring(root, xml_declaration=True, encoding="UTF-8")
-
-        signed_file_content = _sign_file(certificate, xml_string)
+        # Sign the <Invoice> node
+        signed_root = signer.sign(
+            root,
+            key=private_key,
+            cert=[certificate],
+            #reference_uri="#Invoice"
+            )
 
         logger.info("Factura-e for invoice %s (%s) generated and signed",
             self.rec_name, self.id)
 
-        return signed_file_content
+        # Verify
+        verifier = XAdESVerifier()
+        try:
+            verify_results = verifier.verify(
+                signed_root,
+                x509_cert=certificate,
+                expect_references=3,  # Standtad for Facturae: data,
+                                      # certificate and propierties.
+                expect_signature_policy=signature_policy
+                )
+        except Exception: # Any error (InvalidSignature, etc.)
+            return False
+
+        return etree.tostring(signed_root, xml_declaration=True, encoding="UTF-8")
 
     @classmethod
     def double_up_to_eight(cls, value):

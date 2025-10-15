@@ -6,6 +6,7 @@ import os
 import math
 import hashlib
 import base64
+import urllib.request
 from decimal import Decimal
 from jinja2 import Environment, FileSystemLoader
 from lxml import etree
@@ -494,7 +495,11 @@ class Invoice(metaclass=PoolMeta):
         Configuration = pool.get('account.configuration')
 
         config = Configuration(1)
-        hash_object = hashlib.sha256(config.policy_file)
+        if not config.policy_url:
+            return None
+        with urllib.request.urlopen(config.policy_url) as f:
+            policy_file = f.read()
+        hash_object = hashlib.sha256(policy_file)
         digest = hash_object.digest()
         return base64.b64encode(digest).decode('utf-8')
 

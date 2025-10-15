@@ -46,9 +46,17 @@ msgctxt "field:account.invoice,invoice_facturae_filename:"
 msgid "Factura-e filename"
 msgstr "Nombre fichero Factura-e"
 
+msgctxt "field:account.invoice,invoice_facturae_filetype:"
+msgid "Factura-e filetype"
+msgstr "Tipo de archivo Factura-e"
+
 msgctxt "field:account.invoice,invoice_facturae_sent:"
 msgid "Factura-e Sent"
 msgstr "Factura-e Enviada"
+
+msgctxt "field:account.invoice,paid_directly:"
+msgid "Has Payed directly"
+msgstr "Ha pagado directamente"
 
 msgctxt "field:account.invoice,receiver_contract_reference:"
 msgid "Receiver Contract Reference"
@@ -74,13 +82,29 @@ msgctxt "field:account.payment.type,facturae_type:"
 msgid "Factura-e Type"
 msgstr "Tipus Factura-e"
 
+msgctxt "field:account.tax,isp:"
+msgid "Inversion del Sujeto Pasivo"
+msgstr "Inversión del Sujeto Pasivo"
+
 msgctxt "field:account.tax,report_type:"
 msgid "Report Type"
 msgstr "Tipo informe"
 
+msgctxt "field:account.tax,service:"
+msgid "Service Rate"
+msgstr "Tarifa de servicio"
+
+msgctxt "field:account.tax.template,isp:"
+msgid "Inversion del Sujeto Pasivo"
+msgstr "Inversión del Sujeto Pasivo"
+
 msgctxt "field:account.tax.template,report_type:"
 msgid "Report Type"
 msgstr "Tipo informe"
+
+msgctxt "field:account.tax.template,service:"
+msgid "Service Rate"
+msgstr "Tarifa de servicio"
 
 msgctxt "field:company.company,facturae_person_type:"
 msgid "Person Type"
@@ -101,6 +125,34 @@ msgstr "Organo gestor"
 msgctxt "field:company.company,organo_proponente:"
 msgid "Organo proponente"
 msgstr "Organo proponente"
+
+msgctxt "field:company.company,registration_data_additional:"
+msgid "Other registration data"
+msgstr "Otros datos de registro"
+
+msgctxt "field:company.company,registration_data_book:"
+msgid "Book"
+msgstr "Libro"
+
+msgctxt "field:company.company,registration_data_folio:"
+msgid "Folio"
+msgstr "Folio"
+
+msgctxt "field:company.company,registration_data_location:"
+msgid "Register of companies location"
+msgstr "Ubicación del registro de empresas"
+
+msgctxt "field:company.company,registration_data_section:"
+msgid "Section"
+msgstr "Sección"
+
+msgctxt "field:company.company,registration_data_sheet:"
+msgid "Sheet"
+msgstr "Hoja"
+
+msgctxt "field:company.company,registration_data_volume:"
+msgid "Volume"
+msgstr "Volumen"
 
 msgctxt "field:company.company,unidad_tramitadora:"
 msgid "Unidad tramitadora"
@@ -173,6 +225,30 @@ msgstr ""
 msgctxt "help:account.configuration.facturae,facturae_certificate:"
 msgid "Certificate to sign Factura-e"
 msgstr "Certificado de firma Factura-e"
+
+msgctxt "help:account.invoice,paid_directly:"
+msgid "The invoice has payed with the 'PAY' button"
+msgstr "La factura se ha pagado con el botón 'PAGAR'"
+
+msgctxt "help:account.tax,isp:"
+msgid "Indicates if the tax is Inversion del sujeto Pasivo"
+msgstr "Indica si el impuesto es Inversión del sujeto Pasivo"
+
+msgctxt "help:account.tax,service:"
+msgid "Indicates if the tax is used for services"
+msgstr "Indica si el impuesto se utiliza para servicios"
+
+msgctxt "help:account.tax.template,isp:"
+msgid "Indicates if the tax is Inversion del sujeto Pasivo"
+msgstr "Indica si el impuesto es Inversión del sujeto Pasivo"
+
+msgctxt "help:account.tax.template,service:"
+msgid "Indicates if the tax is used for services"
+msgstr "Indica si el impuesto se utiliza para servicios"
+
+msgctxt "help:company.company,registration_data_location:"
+msgid "E.g.: Reg. M. de Barcelona"
+msgstr "Ej: Reg. M. de Barcelona"
 
 msgctxt "model:account.configuration.facturae,name:"
 msgid "Account Configuration Factura-e"
@@ -357,6 +433,14 @@ msgstr "Ninguno"
 msgctxt "selection:account.configuration.facturae,facturae_service:"
 msgid "Only Generate Facturae"
 msgstr "Solo genera Factura-e"
+
+msgctxt "selection:account.invoice,invoice_facturae_filetype:"
+msgid "XML"
+msgstr "XML"
+
+msgctxt "selection:account.invoice,invoice_facturae_filetype:"
+msgid "XSIG"
+msgstr "XSIG"
 
 msgctxt "selection:account.invoice,rectificative_reason_code:"
 msgid "Applicable Date/Period"
@@ -967,6 +1051,14 @@ msgstr "Factura-e"
 msgctxt "view:party.address:"
 msgid "Factura-e"
 msgstr "Factura-e"
+
+msgctxt "view:party.address:"
+msgid "General"
+msgstr "General"
+
+msgctxt "view:party.address:"
+msgid "eInvoice"
+msgstr "factura-e"
 
 msgctxt "view:sale.sale:"
 msgid "Factura-e"

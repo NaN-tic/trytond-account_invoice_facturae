@@ -60,6 +60,12 @@ class Configuration(metaclass=PoolMeta):
             'facturae_service').default_facturae_service()
 
     @classmethod
+    def default_policy_url(cls, **pattern):
+        return ('https://www.facturae.gob.es/formato/Polticasfirma/'
+            'A)%20Versi%C3%B3n%203.1/'
+            'Politica_Firma_formato_facturae_v3_1.pdf')
+
+    @classmethod
     def get_facturae_service(cls):
         pool = Pool()
         ConfigurationFacturae = pool.get('account.configuration.facturae')

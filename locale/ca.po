@@ -112,7 +112,7 @@ msgstr "Inversió del subjecte passiu"
 
 msgctxt "field:account.tax.template,report_type:"
 msgid "Report Type"
-msgstr "Tipus Informe"
+msgstr "Tipus informe"
 
 msgctxt "field:account.tax.template,service:"
 msgid "Service Rate"
@@ -128,15 +128,15 @@ msgstr "Tipus residència"
 
 msgctxt "field:company.company,oficina_contable:"
 msgid "Oficina contable"
-msgstr "Oficina contable"
+msgstr "Oficina comptable"
 
 msgctxt "field:company.company,organo_gestor:"
 msgid "Organo gestor"
-msgstr "Organo gestor"
+msgstr "Òrgan gestor"
 
 msgctxt "field:company.company,organo_proponente:"
 msgid "Organo proponente"
-msgstr "Organo proponente"
+msgstr "Òrgan proponent"
 
 msgctxt "field:company.company,registration_data_additional:"
 msgid "Other registration data"
@@ -168,7 +168,7 @@ msgstr "Volum"
 
 msgctxt "field:company.company,unidad_tramitadora:"
 msgid "Unidad tramitadora"
-msgstr "Unidad tramitadora"
+msgstr "Unitat tramitadora"
 
 msgctxt "field:party.address,facturae_person_type:"
 msgid "Person Type"

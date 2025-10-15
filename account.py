@@ -52,6 +52,11 @@ class Configuration(metaclass=PoolMeta):
     invoice_facturae_after = fields.TimeDelta("Send Factura-e after",
         help="Grace period after which the invoice will be sent to the "
         "facturae service. Applies only if a worker queue is activated.")
+    policy_url = fields.Char("Policy URL")
+    policy_file = fields.Binary('Policy File',
+        filename='policy_file_filename')
+    policy_file_filename = fields.Function(fields.Char(
+        'Policy File filename'), 'get_policy_file_filename')
 
     @classmethod
     def default_facturae_service(cls, **pattern):
@@ -64,6 +69,9 @@ class Configuration(metaclass=PoolMeta):
         ConfigurationFacturae = pool.get('account.configuration.facturae')
         return ConfigurationFacturae.fields_get(['facturae_service'])[
             'facturae_service']['selection']
+
+    def get_policy_file_filename(self, name):
+        return 'policy.pdf'
 
     @classmethod
     def multivalue_model(cls, field):

@@ -14,6 +14,18 @@ msgctxt "field:account.configuration,invoice_facturae_after:"
 msgid "Send Factura-e after"
 msgstr "Enviar Factura-e después de"
 
+msgctxt "field:account.configuration,policy_file:"
+msgid "Policy File"
+msgstr "Archivo de políticas"
+
+msgctxt "field:account.configuration,policy_file_filename:"
+msgid "Policy File filename"
+msgstr "Nombre del archivo de política"
+
+msgctxt "field:account.configuration,policy_url:"
+msgid "Policy URL"
+msgstr "URL de la política"
+
 msgctxt "field:account.configuration.facturae,company:"
 msgid "Company"
 msgstr "Empresa"

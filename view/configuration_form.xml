@@ -11,5 +11,10 @@ copyright notices and license types. -->
         <label name="invoice_facturae_after"/>
         <field name="invoice_facturae_after"/>
         <newline/>
+        <label name="policy_url"/>
+        <field name="policy_url"/>
+        <label name="policy_file"/>
+        <field name="policy_file"/>
+        <newline/>
     </xpath>
 </data>

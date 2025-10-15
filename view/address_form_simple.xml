@@ -2,7 +2,7 @@
 <!-- The COPYRIGHT file at the top level of this repository contains the full
      copyright notices and license terms. -->
 <form col="6">
-    <notebook col="6">
+    <notebook>
         <page id="general" string="General" col="6">
             <label name="party" />
             <field name="party" colspan="5" />

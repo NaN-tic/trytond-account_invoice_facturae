@@ -4,7 +4,6 @@
 import logging
 import os
 import base64
-import random
 import xmlsig
 import hashlib
 import datetime
@@ -205,13 +204,21 @@ class Invoice(metaclass=PoolMeta):
     def taxes_outputs(self):
         """Return list of 'impuestos repecutidos'"""
         return [inv_tax for inv_tax in self.taxes
-            if inv_tax.tax and inv_tax.tax.rate >= Decimal(0)]
+            if (inv_tax.tax and
+                (inv_tax.tax.type == 'percentage'
+                    and inv_tax.tax.rate >= Decimal(0))
+                or inv_tax.tax.type == 'fixed')
+            ]
 
     @property
     def taxes_withheld(self):
         """Return list of 'impuestos retenidos'"""
         return [inv_tax for inv_tax in self.taxes
-            if inv_tax.tax and inv_tax.tax.rate < Decimal(0)]
+            if (inv_tax.tax and
+                (inv_tax.tax.type == 'percentage'
+                    and inv_tax.tax.rate < Decimal(0))
+                or inv_tax.tax.type == 'fixed')
+            ]
 
     @property
     def payment_details(self):
@@ -791,13 +798,21 @@ class InvoiceLine(metaclass=PoolMeta):
     def taxes_outputs(self):
         """Return list of 'impuestos repecutidos'"""
         return [inv_tax for inv_tax in self.invoice_taxes
-            if inv_tax.tax and inv_tax.tax.rate >= Decimal(0)]
+            if (inv_tax.tax and
+                (inv_tax.tax.type == 'percentage'
+                    and inv_tax.tax.rate >= Decimal(0))
+                or inv_tax.tax.type == 'fixed')
+            ]
 
     @property
     def taxes_withheld(self):
         """Return list of 'impuestos retenidos'"""
         return [inv_tax for inv_tax in self.invoice_taxes
-            if inv_tax.tax and inv_tax.tax.rate < Decimal(0)]
+            if (inv_tax.tax and
+                (inv_tax.tax.type == 'percentage'
+                    and inv_tax.tax.rate < Decimal(0))
+                or inv_tax.tax.type == 'fixed')
+            ]
 
     @property
     def taxes_additional_line_item_information(self):
@@ -805,7 +820,11 @@ class InvoiceLine(metaclass=PoolMeta):
         for inv_tax in self.invoice_taxes:
             if inv_tax.tax and (not inv_tax.tax.report_type
                     or inv_tax.tax.report_type == '05'):
-                key = (inv_tax.tax.rate * 100, inv_tax.base, inv_tax.amount)
+                key = (inv_tax.tax.type == 'percentage'
+                            and (inv_tax.tax.rate * 100)
+                            or inv_tax.tax.amount,
+                        inv_tax.base,
+                        inv_tax.amount)
                 res.setdefault('05', []).append((key, inv_tax.description))
             elif inv_tax.tax and inv_tax.tax.report_description:
                 res[inv_tax.tax.report_type] = inv_tax.tax.report_description

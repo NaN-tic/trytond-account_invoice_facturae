@@ -394,6 +394,7 @@
                 - RelatedInvoice[:40]
                 - Extensions
                 #}
+                {% if invoice.facturae_attachments %}
                 <RelatedDocuments>
                     {% for attachment in invoice.facturae_attachments %}
                     <Attachment>
@@ -405,6 +406,7 @@
                     </Attachment>
                     {% endfor %}
                 </RelatedDocuments>
+                {% endif %}
                 <InvoiceAdditionalInformation> # [:2500]
                   {{ invoice.facturae_additional_information or '' }}
                 </InvoiceAdditionalInformation>

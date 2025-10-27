@@ -4,6 +4,8 @@
 import logging
 import os
 import base64
+import zipfile
+import io
 import xmlsig
 import hashlib
 import datetime
@@ -115,6 +117,8 @@ FACe_REQUIRED_FIELDS = ['facturae_person_type', 'facturae_residence_type']
 DEFAULT_FACTURAE_TEMPLATE = 'template_facturae_3.2.2.xml'
 DEFAULT_FACTURAE_SCHEMA = 'Facturaev3_2_2-offline.xml'
 
+MAX_UNCOMPRESSED_SIZE = 100 * 1024  # 100KB
+
 
 def module_path():
     return os.path.dirname(os.path.abspath(__file__))
@@ -148,6 +152,51 @@ class InvoiceAttachment(ModelSQL, ModelView):
             'Attachment Compression Algorithm'), 'get_attachment_data')
     attachment_base64 = fields.Function(fields.Char('Attachment in Base64'),
         'get_attachment_data')
+
+    @fields.depends('attachment', 'attachment_format')
+    def on_change_with_attachment_format(self):
+        if self.attachment:
+            name = self.attachment.name or ''
+            ext = name.split('.')[-1].lower() if '.' in name else ''
+            if ext in self.attachment_format.values():
+                return ext
+            else:
+                raise UserError(gettext(
+                        'account_invoice_facturae.msg_unsupported_format',
+                        format=ext))
+        return None
+
+    @classmethod
+    def get_attachment_data(cls, attachments, names):
+        result = {name: {} for name in names}
+        for record in attachments:
+            if record.attachment and record.attachment.data:
+                compressed_data = record.attachment.data
+                size = record.attachment.get_size()
+                algorithm = 'NONE'
+                if size < MAX_UNCOMPRESSED_SIZE:
+                    algorithm = 'ZIP'
+                    zip_buffer = io.BytesIO()
+                    with zipfile.ZipFile(zip_buffer,
+                            mode='w',
+                            compression=zipfile.ZIP_LZMA,
+                            compresslevel=9) as zf:
+                        zf.writestr(record.attachment.name or 'file',
+                            compressed_data)
+                    compressed_data = zip_buffer.getvalue()
+                base64_data = base64.b64encode(compressed_data).decode('ascii')
+                if 'attachment_compression_algorithm' in names:
+                    result['attachment_compression_algorithm'][record.id] = (
+                        algorithm)
+                if 'attachment_base64' in names:
+                    result['attachment_base64'][record.id] = base64_data
+            else:
+                if 'attachment_compression_algorithm' in names:
+                    result['attachment_compression_algorithm'][record.id] = (
+                        None)
+                if 'attachment_base64' in names:
+                    result['attachment_base64'][record.id] = None
+        return result
 
 
 class Invoice(metaclass=PoolMeta):

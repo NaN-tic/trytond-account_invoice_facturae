@@ -392,9 +392,19 @@
             <AdditionalData>
                 {# optional, not supported:
                 - RelatedInvoice[:40]
-                - RelatedDocuments
                 - Extensions
                 #}
+                <RelatedDocuments>
+                    {% for attachment in invoice.facturae_attachments %}
+                    <Attachment>
+                      <AttachmentCompressionAlgorithm>{{ attachment.attachment_compression_algorithm }}</AttachmentCompressionAlgorithm>
+                      <AttachmentFormat>{{ attachment.attachment_format }}</AttachmentFormat>
+                      <AttachmentEncoding>BASE64</AttachmentEncoding>
+                      <AttachmentDescription>{{ attachment.description or 'Extra Document' }}</AttachmentDescription> # [:2500]
+                      <AttachmentData>{{ attachment.file_base64 }}</AttachmentData>
+                    </Attachment>
+                    {% endfor %}
+                </RelatedDocuments>
                 <InvoiceAdditionalInformation> # [:2500]
                   {{ invoice.facturae_additional_information or '' }}
                 </InvoiceAdditionalInformation>

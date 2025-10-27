@@ -4,7 +4,6 @@
 import logging
 import os
 import base64
-import random
 import xmlsig
 import hashlib
 import datetime
@@ -14,7 +13,8 @@ from decimal import Decimal
 from jinja2 import Environment, FileSystemLoader
 from lxml import etree
 from operator import attrgetter
-from trytond.model import ModelView, fields
+
+from trytond.model import ModelSQL, ModelView, fields
 from trytond.pool import Pool, PoolMeta
 from trytond.pyson import Bool, Eval
 from trytond.transaction import Transaction
@@ -120,6 +120,36 @@ def module_path():
     return os.path.dirname(os.path.abspath(__file__))
 
 
+class InvoiceAttachment(ModelSQL, ModelView):
+    "Invoice Attachment"
+    __name__ = 'account.invoice.facturae.attachment'
+
+    invoice = fields.Many2One('account.invoice', 'Invoice', required=True)
+    description = fields.Text('Attachment Description', size=2500,
+        required=True)
+    attachment = fields.Many2One('ir.attachment', 'Attachment', required=True,
+        domain=[('resource', '=', Eval('_parent_invoice'))])
+    attachment_format = fields.Selection([
+            (None, ""),
+            ('xml', "XML"),
+            ('doc', "DOC"),
+            ('docx', "DOCX"),
+            ('gif', "GIF"),
+            ('rtf', "RTF"),
+            ('pdf', "PDF"),
+            ('xls', "XLS"),
+            ('xlsx', "XLSX"),
+            ('jpg', "JPG"),
+            ('bmp', "BMP"),
+            ('tiff', "TIFF"),
+            ('html', "HTML"),
+            ], 'Attachment Format', sort=False, readonly=True)
+    attachment_compression_algorithm = fields.Function(fields.Char(
+            'Attachment Compression Algorithm'), 'get_attachment_data')
+    attachment_base64 = fields.Function(fields.Char('Attachment in Base64'),
+        'get_attachment_data')
+
+
 class Invoice(metaclass=PoolMeta):
     __name__ = 'account.invoice'
     credited_invoices = fields.Function(fields.Many2Many('account.invoice',
@@ -151,6 +181,8 @@ class Invoice(metaclass=PoolMeta):
         depends=['state'])
     invoice_description = fields.Text('Invoice Description', size=2500,
         states={'readonly': (Eval('state') != 'draft'),}, depends=['state'])
+    facturae_attachments = fields.One2Many(
+        'account.invoice.facturae.attachment', 'invoice', 'Attachments')
 
     @classmethod
     def __setup__(cls):
@@ -353,7 +385,6 @@ class Invoice(metaclass=PoolMeta):
             raise UserError(gettext(
                     'account_invoice_facturae.company_vat_identifier',
                     party=self.company.party.rec_name))
-
         company_address = self.company.party.address_get(type='invoice')
         if (not company_address
                 or not company_address.street
@@ -401,7 +432,7 @@ class Invoice(metaclass=PoolMeta):
                 if not rates:
                     raise UserError(gettext(
                             'account_invoice_facturae.no_rate',
-                            currency=self.currenc.name,
+                            currency=self.currency.name,
                             date=self.invoice_date.strftime('%d/%m/%Y')))
                 exchange_rate = rates[0].rate
                 exchange_rate_date = rates[0].date
@@ -612,13 +643,11 @@ class Invoice(metaclass=PoolMeta):
                 etree.QName(xmlsig.constants.DSigNs, "DigestMethod"),
                 attrib={"Algorithm": xmldsig_sha1},
                 )
-
             hash_cert = hashlib.sha1(crt)
             etree.SubElement(
                 cert_digest, etree.QName(xmlsig.constants.DSigNs,
                     "DigestValue")
                 ).text = base64.b64encode(hash_cert.digest())
-
             issuer_serial = etree.SubElement(
                 signing_certificate_cert, etree.QName(xades, "IssuerSerial")
                 )
@@ -630,7 +659,6 @@ class Invoice(metaclass=PoolMeta):
                 issuer_serial, etree.QName(xmlsig.constants.DSigNs,
                     "X509SerialNumber")
                 ).text = str(pem.serial_number)
-
             signature_policy_identifier = etree.SubElement(
                 signed_signature_properties,
                 etree.QName(xades, "SignaturePolicyIdentifier"),
@@ -686,8 +714,7 @@ class Invoice(metaclass=PoolMeta):
                 data_object_format, etree.QName(xades, "ObjectIdentifier")
                 )
             etree.SubElement(
-                data_object_format_identifier,
-                etree.QName(xades, "Identifier"),
+                data_object_format_identifier, etree.QName(xades, "Identifier"),
                 attrib={"Qualifier": "OIDAsURN"}
                 ).text = "urn:oid:1.2.840.10003.5.109.10"
             etree.SubElement(
@@ -697,7 +724,8 @@ class Invoice(metaclass=PoolMeta):
                 data_object_format, etree.QName(xades, "MimeType")
                 ).text = "text/xml"
             etree.SubElement(
-                data_object_format, etree.QName(xades, "Encoding"))
+                data_object_format, etree.QName(xades, "Encoding")
+                )
 
             # Set the certificate values
             ctx = xmlsig.SignatureContext()
@@ -891,7 +919,7 @@ class InvoiceFacturaeReport(Report):
         super().__setup__()
         # Make transaction read-write in case invoice_facturae field is
         # None and we need to compute and store it.
-        cls.__rpc__['execute'] = RPC(False)
+        cls.__rpc__ = RPC(False)
 
     @classmethod
     def _execute(cls, records, header, data, action):

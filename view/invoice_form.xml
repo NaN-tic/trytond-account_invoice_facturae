@@ -30,6 +30,8 @@
             <field name="receiver_contract_reference"/>
             <separator name="invoice_description" colspan="4"/>
             <field name="invoice_description" colspan="4"/>
+            <separator name="facturae_attachments" colspan="4"/>
+            <field name="facturae_attachments" colspan="4"/>
         </page>
     </xpath>
 </data>

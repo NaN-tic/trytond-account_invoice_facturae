@@ -256,14 +256,16 @@
                 {% for line in invoice.lines if line.type == 'line' %}
                 <InvoiceLine>
                     {# TODO: optional, not supported
-                    - Issuer/ReceiverContractReference, Issuer/ReceiverContractDate (contract)
-                    - FileReference, FileDate
+                    - IssuerContractReference, Issuer/ReceiverContractDate (contract)
+                    - FileDate
                     - SequenceNumber
                     - DeliveryNotesReferences (account_invoice_stock)
                     - TransactionDate
                     - Extensions
                     #}
-                    <ReceiverTransactionReference>{{ line.facturae_receiver_transaction_reference }}</ReceiverTransactionReference>
+                    <ReceiverContractReference>{{ line.receiver_contract_reference }}</ReceiverContractReference>
+                    <ReceiverTransactionReference>{{ line.receiver_transaction_reference }}</ReceiverTransactionReference>
+                    <FileReference>{{ line.file_reference }}</FileReference>
                     <ItemDescription>{{ line.facturae_item_description[:2500] }}</ItemDescription>
                     <Quantity>{{ line.quantity }}</Quantity>
                     <UnitOfMeasure>{{ UOM_CODE2TYPE.get(line.unit.symbol, '05') if line.unit else '05' }}</UnitOfMeasure>
@@ -371,11 +373,11 @@
                         <IBAN>{% for number in (move_line.bank_account.numbers|selectattr('type', 'equalto', 'iban')) %}{% if loop.first %}{{ number.number_compact }}{% endif %}{% endfor %}</IBAN>
                         {# Unnecessary if IBAN is supplied: AccountNumber, BankCode, BranchCode, BranchInSpainAddress, OverseasBranchAddress, BIC #}
                     </AccountToBeDebited>
+                    <CollectionAdditionalInformation>{{ i.payment_term and i.payment_term.name[:2500] or '' }}</CollectionAdditionalInformation>
+                    <DebitReconciliationReference>{{ invoice.receiver_contract_reference[:60] or '' }}</DebitReconciliationReference>
                     {# optional, not supported:
                     - PaymentReconciliationReference[:60]
-                    - CollectionAdditionalInformation[:2500]
                     - RegulatoryReportingData (for international operations)
-                    - DebitReconciliationReference[:60]
                     #}
                     {% endif %}
                 </Installment>
@@ -392,11 +394,23 @@
             <AdditionalData>
                 {# optional, not supported:
                 - RelatedInvoice[:40]
-                - RelatedDocuments
                 - Extensions
                 #}
-                <InvoiceAdditionalInformation> # [:2500]
-                  {{ invoice.facturae_additional_information or '' }}
+                {% if invoice.facturae_attachments %}
+                <RelatedDocuments>
+                  {%- for attachment in invoice.facturae_attachments -%}
+                  <Attachment>
+                    <AttachmentCompressionAlgorithm>{{ attachment.attachment_compression_algorithm }}</AttachmentCompressionAlgorithm>
+                    <AttachmentFormat>{{ attachment.attachment_format }}</AttachmentFormat>
+                    <AttachmentEncoding>{{ attachment.attachment_encoding }}</AttachmentEncoding>
+                    <AttachmentDescription>{{ attachment.description[:2500] or 'Extra Document' }}</AttachmentDescription>
+                    <AttachmentData>{{ attachment.attachment_base64 }}</AttachmentData>
+                  </Attachment>
+                  {%- endfor -%}
+                </RelatedDocuments>
+                {% endif %}
+                <InvoiceAdditionalInformation>
+                  {{ invoice.facturae_additional_information[:2500] or '' }}
                 </InvoiceAdditionalInformation>
             </AdditionalData>
         </Invoice>

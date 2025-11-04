@@ -14,14 +14,6 @@ msgctxt "field:account.configuration,invoice_facturae_after:"
 msgid "Send Factura-e after"
 msgstr "Envia "
 
-msgctxt "field:account.configuration,policy_file:"
-msgid "Policy File"
-msgstr "Fitxer de polítiques"
-
-msgctxt "field:account.configuration,policy_file_filename:"
-msgid "Policy File filename"
-msgstr "Nom del fitxer de política"
-
 msgctxt "field:account.configuration,policy_url:"
 msgid "Policy URL"
 msgstr "URL de la política"
@@ -41,6 +33,10 @@ msgstr "Servei Factura-e"
 msgctxt "field:account.invoice,credited_invoices:"
 msgid "Credited Invoices"
 msgstr "Factures abonades"
+
+msgctxt "field:account.invoice,facturae_attachments:"
+msgid "Attachments"
+msgstr "Adjunts"
 
 msgctxt "field:account.invoice,file_reference:"
 msgid "File Reference"
@@ -81,6 +77,35 @@ msgstr "Codi motiu rectificació"
 msgctxt "field:account.invoice.credit.start,rectificative_reason_code:"
 msgid "Rectificative Reason Code"
 msgstr "Codi motiu rectificació"
+
+msgctxt "field:account.invoice.facturae.attachment,attachment:"
+msgid "Attachment"
+msgstr "Adjunt"
+
+msgctxt "field:account.invoice.facturae.attachment,attachment_base64:"
+msgid "Attachment in Base64"
+msgstr "Adjunció a Base64"
+
+msgctxt ""
+"field:account.invoice.facturae.attachment,attachment_compression_algorithm:"
+msgid "Attachment Compression Algorithm"
+msgstr "Algoritme de compressió d'adjunts"
+
+msgctxt "field:account.invoice.facturae.attachment,attachment_encoding:"
+msgid "Attachment Encoding"
+msgstr "Codificació d'adjunts"
+
+msgctxt "field:account.invoice.facturae.attachment,attachment_format:"
+msgid "Attachment Format"
+msgstr "Format d'adjunt"
+
+msgctxt "field:account.invoice.facturae.attachment,description:"
+msgid "Attachment Description"
+msgstr "Descripció de l'adjunt"
+
+msgctxt "field:account.invoice.facturae.attachment,invoice:"
+msgid "Invoice"
+msgstr "Factura"
 
 msgctxt "field:account.invoice.generate_facturae.start,certificate:"
 msgid "Factura-e Certificate"
@@ -266,6 +291,10 @@ msgctxt "model:account.configuration.facturae,name:"
 msgid "Account Configuration Factura-e"
 msgstr "Configuració comptable Factura-e"
 
+msgctxt "model:account.invoice.facturae.attachment,name:"
+msgid "Invoice Attachment"
+msgstr "Adjunt de factura"
+
 msgctxt "model:account.invoice.generate_facturae.start,name:"
 msgid "Generate Factura-e file - Start"
 msgstr "Inici genera fitxer Factura-e"
@@ -402,6 +431,10 @@ msgstr ""
 "No pots configurar un tercer amb el \"Mètode d'agrupació factures de venda\""
 " com a \"Estàndard\" i els camps \"Número d'expedient\"  o \"Número de "
 "contracte\" omplerts."
+
+msgctxt "model:ir.message,text:msg_unsupported_format"
+msgid "Unsupported attachment format: %(format)s"
+msgstr "Format de fitxer adjunt no compatible: %(format)s"
 
 msgctxt "model:ir.message,text:no_rate"
 msgid "No rate found for currency \"%(currency)s\" on \"%(date)s\""
@@ -646,6 +679,70 @@ msgid ""
 msgstr ""
 "Base imposable modificada quotes repercutides no satisfetes. Autodeclaració "
 "en curs"
+
+msgctxt "selection:account.invoice.facturae.attachment,attachment_encoding:"
+msgid "BASE64"
+msgstr "BASE64"
+
+msgctxt "selection:account.invoice.facturae.attachment,attachment_encoding:"
+msgid "BER"
+msgstr "BER"
+
+msgctxt "selection:account.invoice.facturae.attachment,attachment_encoding:"
+msgid "DER"
+msgstr "DER"
+
+msgctxt "selection:account.invoice.facturae.attachment,attachment_encoding:"
+msgid "NONE"
+msgstr "NONE"
+
+msgctxt "selection:account.invoice.facturae.attachment,attachment_format:"
+msgid "BMP"
+msgstr "BMP"
+
+msgctxt "selection:account.invoice.facturae.attachment,attachment_format:"
+msgid "DOC"
+msgstr "DOC"
+
+msgctxt "selection:account.invoice.facturae.attachment,attachment_format:"
+msgid "DOCX"
+msgstr "DOCX"
+
+msgctxt "selection:account.invoice.facturae.attachment,attachment_format:"
+msgid "GIF"
+msgstr "GIF"
+
+msgctxt "selection:account.invoice.facturae.attachment,attachment_format:"
+msgid "HTML"
+msgstr "HTML"
+
+msgctxt "selection:account.invoice.facturae.attachment,attachment_format:"
+msgid "JPG"
+msgstr "JPG"
+
+msgctxt "selection:account.invoice.facturae.attachment,attachment_format:"
+msgid "PDF"
+msgstr "PDF"
+
+msgctxt "selection:account.invoice.facturae.attachment,attachment_format:"
+msgid "RTF"
+msgstr "RTF"
+
+msgctxt "selection:account.invoice.facturae.attachment,attachment_format:"
+msgid "TIFF"
+msgstr "TIFF"
+
+msgctxt "selection:account.invoice.facturae.attachment,attachment_format:"
+msgid "XLS"
+msgstr "XLS"
+
+msgctxt "selection:account.invoice.facturae.attachment,attachment_format:"
+msgid "XLSX"
+msgstr "XLSX"
+
+msgctxt "selection:account.invoice.facturae.attachment,attachment_format:"
+msgid "XML"
+msgstr "XML"
 
 msgctxt "selection:account.invoice.generate_facturae.start,service:"
 msgid "None"
@@ -1046,8 +1143,16 @@ msgid "Factura-e"
 msgstr "Factura-e "
 
 msgctxt "view:account.invoice:"
+msgid "Fields Information"
+msgstr "Informació dels camps"
+
+msgctxt "view:account.invoice:"
 msgid "Generate Factura-e"
 msgstr "Genera Factura-e"
+
+msgctxt "view:account.invoice:"
+msgid "State Information"
+msgstr "Informació estat"
 
 msgctxt "view:account.tax.template:"
 msgid "Factura-e"

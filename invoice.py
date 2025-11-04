@@ -4,6 +4,8 @@
 import logging
 import os
 import base64
+import zipfile
+import io
 import xmlsig
 import hashlib
 import datetime
@@ -13,7 +15,8 @@ from decimal import Decimal
 from jinja2 import Environment, FileSystemLoader
 from lxml import etree
 from operator import attrgetter
-from trytond.model import ModelView, fields
+
+from trytond.model import ModelSQL, ModelView, fields
 from trytond.pool import Pool, PoolMeta
 from trytond.pyson import Bool, Eval
 from trytond.transaction import Transaction
@@ -114,9 +117,100 @@ FACe_REQUIRED_FIELDS = ['facturae_person_type', 'facturae_residence_type']
 DEFAULT_FACTURAE_TEMPLATE = 'template_facturae_3.2.2.xml'
 DEFAULT_FACTURAE_SCHEMA = 'Facturaev3_2_2-offline.xml'
 
+MAX_UNCOMPRESSED_SIZE = 100 * 1024  # 100KB
+
 
 def module_path():
     return os.path.dirname(os.path.abspath(__file__))
+
+
+class InvoiceAttachment(ModelSQL, ModelView):
+    "Invoice Attachment"
+    __name__ = 'account.invoice.facturae.attachment'
+
+    invoice = fields.Many2One('account.invoice', 'Invoice', required=True)
+    description = fields.Char('Attachment Description', size=2500, required=True)
+    attachment = fields.Many2One('ir.attachment', 'Attachment', domain=[
+        ('resource.id', '=', Eval('invoice', -1), 'account.invoice')
+    ], required=True)
+    attachment_format = fields.Selection([
+            (None, ""),
+            ('xml', "XML"),
+            ('doc', "DOC"),
+            ('docx', "DOCX"),
+            ('gif', "GIF"),
+            ('rtf', "RTF"),
+            ('pdf', "PDF"),
+            ('xls', "XLS"),
+            ('xlsx', "XLSX"),
+            ('jpg', "JPG"),
+            ('bmp', "BMP"),
+            ('tiff', "TIFF"),
+            ('html', "HTML"),
+            ], 'Attachment Format', sort=False, required=True)
+    attachment_encoding = fields.Selection([
+            (None, ""),
+            ('NONE', "NONE"),
+            ('BASE64', "BASE64"),
+            ('BER', "BER"),
+            ('DER', "DER"),
+            ], 'Attachment Encoding', sort=False, readonly=True, required=True)
+    attachment_compression_algorithm = fields.Function(fields.Char(
+            'Attachment Compression Algorithm'), 'get_attachment_data')
+    attachment_base64 = fields.Function(fields.Char('Attachment in Base64'),
+        'get_attachment_data')
+
+    @staticmethod
+    def default_attachment_encoding():
+        return 'BASE64'
+
+    @fields.depends('attachment', 'attachment_format')
+    def on_change_with_attachment_format(self, name=None):
+        if self.attachment:
+            attach_name = self.attachment.name or ''
+            ext = (attach_name.split('.')[-1].lower()
+                if '.' in attach_name else '')
+            extensions_allowed = [
+                x for x, l in self.__class__.attachment_format.selection]
+            if ext in extensions_allowed:
+                return ext
+            else:
+                raise UserError(gettext(
+                        'account_invoice_facturae.msg_unsupported_format',
+                        format=ext))
+        return
+
+    @classmethod
+    def get_attachment_data(cls, attachments, names):
+        result = {name: {} for name in names}
+        for record in attachments:
+            if record.attachment and record.attachment.data:
+                compressed_data = record.attachment.data
+                size = record.attachment.data_size
+                algorithm = 'NONE'
+                if size < MAX_UNCOMPRESSED_SIZE:
+                    algorithm = 'ZIP'
+                    zip_buffer = io.BytesIO()
+                    with zipfile.ZipFile(zip_buffer,
+                            mode='w',
+                            compression=zipfile.ZIP_LZMA,
+                            compresslevel=9) as zf:
+                        zf.writestr(record.attachment.name or 'file',
+                            compressed_data)
+                    compressed_data = zip_buffer.getvalue()
+                base64_data = base64.b64encode(compressed_data).decode('ascii')
+                if 'attachment_compression_algorithm' in names:
+                    result['attachment_compression_algorithm'][record.id] = (
+                        algorithm)
+                if 'attachment_base64' in names:
+                    result['attachment_base64'][record.id] = base64_data
+            else:
+                if 'attachment_compression_algorithm' in names:
+                    result['attachment_compression_algorithm'][record.id] = (
+                        None)
+                if 'attachment_base64' in names:
+                    result['attachment_base64'][record.id] = None
+        return result
 
 
 class Invoice(metaclass=PoolMeta):
@@ -150,12 +244,16 @@ class Invoice(metaclass=PoolMeta):
         depends=['state'])
     invoice_description = fields.Text('Invoice Description', size=2500,
         states={'readonly': (Eval('state') != 'draft'),}, depends=['state'])
+    facturae_attachments = fields.One2Many(
+        'account.invoice.facturae.attachment', 'invoice', 'Attachments')
 
     @classmethod
     def __setup__(cls):
         super(Invoice, cls).__setup__()
-        cls._check_modify_exclude |= {'invoice_facturae', 'invoice_facturae_sent',
-            'invoice_facturae_filetype'}
+        cls._check_modify_exclude |= {'invoice_facturae',
+            'invoice_facturae_sent', 'invoice_facturae_filetype',
+            'file_reference', 'receiver_contract_reference',
+            'invoice_description', 'facturae_attachments'}
         cls._buttons.update({
                 'generate_facturae_wizard': {
                     'invisible': ((Eval('type') != 'out')
@@ -360,7 +458,6 @@ class Invoice(metaclass=PoolMeta):
             raise UserError(gettext(
                     'account_invoice_facturae.company_vat_identifier',
                     party=self.company.party.rec_name))
-
         company_address = self.company.party.address_get(type='invoice')
         if (not company_address
                 or not company_address.street
@@ -408,7 +505,7 @@ class Invoice(metaclass=PoolMeta):
                 if not rates:
                     raise UserError(gettext(
                             'account_invoice_facturae.no_rate',
-                            currency=self.currenc.name,
+                            currency=self.currency.name,
                             date=self.invoice_date.strftime('%d/%m/%Y')))
                 exchange_rate = rates[0].rate
                 exchange_rate_date = rates[0].date
@@ -619,13 +716,11 @@ class Invoice(metaclass=PoolMeta):
                 etree.QName(xmlsig.constants.DSigNs, "DigestMethod"),
                 attrib={"Algorithm": xmldsig_sha1},
                 )
-
             hash_cert = hashlib.sha1(crt)
             etree.SubElement(
                 cert_digest, etree.QName(xmlsig.constants.DSigNs,
                     "DigestValue")
                 ).text = base64.b64encode(hash_cert.digest())
-
             issuer_serial = etree.SubElement(
                 signing_certificate_cert, etree.QName(xades, "IssuerSerial")
                 )
@@ -637,7 +732,6 @@ class Invoice(metaclass=PoolMeta):
                 issuer_serial, etree.QName(xmlsig.constants.DSigNs,
                     "X509SerialNumber")
                 ).text = str(pem.serial_number)
-
             signature_policy_identifier = etree.SubElement(
                 signed_signature_properties,
                 etree.QName(xades, "SignaturePolicyIdentifier"),
@@ -693,8 +787,7 @@ class Invoice(metaclass=PoolMeta):
                 data_object_format, etree.QName(xades, "ObjectIdentifier")
                 )
             etree.SubElement(
-                data_object_format_identifier,
-                etree.QName(xades, "Identifier"),
+                data_object_format_identifier, etree.QName(xades, "Identifier"),
                 attrib={"Qualifier": "OIDAsURN"}
                 ).text = "urn:oid:1.2.840.10003.5.109.10"
             etree.SubElement(
@@ -704,7 +797,8 @@ class Invoice(metaclass=PoolMeta):
                 data_object_format, etree.QName(xades, "MimeType")
                 ).text = "text/xml"
             etree.SubElement(
-                data_object_format, etree.QName(xades, "Encoding"))
+                data_object_format, etree.QName(xades, "Encoding")
+                )
 
             # Set the certificate values
             ctx = xmlsig.SignatureContext()
@@ -762,9 +856,38 @@ class InvoiceLine(metaclass=PoolMeta):
             )
 
     @property
-    def facturae_receiver_transaction_reference(self):
-        # TODO Issuer/ReceiverTransactionDate (sale, contract...)
-        return ''
+    def receiver_contract_reference(self):
+        pool = Pool()
+        SaleLine = pool.get('sale.line')
+
+        if self.invoice:
+            inv = self.invoice
+            if inv.receiver_contract_reference:
+                return inv.receiver_contract_reference
+            elif (inv.invoice_address
+                    and inv.invoice_address.receiver_contract_reference):
+                return inv.invoice_address.receiver_contract_reference
+        if (self.origin and isinstance(self.origin, SaleLine)
+                and self.origin.sale.receiver_contract_reference):
+            return self.origin.sale.receiver_contract_reference
+
+    @property
+    def receiver_transaction_reference(self):
+        pool = Pool()
+        SaleLine = pool.get('sale.line')
+
+        if (self.origin and isinstance(self.origin, SaleLine)
+                and self.origin.sale.receiver_transaction_reference):
+            return self.origin.sale.receiver_transaction_reference
+
+    @property
+    def file_reference(self):
+        pool = Pool()
+        SaleLine = pool.get('sale.line')
+
+        if (self.origin and isinstance(self.origin, SaleLine)
+                and self.origin.sale.file_reference):
+            return self.origin.sale.file_reference
 
     @property
     def facturae_start_date(self):
@@ -910,7 +1033,7 @@ class InvoiceFacturaeReport(Report):
         super().__setup__()
         # Make transaction read-write in case invoice_facturae field is
         # None and we need to compute and store it.
-        cls.__rpc__['execute'] = RPC(False)
+        cls.__rpc__ = RPC(False)
 
     @classmethod
     def _execute(cls, records, header, data, action):

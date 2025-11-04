@@ -73,5 +73,8 @@ Message returned by signing process: %(process_output)s</field>
       <record model="ir.message" id="msg_no_facturae">
           <field name="text">Invoice %(invoice)s has no factura-e file.</field>
       </record>
+      <record model="ir.message" id="msg_unsupported_format">
+          <field name="text">Unsupported attachment format: %(format)s</field>
+      </record>
     </data>
 </tryton>

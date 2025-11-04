@@ -129,10 +129,10 @@ class InvoiceAttachment(ModelSQL, ModelView):
     __name__ = 'account.invoice.facturae.attachment'
 
     invoice = fields.Many2One('account.invoice', 'Invoice', required=True)
-    description = fields.Text('Attachment Description', size=2500,
-        required=True)
-    attachment = fields.Many2One('ir.attachment', 'Attachment', required=True,
-        domain=[('resource', '=', Eval('_parent_invoice'))])
+    description = fields.Char('Attachment Description', size=2500, required=True)
+    attachment = fields.Many2One('ir.attachment', 'Attachment', domain=[
+        ('resource.id', '=', Eval('invoice', -1), 'account.invoice')
+    ], required=True)
     attachment_format = fields.Selection([
             (None, ""),
             ('xml', "XML"),
@@ -147,24 +147,38 @@ class InvoiceAttachment(ModelSQL, ModelView):
             ('bmp', "BMP"),
             ('tiff', "TIFF"),
             ('html', "HTML"),
-            ], 'Attachment Format', sort=False, readonly=True)
+            ], 'Attachment Format', sort=False, required=True)
+    attachment_encoding = fields.Selection([
+            (None, ""),
+            ('NONE', "NONE"),
+            ('BASE64', "BASE64"),
+            ('BER', "BER"),
+            ('DER', "DER"),
+            ], 'Attachment Encoding', sort=False, readonly=True, required=True)
     attachment_compression_algorithm = fields.Function(fields.Char(
             'Attachment Compression Algorithm'), 'get_attachment_data')
     attachment_base64 = fields.Function(fields.Char('Attachment in Base64'),
         'get_attachment_data')
 
+    @staticmethod
+    def default_attachment_encoding():
+        return 'BASE64'
+
     @fields.depends('attachment', 'attachment_format')
-    def on_change_with_attachment_format(self):
+    def on_change_with_attachment_format(self, name=None):
         if self.attachment:
-            name = self.attachment.name or ''
-            ext = name.split('.')[-1].lower() if '.' in name else ''
-            if ext in self.attachment_format.values():
+            attach_name = self.attachment.name or ''
+            ext = (attach_name.split('.')[-1].lower()
+                if '.' in attach_name else '')
+            extensions_allowed = [
+                x for x, l in self.__class__.attachment_format.selection]
+            if ext in extensions_allowed:
                 return ext
             else:
                 raise UserError(gettext(
                         'account_invoice_facturae.msg_unsupported_format',
                         format=ext))
-        return None
+        return
 
     @classmethod
     def get_attachment_data(cls, attachments, names):
@@ -172,7 +186,7 @@ class InvoiceAttachment(ModelSQL, ModelView):
         for record in attachments:
             if record.attachment and record.attachment.data:
                 compressed_data = record.attachment.data
-                size = record.attachment.get_size()
+                size = record.attachment.data_size
                 algorithm = 'NONE'
                 if size < MAX_UNCOMPRESSED_SIZE:
                     algorithm = 'ZIP'
@@ -236,8 +250,10 @@ class Invoice(metaclass=PoolMeta):
     @classmethod
     def __setup__(cls):
         super(Invoice, cls).__setup__()
-        cls._check_modify_exclude |= {'invoice_facturae', 'invoice_facturae_sent',
-            'invoice_facturae_filetype'}
+        cls._check_modify_exclude |= {'invoice_facturae',
+            'invoice_facturae_sent', 'invoice_facturae_filetype',
+            'file_reference', 'receiver_contract_reference',
+            'invoice_description', 'facturae_attachments'}
         cls._buttons.update({
                 'generate_facturae_wizard': {
                     'invisible': ((Eval('type') != 'out')
@@ -832,9 +848,38 @@ class InvoiceLine(metaclass=PoolMeta):
             )
 
     @property
-    def facturae_receiver_transaction_reference(self):
-        # TODO Issuer/ReceiverTransactionDate (sale, contract...)
-        return ''
+    def receiver_contract_reference(self):
+        pool = Pool()
+        SaleLine = pool.get('sale.line')
+
+        if self.invoice:
+            inv = self.invoice
+            if inv.receiver_contract_reference:
+                return inv.receiver_contract_reference
+            elif (inv.invoice_address
+                    and inv.invoice_address.receiver_contract_reference):
+                return inv.invoice_address.receiver_contract_reference
+        if (self.origin and isinstance(self.origin, SaleLine)
+                and self.origin.sale.receiver_contract_reference):
+            return self.origin.sale.receiver_contract_reference
+
+    @property
+    def receiver_transaction_reference(self):
+        pool = Pool()
+        SaleLine = pool.get('sale.line')
+
+        if (self.origin and isinstance(self.origin, SaleLine)
+                and self.origin.sale.receiver_transaction_reference):
+            return self.origin.sale.receiver_transaction_reference
+
+    @property
+    def file_reference(self):
+        pool = Pool()
+        SaleLine = pool.get('sale.line')
+
+        if (self.origin and isinstance(self.origin, SaleLine)
+                and self.origin.sale.file_reference):
+            return self.origin.sale.file_reference
 
     @property
     def facturae_start_date(self):

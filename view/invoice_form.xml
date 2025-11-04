@@ -21,17 +21,21 @@
 
     <xpath expr="/form/notebook" position="inside">
         <page id="facturae" string="Factura-e">
-            <label name="invoice_facturae_sent"/>
-            <field name="invoice_facturae_sent"/>
-            <newline/>
-            <label name="file_reference"/>
-            <field name="file_reference"/>
-            <label name="receiver_contract_reference"/>
-            <field name="receiver_contract_reference"/>
-            <separator name="invoice_description" colspan="4"/>
-            <field name="invoice_description" colspan="4"/>
-            <separator name="facturae_attachments" colspan="4"/>
-            <field name="facturae_attachments" colspan="4"/>
+            <group id="facturae_fields_information" string="Fields Information" colspan="4">
+                <label name="file_reference"/>
+                <field name="file_reference"/>
+                <label name="receiver_contract_reference"/>
+                <field name="receiver_contract_reference"/>
+                <separator name="invoice_description" colspan="4"/>
+                <field name="invoice_description" colspan="4"/>
+            </group>
+            <group id="facturae_state_information" string="State Information" colspan="4">
+                <label name="invoice_facturae_sent"/>
+                <field name="invoice_facturae_sent"/>
+                <newline/>
+                <separator name="facturae_attachments" colspan="4"/>
+                <field name="facturae_attachments" colspan="4"/>
+            </group>
         </page>
     </xpath>
 </data>

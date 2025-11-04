@@ -17,6 +17,7 @@ def register():
         invoice.InvoiceLine,
         invoice.CreditInvoiceStart,
         invoice.GenerateFacturaeStart,
+        invoice.InvoiceAttachment,
         address.Address,
         payment_type.PaymentType,
         company.Company,

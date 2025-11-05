@@ -266,7 +266,7 @@
                     <ReceiverContractReference>{{ line.receiver_contract_reference or '' }}</ReceiverContractReference>
                     <ReceiverTransactionReference>{{ line.receiver_transaction_reference or '' }}</ReceiverTransactionReference>
                     <FileReference>{{ line.file_reference or '' }}</FileReference>
-                    <ItemDescription>{{ line.facturae_description and line.facturae_item_description[:2500] or '' }}</ItemDescription>
+                    <ItemDescription>{{ line.facturae_item_description and line.facturae_item_description[:2500] or '' }}</ItemDescription>
                     <Quantity>{{ line.quantity }}</Quantity>
                     <UnitOfMeasure>{{ UOM_CODE2TYPE.get(line.unit.symbol, '05') if line.unit else '05' }}</UnitOfMeasure>
                     <UnitPriceWithoutTax>{{ Invoice.double_up_to_eight(line.unit_price) }}</UnitPriceWithoutTax>

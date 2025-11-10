@@ -373,7 +373,7 @@
                         <IBAN>{% for number in (move_line.bank_account.numbers|selectattr('type', 'equalto', 'iban')) %}{% if loop.first %}{{ number.number_compact }}{% endif %}{% endfor %}</IBAN>
                         {# Unnecessary if IBAN is supplied: AccountNumber, BankCode, BranchCode, BranchInSpainAddress, OverseasBranchAddress, BIC #}
                     </AccountToBeDebited>
-                    <CollectionAdditionalInformation>{{ i.payment_term and i.payment_term.name[:2500] or '' }}</CollectionAdditionalInformation>
+                    <CollectionAdditionalInformation>{{ invoice.payment_term and invoice.payment_term.name[:2500] or '' }}</CollectionAdditionalInformation>
                     <DebitReconciliationReference>{{ invoice.receiver_contract_reference[:60] or '' }}</DebitReconciliationReference>
                     {# optional, not supported:
                     - PaymentReconciliationReference[:60]

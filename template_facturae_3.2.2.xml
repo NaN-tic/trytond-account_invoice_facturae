@@ -199,7 +199,7 @@
                     - SpecialTaxableBase
                     - SpecialTaxAmount
                     #}
-                    {% if invoice_tax.tax.recargo_equivalencia %}
+                    {% if invoice_tax.tax.tax_kind == 'surcharge' %}
                     {# TODO: EquivalenceSurchace must to have its own Tax entry or it must to go to the IVA line? TaxRate == EquivalenceSurcharge and TaxAmount == EquivalenceSurchargeAmount? #}
                     <EquivalenceSurcharge>{{ (invoice_tax.tax.rate * 100).quantize(Decimal('0.01')) }}</EquivalenceSurcharge>
                     <EquivalenceSurchargeAmount>
@@ -319,7 +319,7 @@
                             - SpecialTaxableBase
                             - SpecialTaxAmount
                             #}
-                            {% if line_tax.tax.recargo_equivalencia %}
+                            {% if line_tax.tax.tax_kind == 'surcharge' %}
                             {# TODO: EquivalenceSurchace must to have its own Tax entry or it must to go to the IVA line? TaxRate == EquivalenceSurcharge and TaxAmount == EquivalenceSurchargeAmount? #}
                             <EquivalenceSurcharge>{{ (line_tax.tax.rate * 100).quantize(Decimal('0.01')) }}</EquivalenceSurcharge>
                             <EquivalenceSurchargeAmount>

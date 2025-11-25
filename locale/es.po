@@ -435,7 +435,7 @@ msgstr ""
 
 msgctxt "model:ir.message,text:msg_unsupported_format"
 msgid "Unsupported attachment format: %(format)s"
-msgstr "Formato de adjunto no admitido: %(formato)s"
+msgstr "Formato de adjunto no admitido: %(format)s"
 
 msgctxt "model:ir.message,text:no_rate"
 msgid "No rate found for currency \"%(currency)s\" on \"%(date)s\""

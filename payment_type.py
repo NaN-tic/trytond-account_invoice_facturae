@@ -3,7 +3,7 @@
 from trytond.model import fields
 from trytond.pool import PoolMeta
 from trytond.i18n import gettext
-from trytond.exceptions import UserError
+from trytond.model.exceptions import ValidationError
 
 __all__ = ['PaymentType']
 
@@ -49,6 +49,6 @@ class PaymentType(metaclass=PoolMeta):
                 and self.account_bank != 'party'
                 or self.facturae_type and self.facturae_type == '04'
                 and self.account_bank != 'company'):
-            raise UserError(gettext(
+            raise ValidationError(gettext(
                 'account_invoice_facturae.incompatible_facturae_type_account_bank',
                 payment_type=self.rec_name))

@@ -374,7 +374,7 @@
                         {# Unnecessary if IBAN is supplied: AccountNumber, BankCode, BranchCode, BranchInSpainAddress, OverseasBranchAddress, BIC #}
                     </AccountToBeDebited>
                     <CollectionAdditionalInformation>{{ invoice.payment_term and invoice.payment_term.name[:2500] or '' }}</CollectionAdditionalInformation>
-                    <DebitReconciliationReference>{{ invoice.receiver_contract_reference[:60] or '' }}</DebitReconciliationReference>
+                    <DebitReconciliationReference>{{ invoice.receiver_contract_reference and invoice.receiver_contract_reference[:60] or '' }}</DebitReconciliationReference>
                     {# optional, not supported:
                     - PaymentReconciliationReference[:60]
                     - RegulatoryReportingData (for international operations)

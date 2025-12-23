@@ -27,6 +27,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         activate_module('account_invoice_facturae')
         activate_module('sale')
         activate_module('sale_invoice_grouping')
+        activate_module('party_zip')
 
     @with_transaction()
     def test_invoice_generation(self):

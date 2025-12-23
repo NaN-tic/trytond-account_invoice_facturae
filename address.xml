@@ -31,4 +31,12 @@
             <field name="name">address_sale_grouping_form</field>
         </record>
     </data>
+
+    <data depends="party_zip">
+        <record model="ir.ui.view" id="address_view_form_simple_party_zip">
+            <field name="model">party.address</field>
+            <field name="inherit" ref="account_invoice_facturae.address_view_form_simple2"/>
+            <field name="name">address_form_simple_party_zip</field>
+        </record>
+    </data>
 </tryton>

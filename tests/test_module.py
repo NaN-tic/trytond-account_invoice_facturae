@@ -20,6 +20,7 @@ CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
 class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
     'Test AccountInvoiceFacturae module'
     module = 'account_invoice_facturae'
+    depends = ['party_zip']
 
     @classmethod
     def setUpClass(cls):

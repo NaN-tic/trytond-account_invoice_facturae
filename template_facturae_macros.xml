@@ -10,7 +10,7 @@
             <SecondSurname>{{ addrs.party.name and addrs.party.name.split(' ', 2)[2][:40] }}</SecondSurname>
             {% endif %}
             {% if addrs %}{{ address(addrs) }}{% endif %}
-            {% if addrs.party.contact_mechanisms %}{{ contact(addrs.party) }}{% endif %}
+            {% if addrs and addrs.party.contact_mechanisms %}{{ contact(addrs.party) }}{% endif %}
             <PhysicalGLN/>
             <LogicalOperationalPoint/>
             <CentreDescription>{{ addrs.party.name and addrs.party.name.split(' ', 2)[0][:40] or addrs.party.code[:40] }}</CentreDescription>
@@ -26,7 +26,7 @@
             <Province>{{ address.subdivision.name[:20] }}</Province>
             <CountryCode>{{ address.country.code3 }}</CountryCode>
         </AddressInSpain>
-        {% else %}
+    {% else %}
         <OverseasAddress>
             <Address>{{ address.street[:80] }}</Address>
             <PostCodeAndTown>{{ (', '.join([address.postal_code, address.city]))[:50] }}</PostCodeAndTown>

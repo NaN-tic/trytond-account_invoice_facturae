@@ -267,12 +267,26 @@
                     <ReceiverTransactionReference>{{ line.receiver_transaction_reference or '' }}</ReceiverTransactionReference>
                     <FileReference>{{ line.file_reference or '' }}</FileReference>
                     <ItemDescription>{{ line.facturae_item_description and line.facturae_item_description[:2500] or '' }}</ItemDescription>
+                    {% set line_quantity = Decimal(line.quantity|string) %}
+                    {% set line_base_price = line.base_price if line.base_price is defined and line.base_price is not none else line.unit_price %}
+                    {% set line_total_cost = line_quantity * line_base_price %}
+                    {% set line_discount_amount = (line_quantity * line.discount_amount) if line.discount_amount is defined and line.discount_amount else Decimal(0) %}
                     <Quantity>{{ line.quantity }}</Quantity>
                     <UnitOfMeasure>{{ UOM_CODE2TYPE.get(line.unit.symbol, '05') if line.unit else '05' }}</UnitOfMeasure>
-                    <UnitPriceWithoutTax>{{ Invoice.double_up_to_eight(line.unit_price) }}</UnitPriceWithoutTax>
-                    <TotalCost>{{ Invoice.double_up_to_eight(line.amount) }}</TotalCost>
+                    <UnitPriceWithoutTax>{{ Invoice.double_up_to_eight(line_base_price) }}</UnitPriceWithoutTax>
+                    <TotalCost>{{ Invoice.double_up_to_eight(line_total_cost) }}</TotalCost>
+                    {% if line_discount_amount %}
+                    <DiscountsAndRebates>
+                        <Discount>
+                            <DiscountReason>{{ (line.discount and ('Discount ' ~ line.discount) or 'Discount')[:2500] }}</DiscountReason>
+                            {% if line.discount_rate is defined and line.discount_rate is not none %}
+                            <DiscountRate>{{ Invoice.double_up_to_eight(line.discount_rate * 100) }}</DiscountRate>
+                            {% endif %}
+                            <DiscountAmount>{{ Invoice.double_up_to_eight(line_discount_amount) }}</DiscountAmount>
+                        </Discount>
+                    </DiscountsAndRebates>
+                    {% endif %}
                     {# TODO: optional, not supported
-                    - DiscountsAndRebates (account_invoice_discount)
                     - Charges
                     #}
                     <GrossAmount>{{ Invoice.double_up_to_eight(line.amount) }}</GrossAmount>

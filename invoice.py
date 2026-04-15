@@ -9,9 +9,8 @@ import io
 import xmlsig
 import hashlib
 import datetime
-import math
 import uuid
-from decimal import Decimal
+from decimal import Decimal, ROUND_DOWN
 from jinja2 import Environment, FileSystemLoader
 from lxml import etree
 from operator import attrgetter
@@ -823,20 +822,17 @@ class Invoice(metaclass=PoolMeta):
 
     @classmethod
     def double_up_to_eight(cls, value):
-        # return max 8 digits in DoubleUpToEightDecimalType
-        _TOTAL_DIGITS = 8
-        def digits_decimal(value):
-            num_str = str(value)
-            if '.' in num_str:
-                num_digits = num_str[::-1].find('.')
-            else:
-                num_digits = 0
+        # Facturae allows between 2 and 8 decimal places.
+        total_digits = 8
+        min_digits = 2
+        value = Decimal(str(value))
 
-            return num_digits
-
-        if digits_decimal(value) > _TOTAL_DIGITS:
-            precision = 10 ** -_TOTAL_DIGITS
-            return math.floor(float(value) / precision) * precision
+        if value.as_tuple().exponent < -total_digits:
+            precision = Decimal(1).scaleb(-total_digits)
+            value = value.quantize(precision, rounding=ROUND_DOWN)
+        if value.as_tuple().exponent > -min_digits:
+            precision = Decimal(1).scaleb(-min_digits)
+            value = value.quantize(precision)
         return value
 
 

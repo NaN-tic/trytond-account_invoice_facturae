@@ -5,6 +5,7 @@ from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 from trytond.exceptions import UserError
 from trytond.i18n import gettext
+from .validation import validate_dir3_values
 
 
 class Address(metaclass=PoolMeta):
@@ -25,6 +26,19 @@ class Address(metaclass=PoolMeta):
     organo_gestor = fields.Char('Organo gestor')
     unidad_tramitadora = fields.Char('Unidad tramitadora')
     organo_proponente = fields.Char('Organo proponente')
+
+    @classmethod
+    def create(cls, vlist):
+        for values in vlist:
+            validate_dir3_values(cls, values)
+        return super().create(vlist)
+
+    @classmethod
+    def write(cls, *args):
+        actions = iter(args)
+        for _, values in zip(actions, actions):
+            validate_dir3_values(cls, values)
+        super().write(*args)
 
     @classmethod
     def __register__(cls, module_name):

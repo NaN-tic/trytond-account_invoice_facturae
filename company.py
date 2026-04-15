@@ -2,6 +2,7 @@
 # copyright notices and license terms.
 from trytond.model import fields
 from trytond.pool import PoolMeta
+from .validation import validate_dir3_values
 
 
 class Company(metaclass=PoolMeta):
@@ -22,3 +23,16 @@ class Company(metaclass=PoolMeta):
     organo_gestor = fields.Char('Organo gestor')
     unidad_tramitadora = fields.Char('Unidad tramitadora')
     organo_proponente = fields.Char('Organo proponente')
+
+    @classmethod
+    def create(cls, vlist):
+        for values in vlist:
+            validate_dir3_values(cls, values)
+        return super().create(vlist)
+
+    @classmethod
+    def write(cls, *args):
+        actions = iter(args)
+        for _, values in zip(actions, actions):
+            validate_dir3_values(cls, values)
+        super().write(*args)

@@ -39,6 +39,15 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
                 return None
         return element.text
 
+    @staticmethod
+    def _valid_dir3_values():
+        return {
+            'oficina_contable': 'ABC123',
+            'organo_gestor': 'DEF456',
+            'unidad_tramitadora': 'GHI789',
+            'organo_proponente': 'JKL012',
+            }
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -47,6 +56,45 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         activate_module('sale')
         activate_module('sale_invoice_grouping')
         activate_module('party_zip')
+
+    @with_transaction()
+    def test_dir3_code_validation(self):
+        pool = Pool()
+        Company = pool.get('company.company')
+        Party = pool.get('party.party')
+        Address = pool.get('party.address')
+
+        company = create_company()
+        company.party.name = 'Seller'
+        company.party.save()
+
+        Company.write([company], self._valid_dir3_values())
+        self.assertEqual(company.oficina_contable, 'ABC123')
+
+        with self.assertRaises(UserError):
+            Company.write([company], {
+                    'oficina_contable': ' ABC123 ',
+                    })
+
+        party = Party(name='Buyer')
+        party.save()
+
+        address, = Address.create([{
+                    'party': party.id,
+                    **self._valid_dir3_values(),
+                    }])
+        self.assertEqual(address.organo_proponente, 'JKL012')
+
+        with self.assertRaises(UserError):
+            Address.create([{
+                        'party': party.id,
+                        'organo_gestor': 'ABC-123',
+                        }])
+
+        with self.assertRaises(UserError):
+            Address.write([address], {
+                    'unidad_tramitadora': 'XYZ 999',
+                    })
 
     @with_transaction()
     def test_invoice_generation(self):

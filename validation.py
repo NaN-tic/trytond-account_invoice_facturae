@@ -15,7 +15,7 @@ DIR3_FIELDS = (
 def validate_dir3_values(model, values):
     for field_name in DIR3_FIELDS:
         value = values.get(field_name)
-        if value is None:
+        if not value:
             continue
         if value != value.strip() or not value.isalnum():
             raise UserError(gettext(

@@ -11,7 +11,7 @@ import hashlib
 import datetime
 import uuid
 from decimal import Decimal, ROUND_DOWN
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 from lxml import etree
 from operator import attrgetter
 
@@ -407,6 +407,9 @@ class Invoice(metaclass=PoolMeta):
 
     def get_facturae(self):
         jinja_env = Environment(
+            autoescape=select_autoescape(
+                enabled_extensions=('xml',),
+                default_for_string=True),
             loader=FileSystemLoader(module_path()),
             trim_blocks=True,
             lstrip_blocks=True,

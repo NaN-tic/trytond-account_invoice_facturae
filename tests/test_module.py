@@ -65,7 +65,8 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         Address = pool.get('party.address')
 
         company = create_company()
-        company.party.name = 'Seller'
+        company.party.name = 'Seller & Co'
+        company.party.trade_name = 'Seller & Trade'
         company.party.save()
 
         Company.write([company], self._valid_dir3_values())
@@ -152,7 +153,8 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         tax_identifier.type = 'eu_vat'
         tax_identifier.code = 'BE0897290877'
         company.header = 'Report Header'
-        company.party.name = 'Seller'
+        company.party.name = 'Seller & Co'
+        company.party.trade_name = 'Seller & Trade'
         company.party.identifiers = [tax_identifier]
         company.facturae_person_type = 'J'
         company.facturae_residence_type = 'R'
@@ -210,7 +212,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
             company_address.subdivision = subdivision
             company_address.country = country
             company_address.save()
-            party = Party(name='Buyer')
+            party = Party(name='Buyer & Co', trade_name='Buyer & Trade')
             tax_identifier = PartyIdentifier()
             tax_identifier.type = 'eu_vat'
             tax_identifier.code = 'BE0897290877'
@@ -317,6 +319,26 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
             invoice.generate_facturae()
             self.assertNotEqual(invoice.invoice_facturae, None)
             self.assertEqual(invoice.invoice_facturae_filename, 'facturae-1.xml')
+            self.assertIn(
+                b'<CorporateName>Seller &amp; Co</CorporateName>',
+                invoice.invoice_facturae)
+            self.assertIn(
+                b'<TradeName>Seller &amp; Trade</TradeName>',
+                invoice.invoice_facturae)
+
+            root = ET.fromstring(invoice.invoice_facturae)
+            corporate_names = [
+                element.text for element in root.iter()
+                if element.tag == 'CorporateName'
+                or element.tag.endswith('}CorporateName')]
+            trade_names = [
+                element.text for element in root.iter()
+                if element.tag == 'TradeName'
+                or element.tag.endswith('}TradeName')]
+            self.assertIn('Seller & Co', corporate_names)
+            self.assertIn('Buyer & Co', corporate_names)
+            self.assertIn('Seller & Trade', trade_names)
+            self.assertIn('Buyer & Trade', trade_names)
 
     @with_transaction()
     def test_attachment_small(self):

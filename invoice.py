@@ -824,19 +824,10 @@ class Invoice(metaclass=PoolMeta):
         return signed_file_content
 
     @classmethod
-    def double_up_to_eight(cls, value):
-        # Facturae allows between 2 and 8 decimal places.
-        total_digits = 8
-        min_digits = 2
+    def quantize_two_decimals(cls, value):
         value = Decimal(str(value))
-
-        if value.as_tuple().exponent < -total_digits:
-            precision = Decimal(1).scaleb(-total_digits)
-            value = value.quantize(precision, rounding=ROUND_DOWN)
-        if value.as_tuple().exponent > -min_digits:
-            precision = Decimal(1).scaleb(-min_digits)
-            value = value.quantize(precision)
-        return value
+        precision = Decimal('0.01')
+        return value.quantize(precision, rounding=ROUND_DOWN)
 
 
 class InvoiceLine(metaclass=PoolMeta):

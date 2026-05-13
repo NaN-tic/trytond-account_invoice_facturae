@@ -98,22 +98,22 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
                     })
 
     @with_transaction()
-    def test_double_up_to_eight(self):
+    def test_quantize_two_decimals(self):
         pool = Pool()
         Invoice = pool.get('account.invoice')
 
         self.assertEqual(
-            Invoice.double_up_to_eight(Decimal('1')),
+            Invoice.quantize_two_decimals(Decimal('1')),
             Decimal('1.00'))
         self.assertEqual(
-            Invoice.double_up_to_eight(Decimal('1.2')),
+            Invoice.quantize_two_decimals(Decimal('1.2')),
             Decimal('1.20'))
         self.assertEqual(
-            Invoice.double_up_to_eight(Decimal('1.234')),
-            Decimal('1.234'))
+            Invoice.quantize_two_decimals(Decimal('1.234')),
+            Decimal('1.23'))
         self.assertEqual(
-            Invoice.double_up_to_eight(Decimal('1.123456789')),
-            Decimal('1.12345678'))
+            Invoice.quantize_two_decimals(Decimal('1.123456789')),
+            Decimal('1.12'))
 
     @with_transaction()
     def test_invoice_generation(self):

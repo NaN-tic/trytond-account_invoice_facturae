@@ -29,7 +29,8 @@ class Sale(metaclass=PoolMeta):
         if invoice:
             invoice_description = []
             for line in invoice.lines:
-                if (not line.origin or line.origin.__name__ != 'sale.line'
+                if (not line.origin
+                        or getattr(line.origin, '__name__', None) != 'sale.line'
                         or not line.origin.sale):
                     continue
                 if line.origin.sale.invoice_description:

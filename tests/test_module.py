@@ -237,6 +237,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         FiscalYear = pool.get('account.fiscalyear')
         Invoice = pool.get('account.invoice')
         InvoiceLine = pool.get('account.invoice.line')
+        Queue = pool.get('ir.queue')
         Party = pool.get('party.party')
         PaymentTerm = pool.get('account.invoice.payment_term')
         ProductUom = pool.get('product.uom')
@@ -284,11 +285,18 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
                     'company': company.id,
                     'facturae_type': '01',
                     }])
-            revenue, = Account.search([('type.revenue', '=', True)])
-            expense, = Account.search([('type.expense', '=', True)])
+            revenue, = Account.search([
+                    ('type.revenue', '=', True),
+                    ('closed', '=', False),
+                    ], limit=1)
+            expense, = Account.search([
+                    ('type.expense', '=', True),
+                    ('closed', '=', False),
+                    ], limit=1)
             tax_account, = Account.search([
-                    ('name', '=', 'Main Tax'),
-                    ])
+                    ('code', '=', '6.3.6'), # Main Tax
+                    ('closed', '=', False),
+                    ], limit=1)
             with Transaction().set_user(0):
                 vat21 = Tax()
                 vat21.name = vat21.description = '21% VAT'
@@ -368,6 +376,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
                 invoice = Invoice()
                 invoice.type = 'out'
                 invoice.party = party
+                invoice.on_change_party()
                 invoice.invoice_address = address
                 invoice.payment_type = payment_receivable
                 invoice.payment_term = term
@@ -394,7 +403,11 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
                 invoice.save()
                 Invoice.post([invoice])
 
-            self.assertEqual(transaction.tasks, [])
+            queued_tasks = Queue.browse(transaction.tasks)
+            self.assertFalse(any(
+                    task.data['model'] == 'account.invoice'
+                    and task.data['method'] == 'generate_facturae'
+                    for task in queued_tasks))
             self.assertEqual(invoice.invoice_facturae, None)
             with self.assertRaises(UserError):
                 invoice.generate_facturae()

@@ -347,6 +347,12 @@ class Invoice(metaclass=PoolMeta):
         super(Invoice, cls).post(invoices)
 
         for invoice in invoices:
+            if (not invoice.invoice_address
+                    or (not invoice.invoice_address.facturae_person_type
+                        and not invoice.invoice_address.facturae_residence_type
+                        and not invoice.invoice_address.facturae_residence_type
+                        )):
+                continue
             cls.__queue__.generate_facturae(invoice)
 
     def _credit(self, **values):

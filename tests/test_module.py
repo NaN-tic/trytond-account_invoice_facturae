@@ -294,8 +294,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
                     ('closed', '=', False),
                     ], limit=1)
             tax_account, = Account.search([
-                    ('code', '=', '6.3.6'), # Main Tax
-                    ('closed', '=', False),
+                    ('name', '=', 'Main Tax'), # Main Tax
                     ], limit=1)
             with Transaction().set_user(0):
                 vat21 = Tax()

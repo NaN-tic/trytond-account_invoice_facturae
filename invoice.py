@@ -830,10 +830,22 @@ class Invoice(metaclass=PoolMeta):
         return signed_file_content
 
     @classmethod
-    def quantize_two_decimals(cls, value):
+    def format_decimal(cls, value, decimals=2, rounding=ROUND_DOWN,
+            trim=False, min_decimals=2):
         value = Decimal(str(value))
-        precision = Decimal('0.01')
-        return value.quantize(precision, rounding=ROUND_DOWN)
+        precision = Decimal(1).scaleb(-decimals)
+        value = value.quantize(precision, rounding=rounding)
+        text = format(value, 'f')
+        if trim and '.' in text:
+            text = text.rstrip('0').rstrip('.')
+        if '.' not in text:
+            if min_decimals:
+                return text + '.' + ('0' * min_decimals)
+            return text
+        integer, decimal = text.split('.', 1)
+        if len(decimal) < min_decimals:
+            decimal = decimal.ljust(min_decimals, '0')
+        return integer + '.' + decimal
 
 
 class InvoiceLine(metaclass=PoolMeta):

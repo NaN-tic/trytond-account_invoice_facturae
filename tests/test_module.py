@@ -9,7 +9,8 @@ from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.tests.test_tryton import (ModuleTestCase, with_transaction,
     activate_module)
-from trytond.modules.account.tests import get_fiscalyear, create_chart
+from trytond.modules.account.tests import (
+    get_fiscalyear, create_chart, get_accounts)
 from trytond.modules.company.tests import (create_company, set_company,
     CompanyTestMixin)
 from trytond.modules.account_invoice.tests import set_invoice_sequences
@@ -98,22 +99,31 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
                     })
 
     @with_transaction()
-    def test_quantize_two_decimals(self):
+    def test_format_decimal(self):
         pool = Pool()
         Invoice = pool.get('account.invoice')
 
         self.assertEqual(
-            Invoice.quantize_two_decimals(Decimal('1')),
-            Decimal('1.00'))
+            Invoice.format_decimal(Decimal('1')),
+            '1.00')
         self.assertEqual(
-            Invoice.quantize_two_decimals(Decimal('1.2')),
-            Decimal('1.20'))
+            Invoice.format_decimal(Decimal('1.2')),
+            '1.20')
         self.assertEqual(
-            Invoice.quantize_two_decimals(Decimal('1.234')),
-            Decimal('1.23'))
+            Invoice.format_decimal(Decimal('1.234')),
+            '1.23')
         self.assertEqual(
-            Invoice.quantize_two_decimals(Decimal('1.123456789')),
-            Decimal('1.12'))
+            Invoice.format_decimal(Decimal('1.123456789')),
+            '1.12')
+        self.assertEqual(
+            Invoice.format_decimal(Decimal('0.079000'), 8, trim=True),
+            '0.079')
+        self.assertEqual(
+            Invoice.format_decimal(Decimal('0.790000'), 8, trim=True),
+            '0.79')
+        self.assertEqual(
+            Invoice.format_decimal(Decimal('1.200000'), 8, trim=True),
+            '1.20')
 
     @with_transaction()
     def test_invoice_generation(self):
@@ -959,6 +969,178 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
             self.assertEqual(
                 Decimal(self._find_xml_text(invoice_line, 'GrossAmount')),
                 Decimal('9.0000'))
+
+    @with_transaction()
+    def test_invoice_generation_with_precise_unit_price(self):
+        'Test invoice generation keeps precise unit price on lines'
+
+        pool = Pool()
+        Configuration = pool.get('account.configuration')
+        Invoice = pool.get('account.invoice')
+        InvoiceLine = pool.get('account.invoice.line')
+        Party = pool.get('party.party')
+        PaymentTerm = pool.get('account.invoice.payment_term')
+        ProductUom = pool.get('product.uom')
+        ProductCategory = pool.get('product.category')
+        ProductTemplate = pool.get('product.template')
+        Product = pool.get('product.product')
+        Tax = pool.get('account.tax')
+        Address = pool.get('party.address')
+        PartyIdentifier = pool.get('party.identifier')
+        Country = pool.get('country.country')
+        Subdivision = pool.get('country.subdivision')
+        PaymentType = pool.get('account.payment.type')
+
+        country = Country(name='Country', code='ES', code3='ESP')
+        country.save()
+        subdivision = Subdivision(
+            name='Subdivision', country=country, code='SUB', type='province')
+        subdivision.save()
+
+        company = create_company()
+        currency = create_currency('EUR')
+        add_currency_rate(currency, 1.0)
+
+        tax_identifier = PartyIdentifier()
+        tax_identifier.type = 'eu_vat'
+        tax_identifier.code = 'BE0897290877'
+        company.header = 'Report Header'
+        company.party.name = 'Seller'
+        company.party.identifiers = [tax_identifier]
+        company.facturae_person_type = 'J'
+        company.facturae_residence_type = 'R'
+        company.party.save()
+        company.save()
+
+        with set_company(company):
+            create_chart(company, tax=True)
+
+            accounts = get_accounts(company)
+            revenue = accounts['revenue']
+            receivable = accounts['receivable']
+
+            vat21, = Tax.search([
+                    ('rate', '=', Decimal('0.21')),
+                    ('type', '=', 'percentage'),
+                    ('company', '=', company.id),
+                    ], limit=1)
+
+            payment_receivable = PaymentType(name='Receivable')
+            payment_receivable.account = receivable
+            payment_receivable.kind = 'receivable'
+            payment_receivable.facturae_type = '04'
+            payment_receivable.save()
+
+            company_address, = company.party.addresses
+            company_address.street = 'St sample, 1'
+            company_address.city = 'City'
+            company_address.postal_code = '08201'
+            company_address.country = country
+            company_address.subdivision = subdivision
+            company_address.save()
+
+            party = Party(name='Buyer')
+            tax_identifier = PartyIdentifier()
+            tax_identifier.type = 'eu_vat'
+            tax_identifier.code = 'BE0897290877'
+            party.identifiers = [tax_identifier]
+            party.save()
+
+            address, = Address.create([{
+                        'party': party.id,
+                        'street': 'St sample, 15',
+                        'city': 'City',
+                        'postal_code': '08201',
+                        'facturae_person_type': 'J',
+                        'facturae_residence_type': 'R',
+                        'country': country.id,
+                        'subdivision': subdivision.id,
+                        }])
+            party.addresses = [address]
+            party.save()
+
+            unit, = ProductUom.search([('name', '=', 'Unit')])
+            product_category = ProductCategory(name='Product Category')
+            product_category.accounting = True
+            product_category.account_revenue = revenue
+            product_category.customer_taxes = [vat21]
+            product_category.save()
+
+            template = ProductTemplate()
+            template.name = 'Product'
+            template.default_uom = unit
+            template.type = 'service'
+            template.list_price = Decimal('20')
+            template.account_category = product_category
+            template.save()
+            product = Product()
+            product.template = template
+            product.save()
+
+            term, = PaymentTerm.create([{
+                        'name': 'Payment term',
+                        'lines': [
+                            ('create', [{
+                                        'type': 'remainder',
+                                        'relativedeltas': [
+                                            ('create', [{
+                                                        'sequence': 0,
+                                                        'days': 0,
+                                                        'months': 0,
+                                                        'weeks': 0,
+                                                        }])],
+                                        }])],
+                        }])
+
+            configuration = Configuration(1)
+            configuration.facturae_service = 'only_file'
+            configuration.save()
+
+            with Transaction().set_user(0):
+                invoice = Invoice()
+                invoice.type = 'out'
+                invoice.party = party
+                invoice.on_change_party()
+                invoice.invoice_address = address
+                invoice.payment_type = payment_receivable
+                invoice.payment_term = term
+                invoice.currency = currency
+                invoice.company = company
+                invoice.set_journal()
+                invoice._update_account()
+
+                line = InvoiceLine()
+                line.company = company
+                line.currency = currency
+                line.account = revenue
+                line.on_change_account()
+                line.product = product
+                line.on_change_product()
+                line.description = 'Test'
+                line.quantity = 10200
+                line.unit_price = Decimal('0.07900')
+
+                invoice.lines = [line]
+                invoice.on_change_lines()
+
+                invoice.save()
+                Invoice.post([invoice])
+
+            invoice.generate_facturae()
+            self.assertIsNotNone(invoice.invoice_facturae)
+
+            root = ET.fromstring(invoice.invoice_facturae)
+            invoice_line = self._find_xml_element(root, 'InvoiceLine')
+            self.assertIsNotNone(invoice_line)
+            self.assertEqual(
+                Decimal(self._find_xml_text(invoice_line, 'UnitPriceWithoutTax')),
+                Decimal('0.07900'))
+            self.assertEqual(
+                Decimal(self._find_xml_text(invoice_line, 'TotalCost')),
+                Decimal('805.80'))
+            self.assertEqual(
+                Decimal(self._find_xml_text(invoice_line, 'GrossAmount')),
+                Decimal('805.80'))
 
     @with_transaction()
     def test_attachment_mixed_sizes(self):

@@ -9,8 +9,7 @@ from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.tests.test_tryton import (ModuleTestCase, with_transaction,
     activate_module)
-from trytond.modules.account.tests import (
-    get_fiscalyear, create_chart, get_accounts)
+from trytond.modules.account.tests import get_fiscalyear, create_chart
 from trytond.modules.company.tests import (create_company, set_company,
     CompanyTestMixin)
 from trytond.modules.account_invoice.tests import set_invoice_sequences
@@ -54,6 +53,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         super().setUpClass()
         activate_module('account_invoice_facturae')
         activate_module('account_invoice_discount')
+        activate_module('account_es')
         activate_module('sale')
         activate_module('sale_invoice_grouping')
         activate_module('party_zip')
@@ -373,6 +373,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         Country = pool.get('country.country')
         Subdivision = pool.get('country.subdivision')
         PaymentType = pool.get('account.payment.type')
+        FiscalYear = pool.get('account.fiscalyear')
 
         country = Country(name='Country', code='ES', code3='ESP')
         country.save()
@@ -559,6 +560,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         Country = pool.get('country.country')
         Subdivision = pool.get('country.subdivision')
         PaymentType = pool.get('account.payment.type')
+        FiscalYear = pool.get('account.fiscalyear')
 
         country = Country(name='Country', code='ES', code3='ESP')
         country.save()
@@ -781,6 +783,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         Country = pool.get('country.country')
         Subdivision = pool.get('country.subdivision')
         PaymentType = pool.get('account.payment.type')
+        FiscalYear = pool.get('account.fiscalyear')
 
         country = Country(name='Country', code='ES', code3='ESP')
         country.save()
@@ -973,9 +976,12 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
     @with_transaction()
     def test_invoice_generation_with_precise_unit_price(self):
         'Test invoice generation keeps precise unit price on lines'
+        from trytond.modules.account_es.tests.test_module import (
+            create_chart as create_chart_es)
 
         pool = Pool()
         Configuration = pool.get('account.configuration')
+        Account = pool.get('account.account')
         Invoice = pool.get('account.invoice')
         InvoiceLine = pool.get('account.invoice.line')
         Party = pool.get('party.party')
@@ -990,6 +996,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         Country = pool.get('country.country')
         Subdivision = pool.get('country.subdivision')
         PaymentType = pool.get('account.payment.type')
+        FiscalYear = pool.get('account.fiscalyear')
 
         country = Country(name='Country', code='ES', code3='ESP')
         country.save()
@@ -1013,11 +1020,21 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         company.save()
 
         with set_company(company):
-            create_chart(company, tax=True)
+            create_chart_es(company)
+            fiscalyear = set_invoice_sequences(get_fiscalyear(company))
+            fiscalyear.save()
+            FiscalYear.create_period([fiscalyear])
 
-            accounts = get_accounts(company)
-            revenue = accounts['revenue']
-            receivable = accounts['receivable']
+            revenue, = Account.search([
+                    ('type.revenue', '=', True),
+                    ('company', '=', company.id),
+                    ('code', 'like', '7000%'),
+                    ], limit=1)
+            receivable, = Account.search([
+                    ('type.receivable', '=', True),
+                    ('company', '=', company.id),
+                    ('code', 'like', '430%'),
+                    ], limit=1)
 
             vat21, = Tax.search([
                     ('rate', '=', Decimal('0.21')),
@@ -1025,11 +1042,12 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
                     ('company', '=', company.id),
                     ], limit=1)
 
-            payment_receivable = PaymentType(name='Receivable')
-            payment_receivable.account = receivable
-            payment_receivable.kind = 'receivable'
-            payment_receivable.facturae_type = '04'
-            payment_receivable.save()
+            payment_receivable, = PaymentType.create([{
+                        'name': 'Receivable',
+                        'kind': 'receivable',
+                        'company': company.id,
+                        'facturae_type': '01',
+                        }])
 
             company_address, = company.party.addresses
             company_address.street = 'St sample, 1'
@@ -1118,7 +1136,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
                 line.on_change_product()
                 line.description = 'Test'
                 line.quantity = 10200
-                line.unit_price = Decimal('0.07900')
+                line.unit_price = Decimal('0.0790')
 
                 invoice.lines = [line]
                 invoice.on_change_lines()
@@ -1134,7 +1152,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
             self.assertIsNotNone(invoice_line)
             self.assertEqual(
                 Decimal(self._find_xml_text(invoice_line, 'UnitPriceWithoutTax')),
-                Decimal('0.07900'))
+                Decimal('0.0790'))
             self.assertEqual(
                 Decimal(self._find_xml_text(invoice_line, 'TotalCost')),
                 Decimal('805.80'))

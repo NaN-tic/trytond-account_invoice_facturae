@@ -1260,6 +1260,15 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
             party.save()
 
             unit, = ProductUom.search([('name', '=', 'Unit')])
+            precise_unit, = ProductUom.create([{
+                        'name': 'Precise Unit',
+                        'symbol': 'pu',
+                        'category': unit.category.id,
+                        'factor': 1.0,
+                        'rate': 1.0,
+                        'rounding': 0.0001,
+                        'digits': 4,
+                        }])
             product_category = ProductCategory(name='Product Category')
             product_category.accounting = True
             product_category.account_revenue = revenue
@@ -1268,7 +1277,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
 
             template = ProductTemplate()
             template.name = 'Product'
-            template.default_uom = unit
+            template.default_uom = precise_unit
             template.type = 'service'
             template.list_price = Decimal('20')
             template.account_category = product_category
@@ -1318,7 +1327,8 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
                 line.on_change_product()
                 line.description = 'Test'
                 line.quantity = 1.7003
-                line.unit_price = Decimal('473.905219')
+                line.unit = precise_unit
+                line.unit_price = Decimal('473.9052')
 
                 invoice.lines = [line]
                 invoice.on_change_lines()
@@ -1334,13 +1344,13 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
             self.assertIsNotNone(invoice_line)
             self.assertEqual(
                 Decimal(self._find_xml_text(invoice_line, 'UnitPriceWithoutTax')),
-                Decimal('473.905219'))
+                Decimal('473.9052'))
             self.assertEqual(
                 Decimal(self._find_xml_text(invoice_line, 'TotalCost')),
-                Decimal('805.80'))
+                Decimal('805.78'))
             self.assertEqual(
                 Decimal(self._find_xml_text(invoice_line, 'GrossAmount')),
-                Decimal('805.80'))
+                Decimal('805.78'))
 
     @with_transaction()
     def test_attachment_mixed_sizes(self):

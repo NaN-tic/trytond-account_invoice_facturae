@@ -52,9 +52,9 @@ class Sale(metaclass=PoolMeta):
         'file_reference')
     def on_change_invoice_address(self):
         if self.invoice_address:
-            self.file_reference = (self.invoice_address.file_reference or None)
+            self.file_reference = self.invoice_address.file_reference
             self.receiver_contract_reference = (
-                self.invoice_address.receiver_contract_reference or None)
+                self.invoice_address.receiver_contract_reference)
         else:
             self.file_reference = None
             self.receiver_contract_reference = None

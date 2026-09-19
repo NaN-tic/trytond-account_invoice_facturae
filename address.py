@@ -26,6 +26,9 @@ class Address(metaclass=PoolMeta):
     organo_gestor = fields.Char('Organo gestor')
     unidad_tramitadora = fields.Char('Unidad tramitadora')
     organo_proponente = fields.Char('Organo proponente')
+    file_reference = fields.Char('File Reference', size=20)
+    receiver_contract_reference = fields.Char('Receiver Contract Reference',
+        size=20)
 
     @classmethod
     def create(cls, vlist):
@@ -121,23 +124,10 @@ class Address(metaclass=PoolMeta):
 class AddressSaleGrouping(metaclass=PoolMeta):
     __name__ = 'party.address'
 
-    file_reference = fields.Char('File Reference', size=20)
-    receiver_contract_reference = fields.Char('Receiver Contract Reference',
-        size=20)
-
     @classmethod
-    def create(cls, vlist):
-        addresses = super().create(vlist)
+    def validate(cls, addresses):
+        super().validate(addresses)
         cls.check_facturae_fields(addresses)
-        return addresses
-
-    @classmethod
-    def write(cls, *args):
-        super().write(*args)
-
-        actions = iter(args)
-        for addresses, values in zip(actions, actions):
-            cls.check_facturae_fields(addresses)
 
     @classmethod
     def check_facturae_fields(cls, addresses):

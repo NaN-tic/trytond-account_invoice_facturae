@@ -10,6 +10,7 @@ import xmlsig
 import hashlib
 import datetime
 import uuid
+from collections import Counter
 from decimal import Decimal, ROUND_DOWN
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from lxml import etree
@@ -949,6 +950,7 @@ class InvoiceLine(metaclass=PoolMeta):
     def facturae_special_taxable_event(self):
         invoice_taxes = [item for item in self.invoice_taxes if item.tax]
         events = set()
+        other_tax_prefixes = None
         for item in invoice_taxes:
             tax = item.tax
             if not tax.special_taxable_event_code:
@@ -960,11 +962,11 @@ class InvoiceLine(metaclass=PoolMeta):
                     'account_invoice_facturae.msg_incomplete_tax_event',
                     tax=tax.rec_name))
             prefix = tax.report_type
-            if prefix == '05' and sum(
-                    t.tax.report_type == '05' for t in invoice_taxes) > 1:
-                rate = tax.rate * 100
-                amount = self.invoice.currency.round(self.amount * tax.rate)
-                prefix = f'05 {rate} {self.amount} {amount}'
+            if prefix == '05':
+                if other_tax_prefixes is None:
+                    other_tax_prefixes = self._facturae_other_tax_prefixes(
+                        invoice_taxes)
+                prefix = other_tax_prefixes[item]
             text = f'{prefix} {reason}'
             if len(text) > 2500:
                 raise UserError(gettext(
@@ -976,28 +978,54 @@ class InvoiceLine(metaclass=PoolMeta):
                 line=self.rec_name))
         return next(iter(events), None)
 
+    def facturae_line_tax_values(self, tax, euro, withheld=False):
+        pool = Pool()
+        Currency = pool.get('currency.currency')
+        currency = self.invoice.currency
+        rate = tax.rate * 100
+        if withheld:
+            rate = Decimal(self.invoice.format_decimal(rate))
+        else:
+            rate = Currency.compute(currency, rate, euro)
+        base = Currency.compute(currency, self.amount, euro)
+        amount = Currency.compute(currency, self.amount * tax.rate, euro)
+        return rate, base, amount
+
+    def _facturae_other_tax_prefixes(self, invoice_taxes):
+        prefixes = {item: '05' for item in invoice_taxes
+            if item.tax and item.tax.report_type in (None, '', '05')}
+        if len(prefixes) < 2:
+            return prefixes
+
+        pool = Pool()
+        Currency = pool.get('currency.currency')
+        euro, = Currency.search([('code', '=', 'EUR')], limit=1)
+        values = {item: self.facturae_line_tax_values(
+                item.tax, euro, withheld=item.tax.rate < 0)
+            for item in prefixes}
+        counts = Counter(parts[:size] for parts in values.values()
+            for size in range(1, len(parts) + 1))
+        for item, parts in values.items():
+            for size, value in enumerate(parts, 1):
+                prefixes[item] += f' {value:f}'
+                if counts[parts[:size]] == 1:
+                    break
+        return prefixes
+
     @property
     def taxes_additional_line_item_information(self):
-        res = {}
-        for inv_tax in self.invoice_taxes:
-            if inv_tax.tax and (not inv_tax.tax.report_type
-                    or inv_tax.tax.report_type == '05'):
-                key = (inv_tax.tax.type == 'percentage'
-                            and (inv_tax.tax.rate * 100)
-                            or inv_tax.tax.amount,
-                        inv_tax.base,
-                        inv_tax.amount)
-                res.setdefault('05', []).append((key, inv_tax.description))
-            elif inv_tax.tax and inv_tax.tax.report_description:
-                res[inv_tax.tax.report_type] = inv_tax.tax.report_description
-        if '05' in res:
-            if len(res['05']) == 1:
-                res['05'] = res['05'][0]
-            else:
-                for key, tax_description in res['05']:
-                    res['05 %s %s %s' % key] = tax_description
-                del res['05']
-        return res
+        invoice_taxes = self.invoice_taxes
+        other_tax_prefixes = self._facturae_other_tax_prefixes(invoice_taxes)
+        descriptions = {}
+        for item in invoice_taxes:
+            tax = item.tax
+            if tax and item not in other_tax_prefixes and tax.report_description:
+                descriptions[tax.report_type] = tax.report_description
+
+        entries = list(descriptions.items())
+        entries.extend((prefix, item.description)
+            for item, prefix in other_tax_prefixes.items())
+        return entries
 
 
 class CreditInvoiceStart(metaclass=PoolMeta):

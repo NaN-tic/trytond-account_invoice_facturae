@@ -293,19 +293,20 @@
                     {% if line.taxes_withheld %}
                     <TaxesWithheld>
                         {% for line_tax in invoice.taxes_withheld %}
+                        {% set rate, base, amount = line.facturae_line_tax_values(line_tax.tax, euro, withheld=true) %}
                         <Tax>
                             <TaxTypeCode>{{ line_tax.tax.report_type }}</TaxTypeCode>
-                            <TaxRate>{{ Invoice.format_decimal(line_tax.tax.rate * 100) }}</TaxRate>
+                            <TaxRate>{{ rate }}</TaxRate>
                             <TaxableBase>
-                                <TotalAmount>{{ Currency.compute(invoice.currency, line.amount, euro) }}</TotalAmount>
+                                <TotalAmount>{{ base }}</TotalAmount>
                                 {% if invoice.currency != euro %}
-                                <EquivalentInEuros>{{ Currency.compute(invoice.currency, line.amount, euro) }}</EquivalentInEuros>
+                                <EquivalentInEuros>{{ base }}</EquivalentInEuros>
                                 {% endif %}
                             </TaxableBase>
                             <TaxAmount>
-                                <TotalAmount>{{ Currency.compute(invoice.currency, line.amount * line_tax.tax.rate, euro) }}</TotalAmount>
+                                <TotalAmount>{{ amount }}</TotalAmount>
                                 {% if invoice.currency != euro %}
-                                <EquivalentInEuros>{{ Currency.compute(invoice.currency, line.amount * line_tax.tax.rate, euro) }}</EquivalentInEuros>
+                                <EquivalentInEuros>{{ amount }}</EquivalentInEuros>
                                 {% endif %}
                             </TaxAmount>
                         </Tax>
@@ -314,19 +315,20 @@
                     {% endif %}
                     <TaxesOutputs>
                         {% for line_tax in line.taxes_outputs %}
+                        {% set rate, base, amount = line.facturae_line_tax_values(line_tax.tax, euro) %}
                         <Tax>
                             <TaxTypeCode>{{ line_tax.tax.report_type }}</TaxTypeCode>
-                            <TaxRate>{{ Currency.compute(invoice.currency, line_tax.tax.rate * 100, euro) }}</TaxRate>
+                            <TaxRate>{{ rate }}</TaxRate>
                             <TaxableBase>
-                                <TotalAmount>{{ Currency.compute(invoice.currency, line.amount, euro) }}</TotalAmount>
+                                <TotalAmount>{{ base }}</TotalAmount>
                                 {% if invoice.currency != euro %}
-                                <EquivalentInEuros>{{ Currency.compute(invoice.currency, line.amount, euro) }}</EquivalentInEuros>
+                                <EquivalentInEuros>{{ base }}</EquivalentInEuros>
                                 {% endif %}
                             </TaxableBase>
                             <TaxAmount>
-                                <TotalAmount>{{ Currency.compute(invoice.currency, line.amount * line_tax.tax.rate, euro) }}</TotalAmount>
+                                <TotalAmount>{{ amount }}</TotalAmount>
                                 {% if invoice.currency != euro %}
-                                <EquivalentInEuros>{{ Currency.compute(invoice.currency, line.amount * line_tax.tax.rate, euro) }}</EquivalentInEuros>
+                                <EquivalentInEuros>{{ amount }}</EquivalentInEuros>
                                 {% endif %}
                             </TaxAmount>
                             {# TODO: special taxes not supported
@@ -352,10 +354,11 @@
                         <EndDate>{{ line.facturae_end_date.isoformat() }}</EndDate>
                     </LineItemPeriod>
                     {% endif %}
-                    {% if line.taxes_additional_line_item_information or line.note %}
+                    {% set tax_information = line.taxes_additional_line_item_information %}
+                    {% if tax_information or line.note %}
                     <AdditionalLineItemInformation>
-                    {% if line.taxes_additional_line_item_information %}
-                    {% for key, description in line.taxes_additional_line_item_information.items() %}
+                    {% if tax_information %}
+                    {% for key, description in tax_information %}
                     {{ key }} = {{ description }}
                     {% endfor %}
                     {% elif line.note %}

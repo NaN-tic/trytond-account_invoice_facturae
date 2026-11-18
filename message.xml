@@ -79,5 +79,14 @@ Message returned by signing process: %(process_output)s</field>
       <record model="ir.message" id="msg_unsupported_format">
           <field name="text">Unsupported attachment format: %(format)s</field>
       </record>
+      <record model="ir.message" id="msg_incomplete_tax_event">
+          <field name="text">Set the Factura-e report type and provide a legal notice or description on the invoice for tax "%(tax)s".</field>
+      </record>
+      <record model="ir.message" id="msg_long_tax_event">
+          <field name="text">The Factura-e special taxable event reason for tax "%(tax)s", including the tax code, exceeds 2500 characters.</field>
+      </record>
+      <record model="ir.message" id="msg_conflicting_tax_events">
+          <field name="text">Invoice line "%(line)s" has multiple special taxable events. Factura-e allows one per line.</field>
+      </record>
     </data>
 </tryton>

@@ -277,7 +277,16 @@ this repository contains the full copyright notices and license terms. -->
 
         <!-- Exempt -->
         <record model="account.tax.template" id="account_es.iva_rep_ex">
-            <field name="report_type">05</field>
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_rep_ex_ser">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_rep_ex_bi">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_rep_ex_form">
             <field name="report_type">05</field>

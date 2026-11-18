@@ -363,7 +363,13 @@
                     {% endif %}
                     </AdditionalLineItemInformation>
                     {% endif %}
-                    {# TODO: SpecialTaxableEvent not supported #}
+                    {% set event = line.facturae_special_taxable_event %}
+                    {% if event %}
+                    <SpecialTaxableEvent>
+                        <SpecialTaxableEventCode>{{ event[0] }}</SpecialTaxableEventCode>
+                        <SpecialTaxableEventReason>{{ event[1] }}</SpecialTaxableEventReason>
+                    </SpecialTaxableEvent>
+                    {% endif %}
                     {% if line.product and line.product.code %}
                     <ArticleCode>{{ line.facturae_article_code[:20] }}</ArticleCode>
                     {% endif %}

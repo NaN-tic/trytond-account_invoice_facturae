@@ -946,6 +946,37 @@ class InvoiceLine(metaclass=PoolMeta):
             ]
 
     @property
+    def facturae_special_taxable_event(self):
+        invoice_taxes = [item for item in self.invoice_taxes if item.tax]
+        events = set()
+        for item in invoice_taxes:
+            tax = item.tax
+            if not tax.special_taxable_event_code:
+                continue
+            reason = ((item.legal_notice or '').strip()
+                or (item.description or '').strip())
+            if not tax.report_type or not reason:
+                raise UserError(gettext(
+                    'account_invoice_facturae.msg_incomplete_tax_event',
+                    tax=tax.rec_name))
+            prefix = tax.report_type
+            if prefix == '05' and sum(
+                    t.tax.report_type == '05' for t in invoice_taxes) > 1:
+                rate = tax.rate * 100
+                amount = self.invoice.currency.round(self.amount * tax.rate)
+                prefix = f'05 {rate} {self.amount} {amount}'
+            text = f'{prefix} {reason}'
+            if len(text) > 2500:
+                raise UserError(gettext(
+                    'account_invoice_facturae.msg_long_tax_event', tax=tax.rec_name))
+            events.add((tax.special_taxable_event_code, text))
+        if len(events) > 1:
+            raise UserError(gettext(
+                'account_invoice_facturae.msg_conflicting_tax_events',
+                line=self.rec_name))
+        return next(iter(events), None)
+
+    @property
     def taxes_additional_line_item_information(self):
         res = {}
         for inv_tax in self.invoice_taxes:

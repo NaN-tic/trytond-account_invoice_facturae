@@ -292,31 +292,40 @@ this repository contains the full copyright notices and license terms. -->
             <field name="report_type">05</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_rep_4_exento">
-            <field name="report_type">05</field>
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_rep_4_exento_ser">
-            <field name="report_type">05</field>
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_rep_4_exento_bi">
-            <field name="report_type">05</field>
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_rep_10_exento">
-            <field name="report_type">05</field>
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_rep_10_exento_ser">
-            <field name="report_type">05</field>
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_rep_10_exento_bi">
-            <field name="report_type">05</field>
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_rep_21_exento">
-            <field name="report_type">05</field>
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_rep_21_exento_ser">
-            <field name="report_type">05</field>
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_rep_21_exento_bi">
-            <field name="report_type">05</field>
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
         </record>
     </data>
 </tryton>

@@ -327,5 +327,29 @@ this repository contains the full copyright notices and license terms. -->
             <field name="report_type">01</field>
             <field name="special_taxable_event_code">01</field>
         </record>
+        <record model="account.tax.template" id="account_es.iva_ex_art_21_sale">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_ex_art_21_sale_ser">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_ex_art_21_sale_bi">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_ex_art_24_1_sale">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_ex_art_24_1_sale_ser">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_ex_art_24_1_sale_bi">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
     </data>
 </tryton>

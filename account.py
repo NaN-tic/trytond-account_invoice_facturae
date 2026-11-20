@@ -2,6 +2,7 @@
 # copyright notices and license terms.
 from trytond.model import ModelSQL, fields
 from trytond.pool import Pool, PoolMeta
+from trytond.pyson import Bool, Eval
 from trytond.modules.company.model import CompanyValueMixin
 
 REPORT_TYPES = [
@@ -38,6 +39,13 @@ REPORT_TYPES = [
     ("27", "IGFEI: Tax on Fluorinated Greenhouse Gases"),
     ("28", "IRNR: Non-resident Income Tax"),
     ("29", "Corporation Tax"),
+    ]
+
+
+SPECIAL_TAXABLE_EVENT_CODES = [
+    (None, ""),
+    ('01', "Taxable and Exempt"),
+    ('02', "Non-taxable"),
     ]
 
 
@@ -98,13 +106,17 @@ class ConfigurationFacturae(ModelSQL, CompanyValueMixin):
 class TaxTemplate(metaclass=PoolMeta):
     __name__ = 'account.tax.template'
 
-    report_type = fields.Selection(REPORT_TYPES, 'Report Type', sort=False)
+    report_type = fields.Selection(REPORT_TYPES, 'Report Type', sort=False,
+        states={'required': Bool(Eval('special_taxable_event_code'))})
+    special_taxable_event_code = fields.Selection(
+        SPECIAL_TAXABLE_EVENT_CODES, "Special Taxable Event", sort=False)
 
     def _get_tax_value(self, tax=None):
         res = super(TaxTemplate, self)._get_tax_value(tax)
 
-        if not tax or tax.report_type != self.report_type:
-            res['report_type'] = self.report_type
+        for name in ('report_type', 'special_taxable_event_code'):
+            if not tax or getattr(tax, name) != getattr(self, name):
+                res[name] = getattr(self, name)
 
         return res
 
@@ -112,4 +124,10 @@ class TaxTemplate(metaclass=PoolMeta):
 class Tax(metaclass=PoolMeta):
     __name__ = 'account.tax'
 
-    report_type = fields.Selection(REPORT_TYPES, 'Report Type', sort=False)
+    report_type = fields.Selection(REPORT_TYPES, 'Report Type', sort=False,
+        states={'required': Bool(Eval('special_taxable_event_code'))})
+    special_taxable_event_code = fields.Selection(
+        SPECIAL_TAXABLE_EVENT_CODES, "Special Taxable Event", sort=False,
+        states={
+            'readonly': Bool(Eval('template')) & ~Eval('template_override'),
+            })

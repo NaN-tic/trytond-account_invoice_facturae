@@ -7,8 +7,8 @@ import xml.etree.ElementTree as ET
 from decimal import Decimal
 from trytond.pool import Pool
 from trytond.transaction import Transaction
-from trytond.tests.test_tryton import (ModuleTestCase, with_transaction,
-    activate_module)
+from trytond.tests.test_tryton import (
+    DB_NAME, USER, ModuleTestCase, activate_module, with_transaction)
 from trytond.modules.account.tests import get_fiscalyear, create_chart
 from trytond.modules.company.tests import (create_company, set_company,
     CompanyTestMixin)
@@ -53,6 +53,17 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         super().setUpClass()
         activate_module('account_invoice_facturae')
         activate_module('account_invoice_discount')
+        with Transaction().start(DB_NAME, USER):
+            pool = Pool()
+            Country = pool.get('country.country')
+            Subdivision = pool.get('country.subdivision')
+            country = Country(name='Spain', code='ES', code3='ESP')
+            country.subdivisions = [
+                Subdivision(name='Ceuta', code='ES-CE'),
+                Subdivision(name='Melilla', code='ES-ML'),
+                Subdivision(name='Canarias', code='ES-CN'),
+                ]
+            country.save()
         activate_module('account_es')
         activate_module('sale')
         activate_module('sale_invoice_grouping')
@@ -149,8 +160,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         Subdivision = pool.get('country.subdivision')
         PaymentType = pool.get('account.payment.type')
 
-        country = Country(name='Country', code='ES', code3='ESP')
-        country.save()
+        country, = Country.search([('code', '=', 'ES')])
         subdivision = Subdivision(
             name='Subdivision', country=country, code='SUB', type='province')
         subdivision.save()
@@ -375,8 +385,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         PaymentType = pool.get('account.payment.type')
         FiscalYear = pool.get('account.fiscalyear')
 
-        country = Country(name='Country', code='ES', code3='ESP')
-        country.save()
+        country, = Country.search([('code', '=', 'ES')])
         subdivision = Subdivision(
             name='Subdivision', country=country, code='SUB', type='province')
         subdivision.save()
@@ -562,8 +571,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         PaymentType = pool.get('account.payment.type')
         FiscalYear = pool.get('account.fiscalyear')
 
-        country = Country(name='Country', code='ES', code3='ESP')
-        country.save()
+        country, = Country.search([('code', '=', 'ES')])
         subdivision = Subdivision(
             name='Subdivision', country=country, code='SUB', type='province')
         subdivision.save()
@@ -785,8 +793,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         PaymentType = pool.get('account.payment.type')
         FiscalYear = pool.get('account.fiscalyear')
 
-        country = Country(name='Country', code='ES', code3='ESP')
-        country.save()
+        country, = Country.search([('code', '=', 'ES')])
         subdivision = Subdivision(
             name='Subdivision', country=country, code='SUB', type='province')
         subdivision.save()
@@ -998,8 +1005,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         PaymentType = pool.get('account.payment.type')
         FiscalYear = pool.get('account.fiscalyear')
 
-        country = Country(name='Country', code='ES', code3='ESP')
-        country.save()
+        country, = Country.search([('code', '=', 'ES')])
         subdivision = Subdivision(
             name='Subdivision', country=country, code='SUB', type='province')
         subdivision.save()
@@ -1185,8 +1191,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         PaymentType = pool.get('account.payment.type')
         FiscalYear = pool.get('account.fiscalyear')
 
-        country = Country(name='Country', code='ES', code3='ESP')
-        country.save()
+        country, = Country.search([('code', '=', 'ES')])
         subdivision = Subdivision(
             name='Subdivision', country=country, code='SUB', type='province')
         subdivision.save()
@@ -1377,8 +1382,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         Subdivision = pool.get('country.subdivision')
         PaymentType = pool.get('account.payment.type')
 
-        country = Country(name='Country', code='ES', code3='ESP')
-        country.save()
+        country, = Country.search([('code', '=', 'ES')])
         subdivision = Subdivision(
             name='Subdivision', country=country, code='SUB', type='province')
         subdivision.save()
@@ -1617,8 +1621,7 @@ class AccountInvoiceFacturaeTestCase(CompanyTestMixin, ModuleTestCase):
         Subdivision = pool.get('country.subdivision')
         PaymentType = pool.get('account.payment.type')
 
-        country = Country(name='Country', code='ES', code3='ESP')
-        country.save()
+        country, = Country.search([('code', '=', 'ES')])
         subdivision = Subdivision(
             name='Subdivision', country=country, code='SUB', type='province')
         subdivision.save()

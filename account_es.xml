@@ -15,10 +15,16 @@ this repository contains the full copyright notices and license terms. -->
         <record model="account.tax.template" id="account_es.iva_X4_compras_bi">
             <field name="report_type">01</field>
         </record>
+        <record model="account.tax.template" id="account_es.iva_X4_compras_ser">
+            <field name="report_type">01</field>
+        </record>
         <record model="account.tax.template" id="account_es.iva_X10_compras_bc">
             <field name="report_type">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_X10_compras_bi">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_X10_compras_ser">
             <field name="report_type">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_X21_compras_bc">
@@ -27,13 +33,25 @@ this repository contains the full copyright notices and license terms. -->
         <record model="account.tax.template" id="account_es.iva_X21_compras_bi">
             <field name="report_type">01</field>
         </record>
+        <record model="account.tax.template" id="account_es.iva_X21_compras_ser">
+            <field name="report_type">01</field>
+        </record>
         <record model="account.tax.template" id="account_es.iva_X0">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_X0_ser">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_X0_bi">
             <field name="report_type">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_ISP_compras_16">
             <field name="report_type">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_IO">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_IO_bi">
             <field name="report_type">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_IC_compras_2_bc_1">
@@ -99,10 +117,25 @@ this repository contains the full copyright notices and license terms. -->
         <record model="account.tax.template" id="account_es.iva_ISP_compras_1">
             <field name="report_type">01</field>
         </record>
+        <record model="account.tax.template" id="account_es.iva_ISP_compras_4_bc_1">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_ISP_compras_10_bc_1">
+            <field name="report_type">01</field>
+        </record>
         <record model="account.tax.template" id="account_es.iva_ISP_compras_2">
             <field name="report_type">01</field>
         </record>
+        <record model="account.tax.template" id="account_es.iva_ISP_compras_4_bc_2">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_ISP_compras_10_bc_2">
+            <field name="report_type">01</field>
+        </record>
         <record model="account.tax.template" id="account_es.iva_sop_ex">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_sop_ex_ser">
             <field name="report_type">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_sop_0">
@@ -111,13 +144,22 @@ this repository contains the full copyright notices and license terms. -->
         <record model="account.tax.template" id="account_es.iva_sop_4">
             <field name="report_type">01</field>
         </record>
+        <record model="account.tax.template" id="account_es.iva_sop_4_ser">
+            <field name="report_type">01</field>
+        </record>
         <record model="account.tax.template" id="account_es.iva_sop_5">
             <field name="report_type">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_sop_10">
             <field name="report_type">01</field>
         </record>
+        <record model="account.tax.template" id="account_es.iva_sop_10_ser">
+            <field name="report_type">01</field>
+        </record>
         <record model="account.tax.template" id="account_es.iva_sop_21">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_sop_21_ser">
             <field name="report_type">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_sop_ex_inv">
@@ -138,13 +180,31 @@ this repository contains the full copyright notices and license terms. -->
         <record model="account.tax.template" id="account_es.iva_rep_4">
             <field name="report_type">01</field>
         </record>
+        <record model="account.tax.template" id="account_es.iva_rep_4_ser">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_rep_4_bi">
+            <field name="report_type">01</field>
+        </record>
         <record model="account.tax.template" id="account_es.iva_rep_5">
             <field name="report_type">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_rep_10">
             <field name="report_type">01</field>
         </record>
+        <record model="account.tax.template" id="account_es.iva_rep_10_ser">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_rep_10_bi">
+            <field name="report_type">01</field>
+        </record>
         <record model="account.tax.template" id="account_es.iva_rep_21">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_rep_21_ser">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_rep_21_bi">
             <field name="report_type">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_sop_alq_ex">
@@ -199,25 +259,97 @@ this repository contains the full copyright notices and license terms. -->
         <record model="account.tax.template" id="account_es.iva_ISP_compras_serv">
             <field name="report_type">01</field>
         </record>
+        <record model="account.tax.template" id="account_es.iva_ISP_compras_4_ser">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_ISP_compras_10_ser">
+            <field name="report_type">01</field>
+        </record>
         <record model="account.tax.template" id="account_es.iva_ISP_compras_serv_1">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_ISP_compras_4_ser_1">
+            <field name="report_type">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_ISP_compras_10_ser_1">
             <field name="report_type">01</field>
         </record>
 
         <!-- Exempt -->
         <record model="account.tax.template" id="account_es.iva_rep_ex">
-            <field name="report_type">05</field>
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_rep_ex_ser">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_rep_ex_bi">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_rep_ex_form">
             <field name="report_type">05</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_rep_4_exento">
-            <field name="report_type">05</field>
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_rep_4_exento_ser">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_rep_4_exento_bi">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_rep_10_exento">
-            <field name="report_type">05</field>
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_rep_10_exento_ser">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_rep_10_exento_bi">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
         </record>
         <record model="account.tax.template" id="account_es.iva_rep_21_exento">
-            <field name="report_type">05</field>
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_rep_21_exento_ser">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_rep_21_exento_bi">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_ex_art_21_sale">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_ex_art_21_sale_ser">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_ex_art_21_sale_bi">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_ex_art_24_1_sale">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_ex_art_24_1_sale_ser">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
+        </record>
+        <record model="account.tax.template" id="account_es.iva_ex_art_24_1_sale_bi">
+            <field name="report_type">01</field>
+            <field name="special_taxable_event_code">01</field>
         </record>
     </data>
 </tryton>

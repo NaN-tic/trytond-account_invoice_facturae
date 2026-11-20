@@ -6,6 +6,8 @@ contains the full copyright notices and license terms. -->
       <page string="Factura-e" id="factura-e">
         <label name="report_type"/>
         <field name="report_type"/>
+        <label name="special_taxable_event_code"/>
+        <field name="special_taxable_event_code"/>
       </page>
     </xpath>
 </data>

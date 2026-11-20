@@ -1188,3 +1188,39 @@ msgstr "Cancelar"
 msgctxt "wizard_button:account.invoice.generate_facturae,start,generate:"
 msgid "Generate"
 msgstr "Generar"
+
+msgctxt "model:ir.message,text:msg_incomplete_tax_event"
+msgid "Set the Factura-e report type and provide a legal notice or description on the invoice for tax \"%(tax)s\"."
+msgstr "Indique el tipo de impuesto Facturae y una mención legal o descripción en la factura para «%(tax)s»."
+
+msgctxt "model:ir.message,text:msg_long_tax_event"
+msgid "The Factura-e special taxable event reason for tax \"%(tax)s\", including the tax code, exceeds 2500 characters."
+msgstr "El motivo de fiscalidad especial de «%(tax)s», incluido el código de impuesto, supera los 2500 caracteres."
+
+msgctxt "model:ir.message,text:msg_conflicting_tax_events"
+msgid "Invoice line \"%(line)s\" has multiple special taxable events. Factura-e allows one per line."
+msgstr "La línea «%(line)s» tiene varios supuestos de fiscalidad especial. Facturae admite uno por línea."
+
+msgctxt "field:account.tax,special_taxable_event_code:"
+msgid "Special Taxable Event"
+msgstr "Fiscalidad especial"
+
+msgctxt "selection:account.tax,special_taxable_event_code:"
+msgid "Taxable and Exempt"
+msgstr "Sujeta y exenta"
+
+msgctxt "selection:account.tax,special_taxable_event_code:"
+msgid "Non-taxable"
+msgstr "No sujeta"
+
+msgctxt "field:account.tax.template,special_taxable_event_code:"
+msgid "Special Taxable Event"
+msgstr "Fiscalidad especial"
+
+msgctxt "selection:account.tax.template,special_taxable_event_code:"
+msgid "Taxable and Exempt"
+msgstr "Sujeta y exenta"
+
+msgctxt "selection:account.tax.template,special_taxable_event_code:"
+msgid "Non-taxable"
+msgstr "No sujeta"
